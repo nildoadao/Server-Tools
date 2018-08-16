@@ -5,8 +5,22 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Server_Tools"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
-    <Grid>
-        
+        Title="MainWindow" Height="507" Width="644.8">
+    <Grid Margin="0,0,0,23">
+        <Button Content="Comparar" HorizontalAlignment="Left" Margin="371,132,0,0" VerticalAlignment="Top" Width="80" Click="Button_Click" RenderTransformOrigin="1.169,-0.869" Height="25"/>
+        <DataGrid Name="FirmwareDataGrid" HorizontalAlignment="Left" Height="269" Margin="10,174,0,0" VerticalAlignment="Top" Width="617" RenderTransformOrigin="0.496,0.542"/>
+        <TextBox HorizontalAlignment="Left" Height="23" Margin="424,15,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="195" Name="NfsServerTextBox" />
+        <TextBox HorizontalAlignment="Left" Height="23" Margin="74,51,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="135" Name="UserTextBox"/>
+        <PasswordBox HorizontalAlignment="Left" Margin="74,81,0,0" VerticalAlignment="Top" Width="135" Name="PasswordTextBox" Height="23"/>
+        <TextBox HorizontalAlignment="Left" Height="23" Margin="74,15,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="190" Name="ServerTextBox"/>
+        <Label Content="Servidor" HorizontalAlignment="Left" Height="23" Margin="15,15,0,0" VerticalAlignment="Top" Width="59"/>
+        <Label Content="Usuario" HorizontalAlignment="Left" Height="23" Margin="15,51,0,0" VerticalAlignment="Top" Width="54"/>
+        <Label Content="Senha" HorizontalAlignment="Left" Height="29" Margin="15,79,0,0" VerticalAlignment="Top" Width="43"/>
+        <Label Content="NFS Server" HorizontalAlignment="Left" Height="23" Margin="346,15,0,0" VerticalAlignment="Top" Width="71"/>
+        <Button Content="Atualizar" HorizontalAlignment="Left" Margin="467,131,0,0" VerticalAlignment="Top" Width="75" Height="26" Click="Button_Click_1"/>
+        <Button Content="Conectar" HorizontalAlignment="Left" Margin="24,131,0,0" VerticalAlignment="Top" Width="75" Click="Button_Click_2" Height="26"/>
+        <Label Content="Conexão:" HorizontalAlignment="Left" Margin="220,131,0,0" VerticalAlignment="Top"/>
+        <Label Content="Offline" HorizontalAlignment="Left" Margin="279,131,0,0" VerticalAlignment="Top" Foreground="Red" Name="StatusLabel"/>
+        <Button Content="Desconectar" HorizontalAlignment="Left" Margin="115,131,0,0" VerticalAlignment="Top" Width="75" Height="26" Click="Button_Click_3"/>
     </Grid>
 </Window>

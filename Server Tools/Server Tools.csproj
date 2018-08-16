@@ -34,8 +34,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Renci.SshNet, Version=2016.1.0.0, Culture=neutral, PublicKeyToken=1cee9f8bde3db106, processorArchitecture=MSIL">
+      <HintPath>..\packages\SSH.NET.2016.1.0\lib\net40\Renci.SshNet.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -54,6 +58,35 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="FileHelper.cs" />
+    <Compile Include="FirmwareUpdatePage.xaml.cs">
+      <DependentUpon>FirmwareUpdatePage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="HomePage.xaml.cs">
+      <DependentUpon>HomePage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="HomePageWindow.xaml.cs">
+      <DependentUpon>HomePageWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="IdracFirmware.cs" />
+    <Compile Include="IdracSshCommand.cs" />
+    <Compile Include="IdracUpdateController.cs" />
+    <Compile Include="NetworkHelper.cs" />
+    <Compile Include="RacadmException.cs" />
+    <Compile Include="Server.cs" />
+    <Compile Include="IdracUpdateItem.cs" />
+    <Page Include="FirmwareUpdatePage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="HomePage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="HomePageWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -85,6 +118,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -92,6 +126,21 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Disk.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\icons8-device-manager-50.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\icons8-downloading-updates-50.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\icons8-hdd-64.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\icons8-repository-32.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

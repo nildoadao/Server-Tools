@@ -133,9 +133,10 @@ namespace Server_Tools
             //IEnumerable<string> reportResult = GetUpdateReport(catalogFile, repository);
             //var catalogItems = GetCatalogItems(repository + @"\" + catalogFile);
 
+            #region //Teste offline
             IEnumerable<string> reportResult = ReadReportFile(@"C:\Users\nildo\Desktop\result.txt");
             var catalogItems = GetCatalogItems(@"C:\Users\nildo\Desktop\Catalog.xml");
-
+            #endregion
             var serverItems = ReadReportFile(reportResult);
             return CompareServerToCatalog(catalogItems, serverItems);
         }

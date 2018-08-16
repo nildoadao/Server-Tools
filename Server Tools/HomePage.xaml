@@ -12,7 +12,12 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <WrapPanel>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="5*"/>
+        </Grid.RowDefinitions>
+        <TextBlock Text="Configurações" FontSize="28" HorizontalAlignment="Center" Margin="20" Height="50"/>
+        <WrapPanel Grid.Row="1">
             <Button Height="50" Width="150" Background="Transparent"  Margin="50" Name="UpdateFirmwareButton" Click="UpdateFirmwareButton_Click">
                 <StackPanel Orientation="Horizontal">
                     <Image Source="Resources/icons8-downloading-updates-50.png"/>

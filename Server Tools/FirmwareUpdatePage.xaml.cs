@@ -49,7 +49,6 @@ namespace Server_Tools
             {
                 return;
             }
-            List<IdracUpdateItem> serversToUpdate = new List<IdracUpdateItem>();
 
             foreach (string item in ServersListBox.Items)
             {
@@ -67,12 +66,7 @@ namespace Server_Tools
 
                     foreach(IdracFirmware firmware in firmwaresToUpdate)
                     {
-                        serversToUpdate.Add(new IdracUpdateItem(server, firmware));
-                    }
-
-                    foreach(IdracUpdateItem idracItem in serversToUpdate)
-                    {
-                        datagridItems.Add(idracItem);
+                        datagridItems.Add(new IdracUpdateItem(server, firmware));
                     }
                     UpdatesDataGrid.ItemsSource = datagridItems;
                 }

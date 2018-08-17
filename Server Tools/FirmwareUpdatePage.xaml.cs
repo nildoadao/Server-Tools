@@ -14,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Xml.Linq;
 
 namespace Server_Tools
 {
@@ -62,7 +63,7 @@ namespace Server_Tools
                 {
                     client.Connect();
                     IdracUpdateController idrac = new IdracUpdateController(client);
-                    IEnumerable<IdracFirmware> firmwaresToUpdate = idrac.GetUpdates(RepositoryTextBox.Text, "Catalog.xml");
+                    IEnumerable<IdracFirmware> firmwaresToUpdate = idrac.GetUpdates(RepositoryTextBox.Text, CatalogTextBox.Text);
 
                     foreach(IdracFirmware firmware in firmwaresToUpdate)
                     {
@@ -88,26 +89,30 @@ namespace Server_Tools
         {
             if(ServersListBox.Items.Count == 0)
             {
-                MessageBox.Show("Insira ao meno um servidor para atualização", "Aviso");
+                MessageBox.Show("Insira ao menos um servidor para atualização", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
                 return false;
             }
             else if (UserTextBox.Text.Trim().Equals(""))
             {
-                MessageBox.Show("Insira o nome do usuario para atualização", "Aviso");
+                MessageBox.Show("Insira o nome do usuario para atualização", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
                 return false;
             }
             else if (PasswordBox.Password.Trim().Equals(""))
             {
-                MessageBox.Show("Insira a senha para atualização", "Aviso");
+                MessageBox.Show("Insira a senha para atualização", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
                 return false;
             }
             else if (RepositoryTextBox.Text.Trim().Equals(""))
             {
-                MessageBox.Show("Informe o repositorio de armazenamento dos firmwares", "Aviso");
+                MessageBox.Show("Informe o repositorio de armazenamento dos firmwares", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
                 return false;
             }
 
             return true;
+        }
+
+        private void UpdateButton_Click(object sender, RoutedEventArgs e)
+        {
         }
     }
 }

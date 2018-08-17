@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Server_Tools"
         mc:Ignorable="d"
-        Title="HomePageWindow" Height="600" Width="800">
+        Title="Server Tools" Height="600" Width="800">
     <Frame Name="MainFrame"/>
 
 </Window>

@@ -7,7 +7,7 @@
       mc:Ignorable="d" 
       d:DesignHeight="600" d:DesignWidth="800"
       Title="FirmwareUpdatePage">
-    <Grid Margin="5">
+    <Grid Margin="5" HorizontalAlignment="Center">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -27,36 +27,38 @@
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="Auto"/>
+
         </Grid.ColumnDefinitions>
-        <TextBlock Text="Dados do Servidor" Grid.Column="1" VerticalAlignment="Bottom" FontSize="14" Margin="5"/>
-        <TextBlock Text="Host/IP:" Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5"/>
+        <TextBlock Text="Dados do Servidor" Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Bottom" FontWeight="Bold" FontSize="15" Margin="5"/>
+        <TextBlock Text="Host/IP:" Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Bottom" FontSize="13" Margin="5"/>
         <TextBox Name="ServerTextBox" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="5" Height="Auto" Width="200"/>
-        <TextBlock Text="Credencias para Atualização" Margin="15" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="14"/>
-        <TextBlock Text="Usuario:" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5" Grid.Row="3"/>
-        <TextBox Name="UserTextBox" Grid.Column="1" Grid.Row="3" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="5" Height="Auto" Width="150"/>
-        <TextBlock Text="Senha:" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5" Grid.Row="4"/>
-        <PasswordBox Name="PasswordBox" Grid.Column="1" Grid.Row="4" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="5" Height="Auto" Width="150"/>
-        <Button Name="SearchUpdateButton" Click="SearchUpdateButton_Click" Content="Checar Updates" Margin="5" Height="30" Width="100" Grid.Column="1" Grid.Row="8" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-        <Button Name="AddServerButton" Click="AddServerButton_Click" Content="Adicionar" Height="30" Width="70" Grid.Column="2" Grid.Row="1" HorizontalAlignment="Left" Margin="5"/>
-        <Button Name="RemoveServerButton" Click="RemoveServerButton_Click" Content="Remover" Height="30" Width="70" Grid.Column="2" Grid.Row="2" HorizontalAlignment="Left" Margin="5"/>
+        <TextBlock Text="Usuario:" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5" Grid.Row="2" FontSize="13"/>
+        <TextBox Name="UserTextBox" Grid.Column="1" Grid.Row="2" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="5" Height="Auto" Width="150"/>
+        <TextBlock Text="Senha:" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5" Grid.Row="3" FontSize="13"/>
+        <PasswordBox Name="PasswordBox" Grid.Column="1" Grid.Row="3" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="5" Height="Auto" Width="150"/>
+        
+        <Button Name="SearchUpdateButton" Click="SearchUpdateButton_Click" Content="Checar Updates" Margin="5" Height="20" Width="100" Grid.Column="1" Grid.Row="8" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+        <Button Name="AddServerButton" Click="AddServerButton_Click" Content="Adicionar" Height="20" Width="70" Grid.Column="2" Grid.Row="1" HorizontalAlignment="Left" Margin="5"/>
+        <Button Name="RemoveServerButton" Click="RemoveServerButton_Click" Content="Remover" Height="20" Width="70" Grid.Column="2" Grid.Row="2" HorizontalAlignment="Left" Margin="5"/>
         <StackPanel Orientation="Horizontal" Grid.Column="4">
-            <TextBlock Text="Lista de Servidores:" Margin="5" VerticalAlignment="Bottom"/>
-            <Button Name="AddCsvButton" Content="Adicionar CSV" Width="100" Height="30" Margin="5"/>
+            <TextBlock Text="Lista de Servidores:" Margin="5" VerticalAlignment="Bottom" FontSize="13"/>
+            <Button Name="AddCsvButton" Content="Adicionar CSV" Width="100" Height="20" Margin="5" HorizontalAlignment="Right"/>
         </StackPanel>
-        <ListBox Name="ServersListBox" HorizontalAlignment="Left" Grid.Column="4" Grid.Row="1" Width="200" Height="200" Grid.ColumnSpan="2" Grid.RowSpan="7" Margin="5"/>
-        <TextBlock Text="Repositorio:" Grid.Column="0" Grid.Row="6" Margin="5"/>
-        <TextBox Name="RepositoryTextBox" HorizontalAlignment="Left" Grid.Column="1" Grid.Row="6" Width="200" Height="Auto" Margin="5"/>
-        <Button Name="OpenRepositoryButton" Margin="5" Content="..." Grid.Row="6" Grid.Column="2" Width="30" Height="20" HorizontalAlignment="Left"/>
-        <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="7" Margin="5">
+        <ListBox Name="ServersListBox" HorizontalAlignment="Left" Grid.Column="4" Grid.Row="1" Width="300" Height="200" Grid.ColumnSpan="2" Grid.RowSpan="7" Margin="5"/>
+        <TextBlock Text="Repositorio:" Grid.Column="0" Grid.Row="4" Margin="5" FontSize="13" VerticalAlignment="Bottom" HorizontalAlignment="Right"/>
+        <TextBox Name="RepositoryTextBox" HorizontalAlignment="Left" VerticalAlignment="Bottom" Grid.Column="1" Grid.Row="4" Width="200" Height="20" Margin="5"/>
+        <Button Name="CatalogButton" Margin="5" Content="..." Grid.Row="6" Grid.Column="2" Width="30" Height="20" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
+        <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="5" Margin="5">
             <RadioButton Margin="2" Name="NfsRadioButton" GroupName="RepositorySource" Content="NFS" IsChecked="True"/>
             <RadioButton Margin="2" Name="FtpRadioButton" GroupName="RepositorySource" Content="FTP"/>
             <RadioButton Margin="2" Name="TftpRadioButton" GroupName="RepositorySource" Content="TFTP"/>
         </StackPanel>
-        <StackPanel Grid.Column="4" Grid.Row="8">
-            <Button Name="UpdateButton" Content="Atualizar Selecionados" Margin="5" Height="30" Width="150" HorizontalAlignment="Left"/>
-            <CheckBox Name="RebootCheckBox" Content="Reinicar caso necessário" Margin="5"/>
+        <TextBlock Text="Catalogo:" Margin="5"  Grid.Row="6" FontSize="13" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
+        <TextBox Text="Catalog.xml" Name="CatalogTextBox" FontStyle="Italic" Width="200" Height="20" Grid.Row="6" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="5"/>
+        <StackPanel Grid.Column="4" Grid.Row="8" Width="Auto">
+            <Button Name="UpdateButton" Click="UpdateButton_Click" Content="Atualizar Selecionados" Margin="5" Height="20" Width="150" HorizontalAlignment="Left"/>
+            <CheckBox Name="RebootCheckBox" Content="Reinicar caso necessário" Margin="5" />
         </StackPanel>
-        <DataGrid Name="UpdatesDataGrid" Grid.Row="9" Grid.Column="1" Width="600" Height="200" Grid.ColumnSpan="6" Margin="5"/>
+        <DataGrid Name="UpdatesDataGrid" Grid.Row="9" Grid.Column="0" Width="Auto" Height="200" Grid.ColumnSpan="6" Margin="5"/>
     </Grid>
 </Page>

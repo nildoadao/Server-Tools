@@ -74,7 +74,12 @@ namespace Server_Tools
 
             var updateItem = from catalogItem in catalogItems
                              join serverItem in serverItems on catalogItem.AvaliableVersion equals serverItem.AvaliableVersion                            
-                             select new IdracFirmware(false, serverItem.Firmware) { CurrentVersion = serverItem.CurrentVersion, AvaliableVersion = serverItem.AvaliableVersion, FirmwarePath = catalogItem.FirmwarePath };
+                             select new IdracFirmware(false, serverItem.Firmware)
+                             {
+                                 CurrentVersion = serverItem.CurrentVersion,
+                                 AvaliableVersion = serverItem.AvaliableVersion,
+                                 FirmwarePath = catalogItem.FirmwarePath
+                             };
 
             foreach(IdracFirmware item in updateItem)
             {
@@ -88,8 +93,28 @@ namespace Server_Tools
             List<IdracFirmware> firmwareList = new List<IdracFirmware>();
             XDocument xml = XDocument.Load(path);
             var catalogItems = from c in xml.Root.Descendants("SoftwareComponent")
-                               select new IdracFirmware(false, (string)c.Element("Name")){ AvaliableVersion = (string)c.Attribute("vendorVersion"),
-                                                                                                FirmwarePath = (string)c.Attribute("path") };
+                               select new IdracFirmware(false, (string)c.Element("Name"))
+                               {
+                                   AvaliableVersion = (string)c.Attribute("vendorVersion"),
+                                   FirmwarePath = (string)c.Attribute("path")
+                               };
+
+            foreach (IdracFirmware item in catalogItems)
+            {
+                firmwareList.Add(item);
+            }
+            return firmwareList;
+        }
+
+        public IEnumerable<IdracFirmware> GetCatalogItems(XDocument xmlFile)
+        {
+            List<IdracFirmware> firmwareList = new List<IdracFirmware>();
+            var catalogItems = from node in xmlFile.Root.Descendants("SoftwareComponent")
+                               select new IdracFirmware(false, (string)node.Element("Name"))
+                               {
+                                   AvaliableVersion = (string)node.Attribute("vendorVersion"),
+                                   FirmwarePath = (string)node.Attribute("path")
+                               };
 
             foreach (IdracFirmware item in catalogItems)
             {
@@ -104,9 +129,7 @@ namespace Server_Tools
             SshCommand commandResult = command.GenerateUpdateReport(client, catalogFile, nfsShare);
             List<string> reportLines = new List<string>();
 
-            string[] lines = commandResult.Result.Split('\n');
-
-            foreach(string line in lines)
+            foreach(string line in commandResult.Result.Split('\n'))
             {
                 reportLines.Add(line);
             }
@@ -131,12 +154,11 @@ namespace Server_Tools
         public IEnumerable<IdracFirmware> GetUpdates(string repository, string catalogFile)
         {
             //IEnumerable<string> reportResult = GetUpdateReport(catalogFile, repository);
-            //var catalogItems = GetCatalogItems(repository + @"\" + catalogFile);
+            var catalogItems = GetCatalogItems(NetworkHelper.ReadXmlFtpFile(repository + "/" + catalogFile));
 
-            #region //Teste offline
-            IEnumerable<string> reportResult = ReadReportFile(@"C:\Users\nildo\Desktop\result.txt");
-            var catalogItems = GetCatalogItems(@"C:\Users\nildo\Desktop\Catalog.xml");
-            #endregion
+            IEnumerable<string> reportResult = NetworkHelper.ReadFtpFile("ftp://192.168.1.150/result.txt");
+            //var catalogItems = GetCatalogItems(@"C:\Users\nildo\Desktop\Catalog.xml");
+
             var serverItems = ReadReportFile(reportResult);
             return CompareServerToCatalog(catalogItems, serverItems);
         }

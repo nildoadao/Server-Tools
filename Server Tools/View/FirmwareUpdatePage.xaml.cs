@@ -1,4 +1,7 @@
 ﻿using Renci.SshNet;
+using Server_Tools.Model;
+using Server_Tools.Util;
+using Server_Tools.Control;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -15,8 +18,10 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Xml.Linq;
+using System.Threading;
+using System.ComponentModel;
 
-namespace Server_Tools
+namespace Server_Tools.View
 {
     /// <summary>
     /// Interação lógica para FirmwareUpdatePage.xam
@@ -24,11 +29,18 @@ namespace Server_Tools
     public partial class FirmwareUpdatePage : Page
     {
         ObservableCollection<IdracUpdateItem> datagridItems;
+        private bool reboot;
+        private string repositorySource;
+
+        public bool Reboot { get => reboot; set => reboot = value; }
+        public string RepositorySource { get => repositorySource; set => repositorySource = value; }
 
         public FirmwareUpdatePage()
         {
             InitializeComponent();
             datagridItems = new ObservableCollection<IdracUpdateItem>();
+            reboot = false;
+            repositorySource = "FTP";
         }
 
         private void AddServerButton_Click(object sender, RoutedEventArgs e)
@@ -50,37 +62,12 @@ namespace Server_Tools
             {
                 return;
             }
-
-            foreach (string item in ServersListBox.Items)
+            foreach (string server in ServersListBox.Items)
             {
-                if (!NetworkHelper.IsConnected(item))
+                if (!NetworkHelper.IsConnected(server))
                 {
+                    OutputTextBox.AppendText("Servidor " + server + " inacessivel\n");
                     continue;
-                }
-                Server server = new Server(item, UserTextBox.Text, PasswordBox.Password);
-                SshClient client = new SshClient(server.Host, server.User, server.Password);
-                try
-                {
-                    client.Connect();
-                    IdracUpdateController idrac = new IdracUpdateController(client);
-                    IEnumerable<IdracFirmware> firmwaresToUpdate = idrac.GetUpdates(RepositoryTextBox.Text, CatalogTextBox.Text);
-
-                    foreach(IdracFirmware firmware in firmwaresToUpdate)
-                    {
-                        datagridItems.Add(new IdracUpdateItem(server, firmware));
-                    }
-                    UpdatesDataGrid.ItemsSource = datagridItems;
-                }
-                catch(Exception ex)
-                {
-                    MessageBox.Show("Falha ao checar por updates: " + ex.Message, "Erro");
-                }
-                finally
-                {
-                    if(client != null)
-                    {
-                        client.Dispose();
-                    }
                 }
             }
         }
@@ -107,12 +94,37 @@ namespace Server_Tools
                 MessageBox.Show("Informe o repositorio de armazenamento dos firmwares", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
                 return false;
             }
-
             return true;
         }
 
         private void UpdateButton_Click(object sender, RoutedEventArgs e)
         {
+            
+        }
+
+        private void FtpRadioButton_Checked(object sender, RoutedEventArgs e)
+        {
+            repositorySource = "FTP";
+        }
+
+        private void TftpRadioButton_Checked(object sender, RoutedEventArgs e)
+        {
+            repositorySource = "TFTP";
+        }
+
+        private void NfsRadioButton_Checked(object sender, RoutedEventArgs e)
+        {
+            repositorySource = "NFS";
+        }
+
+        private void RebootCheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            reboot = true;
+        }
+
+        private void RebootCheckBox_Unchecked(object sender, RoutedEventArgs e)
+        {
+            reboot = false;
         }
     }
 }

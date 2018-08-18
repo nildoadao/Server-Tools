@@ -1,36 +1,22 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
-using System.Net.NetworkInformation;
+using System.Text;
+using System.Threading.Tasks;
+using System.Xml;
 using System.Xml.Linq;
 
-namespace Server_Tools
+namespace Server_Tools.Util
 {
-    class NetworkHelper
+    class FileHelper
     {
-        //Realiza um teste de ping para um determinado IP
-        public static bool IsConnected(string IpAddres)
+        public static XmlDocument ReadXmlFile(string path)
         {
-            try
-            {
-                Ping ping = new Ping();
-                PingReply reply = ping.Send(IpAddres);
-
-                if (reply.Status == IPStatus.Success)
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            catch (Exception) // Caso o endereço seja fornecido de maneira errada/ mal formatado
-            {
-                return false;
-            }
+            XmlDocument file = new XmlDocument();
+            file.Load(path);
+            return file;
         }
 
         public static IEnumerable<string> ReadFtpFile(string ftpUri)
@@ -39,17 +25,17 @@ namespace Server_Tools
 
             FtpWebRequest request = (FtpWebRequest)WebRequest.Create(ftpUri);
             request.Method = WebRequestMethods.Ftp.DownloadFile;
-            request.Credentials = new NetworkCredential("anonymous", "nildo@nildo.com");
+            request.Credentials = new NetworkCredential("anonymous", "anonymous@anonymous.com");
             FtpWebResponse response = (FtpWebResponse)request.GetResponse();
-    
+
             using (Stream responseStream = response.GetResponseStream())
-            using(StreamReader reader = new StreamReader(responseStream))
+            using (StreamReader reader = new StreamReader(responseStream))
             {
                 file = reader.ReadToEnd();
             }
             List<string> fileLines = new List<string>();
 
-            foreach(string line in file.Split('\n'))
+            foreach (string line in file.Split('\n'))
             {
                 fileLines.Add(line);
             }
@@ -62,11 +48,11 @@ namespace Server_Tools
 
             FtpWebRequest request = (FtpWebRequest)WebRequest.Create(ftpUri);
             request.Method = WebRequestMethods.Ftp.DownloadFile;
-            request.Credentials = new NetworkCredential("anonymous", "nildo@nildo.com");
+            request.Credentials = new NetworkCredential("anonymous", "anonymous@anonymous.com");
             FtpWebResponse response = (FtpWebResponse)request.GetResponse();
 
             using (Stream responseStream = response.GetResponseStream())
-            { 
+            {
                 file = XDocument.Load(responseStream);
             }
 

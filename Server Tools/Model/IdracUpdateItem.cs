@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Server_Tools
+namespace Server_Tools.Model
 {
     class IdracUpdateItem
     {

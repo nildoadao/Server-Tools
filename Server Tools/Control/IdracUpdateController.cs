@@ -1,4 +1,6 @@
 ﻿using Renci.SshNet;
+using Server_Tools.Model;
+using Server_Tools.Util;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -8,30 +10,15 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
-namespace Server_Tools
+namespace Server_Tools.Control
 {
     class IdracUpdateController
     {
         private SshClient client;
 
-        public SshClient GetClient()
-        {
-            return client;
-        }
-
-        public void SetClient(SshClient client)
-        {
-            this.client = client;
-        }
-
         public IdracUpdateController(SshClient client)
         {
             this.client = client;
-        }
-
-        public IEnumerable<string> ReadReportFile(string path)
-        {
-            return File.ReadAllLines(path);
         }
 
         public IEnumerable<IdracFirmware> ReadReportFile(IEnumerable<string> report)
@@ -92,11 +79,11 @@ namespace Server_Tools
         {
             List<IdracFirmware> firmwareList = new List<IdracFirmware>();
             XDocument xml = XDocument.Load(path);
-            var catalogItems = from c in xml.Root.Descendants("SoftwareComponent")
-                               select new IdracFirmware(false, (string)c.Element("Name"))
+            var catalogItems = from node in xml.Root.Descendants("SoftwareComponent")
+                               select new IdracFirmware(false, (string)node.Element("Name"))
                                {
-                                   AvaliableVersion = (string)c.Attribute("vendorVersion"),
-                                   FirmwarePath = (string)c.Attribute("path")
+                                   AvaliableVersion = (string)node.Attribute("vendorVersion"),
+                                   FirmwarePath = (string)node.Attribute("path")
                                };
 
             foreach (IdracFirmware item in catalogItems)
@@ -123,10 +110,10 @@ namespace Server_Tools
             return firmwareList;
         }
 
-        public IEnumerable<string> GetUpdateReport(string catalogFile, string nfsShare)
+        public IEnumerable<string> GetUpdateReport(string catalogFile, string repositoryAddress, RepositoryType type)
         {
-            IdracSshCommand command = new IdracSshCommand();            
-            SshCommand commandResult = command.GenerateUpdateReport(client, catalogFile, nfsShare);
+            IdracSshCommand command = new IdracSshCommand(client);            
+            SshCommand commandResult = command.GenerateUpdateReport(catalogFile, repositoryAddress, type);
             List<string> reportLines = new List<string>();
 
             foreach(string line in commandResult.Result.Split('\n'))
@@ -136,29 +123,16 @@ namespace Server_Tools
             return reportLines;
         }
 
-        public void UpdateFirmware(string firmwareFile, string nfsShare)
+        public void UpdateFirmware(string firmwarePath, string repositoryAddress, RepositoryType type, bool reboot)
         {
-            IdracSshCommand idrac = new IdracSshCommand();
-            idrac.UpdateFirmware(client, firmwareFile, nfsShare);
+            IdracSshCommand idrac = new IdracSshCommand(client);
+            idrac.UpdateFirmware(firmwarePath, repositoryAddress, type, reboot);
         }
 
-        public void UpdateFirmware(IEnumerable<string> firmwareList, string nfsShare)
+        public IEnumerable<IdracFirmware> GetUpdates(string catalogFile, string repositoryAddress, RepositoryType type)
         {
-            IdracSshCommand idrac = new IdracSshCommand();
-            foreach (string firmware in firmwareList)
-            {
-                idrac.UpdateFirmware(client, firmware, nfsShare);
-            }                
-        }
-
-        public IEnumerable<IdracFirmware> GetUpdates(string repository, string catalogFile)
-        {
-            //IEnumerable<string> reportResult = GetUpdateReport(catalogFile, repository);
-            var catalogItems = GetCatalogItems(NetworkHelper.ReadXmlFtpFile(repository + "/" + catalogFile));
-
-            IEnumerable<string> reportResult = NetworkHelper.ReadFtpFile("ftp://192.168.1.150/result.txt");
-            //var catalogItems = GetCatalogItems(@"C:\Users\nildo\Desktop\Catalog.xml");
-
+            IEnumerable<string> reportResult = GetUpdateReport(catalogFile, repositoryAddress, type);
+            var catalogItems = GetCatalogItems(FileHelper.ReadXmlFtpFile(repositoryAddress + "/" + catalogFile));
             var serverItems = ReadReportFile(reportResult);
             return CompareServerToCatalog(catalogItems, serverItems);
         }

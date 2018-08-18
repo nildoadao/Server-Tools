@@ -2,7 +2,7 @@
 using System.Runtime.Serialization;
 
 
-namespace Server_Tools
+namespace Server_Tools.Model
 {
     
     /// <summary>

@@ -12,14 +12,14 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace Server_Tools
+namespace Server_Tools.View
 {
     /// <summary>
     /// Lógica interna para HomePageWindow.xaml
     /// </summary>
-    public partial class HomePageWindow : Window
+    public partial class HomeWindow : Window
     {
-        public HomePageWindow()
+        public HomeWindow()
         {
             InitializeComponent();
             MainFrame.NavigationService.Navigate(new HomePage());

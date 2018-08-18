@@ -10,7 +10,7 @@ using System.Windows;
 [assembly: AssemblyTitle("Server Tools")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Nildo Adão")]
 [assembly: AssemblyProduct("Server Tools")]
 [assembly: AssemblyCopyright("Copyright ©  2018")]
 [assembly: AssemblyTrademark("")]

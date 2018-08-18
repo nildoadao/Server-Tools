@@ -58,45 +58,38 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="FileHelper.cs" />
-    <Compile Include="FirmwareUpdatePage.xaml.cs">
+    <Compile Include="Control\RepositoryType.cs" />
+    <Compile Include="Util\FileHelper.cs" />
+    <Compile Include="View\FirmwareUpdatePage.xaml.cs">
       <DependentUpon>FirmwareUpdatePage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="HomePage.xaml.cs">
+    <Compile Include="View\HomePage.xaml.cs">
       <DependentUpon>HomePage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="HomePageWindow.xaml.cs">
-      <DependentUpon>HomePageWindow.xaml</DependentUpon>
+    <Compile Include="View\HomeWindow.xaml.cs">
+      <DependentUpon>HomeWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="IdracFirmware.cs" />
-    <Compile Include="IdracSshCommand.cs" />
-    <Compile Include="IdracUpdateController.cs" />
-    <Compile Include="NetworkHelper.cs" />
-    <Compile Include="RacadmException.cs" />
-    <Compile Include="Server.cs" />
-    <Compile Include="IdracUpdateItem.cs" />
-    <Page Include="FirmwareUpdatePage.xaml">
+    <Compile Include="Model\IdracFirmware.cs" />
+    <Compile Include="Control\IdracSshCommand.cs" />
+    <Compile Include="Control\IdracUpdateController.cs" />
+    <Compile Include="Util\NetworkHelper.cs" />
+    <Compile Include="Model\RacadmException.cs" />
+    <Compile Include="Model\Server.cs" />
+    <Compile Include="Model\IdracUpdateItem.cs" />
+    <Page Include="View\FirmwareUpdatePage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="HomePage.xaml">
+    <Page Include="View\HomePage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="HomePageWindow.xaml">
+    <Page Include="View\HomeWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="MainWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
     </Page>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
@@ -142,5 +135,6 @@
   <ItemGroup>
     <Resource Include="Resources\icons8-repository-32.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -11,13 +11,11 @@ namespace Server_Tools.Model
 
         private Server server;
         private IdracFirmware firmware;
-        private bool update;
         private string serverName;
         private string firmwareName;
         private string currentVersion;
         private string avaliableVersion;
 
-        public bool Update { get => update; set => update = value; }
         public string ServerName { get => serverName; set => serverName = value; }
         public string FirmwareName { get => firmwareName; set => firmwareName = value; }
         public string CurrentVersion { get => currentVersion; set => currentVersion = value; }
@@ -27,7 +25,6 @@ namespace Server_Tools.Model
 
         public IdracUpdateItem(Server server, IdracFirmware firmware)
         {
-            update = false;
             this.server = server;
             this.firmware = firmware;
             serverName = server.Host;

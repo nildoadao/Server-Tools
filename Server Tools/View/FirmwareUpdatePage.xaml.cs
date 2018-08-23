@@ -29,25 +29,29 @@ namespace Server_Tools.View
     public partial class FirmwareUpdatePage : Page
     {
         ObservableCollection<IdracUpdateItem> datagridItems;
-        private bool reboot;
-        private string repositorySource;
-
-        public bool Reboot { get => reboot; set => reboot = value; }
-        public string RepositorySource { get => repositorySource; set => repositorySource = value; }
 
         public FirmwareUpdatePage()
         {
-            InitializeComponent();
             datagridItems = new ObservableCollection<IdracUpdateItem>();
-            reboot = false;
-            repositorySource = "FTP";
+            InitializeComponent();
         }
 
         private void AddServerButton_Click(object sender, RoutedEventArgs e)
         {
             if (!ServerTextBox.Text.Trim().Equals(""))
-            {
-                ServersListBox.Items.Add(ServerTextBox.Text);
+            {               
+                if (UserTextBox.Text.Trim().Equals("") | PasswordBox.Password.Trim().Equals(""))
+                {
+                    MessageBox.Show("Insira usuario e senha da Idrac", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);                    
+                }
+                else
+                {
+                    Server server = new Server(ServerTextBox.Text, UserTextBox.Text, PasswordBox.Password);
+                    ServersListBox.Items.Add(server);
+                    ServerTextBox.Clear();
+                    UserTextBox.Clear();
+                    PasswordBox.Clear();
+                }
             }
         }
 
@@ -62,37 +66,95 @@ namespace Server_Tools.View
             {
                 return;
             }
-            foreach (string server in ServersListBox.Items)
-            {
-                if (!NetworkHelper.IsConnected(server))
-                {
-                    OutputTextBox.AppendText("Servidor " + server + " inacessivel\n");
-                    continue;
-                }
-            }
+            OutputTextBox.Clear();
+            UpdatesDataGrid.Items.Clear();
+            SearchUpdates();         
         }
 
-        public bool ValidateForm()
+        private async void SearchUpdates()
         {
-            if(ServersListBox.Items.Count == 0)
+            string catalogFile = CatalogTextBox.Text;
+            RepositoryType repositoryType;
+
+            if (FtpRadioButton.IsChecked.Value)
             {
-                MessageBox.Show("Insira ao menos um servidor para atualização", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
-                return false;
+                repositoryType = RepositoryType.FTP;
             }
-            else if (UserTextBox.Text.Trim().Equals(""))
+            else if (TftpRadioButton.IsChecked.Value)
             {
-                MessageBox.Show("Insira o nome do usuario para atualização", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
-                return false;
+                repositoryType = RepositoryType.TFTP;
             }
-            else if (PasswordBox.Password.Trim().Equals(""))
+            else
             {
-                MessageBox.Show("Insira a senha para atualização", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
-                return false;
+                repositoryType = RepositoryType.NFS;
             }
-            else if (RepositoryTextBox.Text.Trim().Equals(""))
+
+            Repository repository = new Repository(RepositoryTextBox.Text, repositoryType);
+
+            if (AnonymousCheckBox.IsPressed)
+            {
+                repository.User = RepositoryUserTextBox.Text;
+                repository.Password = RepositoryPasswordBox.Password;
+            }
+
+            IEnumerable<IdracFirmware> firmwaresToUpdate = new List<IdracFirmware>();
+            OutputTextBox.AppendText("Iniciando busca por updates...\n");
+
+            foreach(Server server in ServersListBox.Items)
+            {
+                await Task.Run(() =>
+                {
+                    if (!NetworkHelper.IsConnected(server.Host))
+                    {
+                        Dispatcher.Invoke(() =>
+                        {
+                            OutputTextBox.AppendText("Servidor " + server.Host + " inacessivel\n");
+                        });                       
+                    }
+                    else
+                    {
+                        try
+                        {
+                            IdracUpdateController idrac = new IdracUpdateController(server);
+                            firmwaresToUpdate = idrac.GetUpdates(catalogFile, repository);
+                        }
+                        catch(Exception ex)
+                        {
+                            Dispatcher.Invoke(() =>
+                            {
+                                OutputTextBox.AppendText("Falha ao buscar por updates para: " + server.Host + " " + ex.Message + "\n");
+                            });
+                        }
+
+                    }
+                });
+                foreach (IdracFirmware firmwareItem in firmwaresToUpdate)
+                {
+                    datagridItems.Add(new IdracUpdateItem(server, firmwareItem));
+                }
+            }
+            OutputTextBox.AppendText("Finalizada buscas por updates " + datagridItems.Count + " updates encontrados\n");
+        }
+
+        private bool ValidateForm()
+        {
+            if (RepositoryTextBox.Text.Trim().Equals(""))
             {
                 MessageBox.Show("Informe o repositorio de armazenamento dos firmwares", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
                 return false;
+            }
+            if (!AnonymousCheckBox.IsChecked.Value)
+            {
+                if (RepositoryTextBox.Text.Trim().Equals(""))
+                {
+                    MessageBox.Show("Informe o usuario para acesso ao repositório", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
+                    return false;
+                }
+                if (RepositoryPasswordBox.Password.Trim().Equals(""))
+                {
+                    MessageBox.Show("Informe a senha para acesso ao repositório", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
+                    return false;
+                }
             }
             return true;
         }
@@ -102,29 +164,16 @@ namespace Server_Tools.View
             
         }
 
-        private void FtpRadioButton_Checked(object sender, RoutedEventArgs e)
+        private void AnonymousCheckBox_Checked(object sender, RoutedEventArgs e)
         {
-            repositorySource = "FTP";
+            RepositoryPasswordBox.IsEnabled = false;
+            RepositoryUserTextBox.IsEnabled = false;
         }
 
-        private void TftpRadioButton_Checked(object sender, RoutedEventArgs e)
+        private void AnonymousCheckBox_Unchecked(object sender, RoutedEventArgs e)
         {
-            repositorySource = "TFTP";
-        }
-
-        private void NfsRadioButton_Checked(object sender, RoutedEventArgs e)
-        {
-            repositorySource = "NFS";
-        }
-
-        private void RebootCheckBox_Checked(object sender, RoutedEventArgs e)
-        {
-            reboot = true;
-        }
-
-        private void RebootCheckBox_Unchecked(object sender, RoutedEventArgs e)
-        {
-            reboot = false;
+            RepositoryUserTextBox.IsEnabled = true;
+            RepositoryPasswordBox.IsEnabled = true;
         }
     }
 }

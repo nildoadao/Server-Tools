@@ -14,14 +14,18 @@ namespace Server_Tools.Control
 {
     class IdracUpdateController
     {
-        private SshClient client;
+        private Server server;
 
-        public IdracUpdateController(SshClient client)
+
+        internal Server Server { get => server; set => server = value; }
+
+
+        public IdracUpdateController(Server server)
         {
-            this.client = client;
+            this.server = server;
         }
 
-        public IEnumerable<IdracFirmware> ReadReportFile(IEnumerable<string> report)
+        private IEnumerable<IdracFirmware> ReadReportFile(IEnumerable<string> report)
         {
             List<IdracFirmware> reportList = new List<IdracFirmware>();
 
@@ -55,7 +59,7 @@ namespace Server_Tools.Control
             return reportList;
         }
 
-        public IEnumerable<IdracFirmware> CompareServerToCatalog(IEnumerable<IdracFirmware> catalogItems, IEnumerable<IdracFirmware> serverItems)
+        private IEnumerable<IdracFirmware> CompareServerToCatalog(IEnumerable<IdracFirmware> catalogItems, IEnumerable<IdracFirmware> serverItems)
         {
             List<IdracFirmware> updatesAvaliable = new List<IdracFirmware>();
 
@@ -75,7 +79,7 @@ namespace Server_Tools.Control
             return updatesAvaliable;
         }
 
-        public IEnumerable<IdracFirmware> GetCatalogItems(string path)
+        private IEnumerable<IdracFirmware> GetCatalogItems(string path)
         {
             List<IdracFirmware> firmwareList = new List<IdracFirmware>();
             XDocument xml = XDocument.Load(path);
@@ -93,7 +97,7 @@ namespace Server_Tools.Control
             return firmwareList;
         }
 
-        public IEnumerable<IdracFirmware> GetCatalogItems(XDocument xmlFile)
+        private IEnumerable<IdracFirmware> GetCatalogItems(XDocument xmlFile)
         {
             List<IdracFirmware> firmwareList = new List<IdracFirmware>();
             var catalogItems = from node in xmlFile.Root.Descendants("SoftwareComponent")
@@ -110,31 +114,39 @@ namespace Server_Tools.Control
             return firmwareList;
         }
 
-        public IEnumerable<string> GetUpdateReport(string catalogFile, string repositoryAddress, RepositoryType type)
-        {
-            IdracSshCommand command = new IdracSshCommand(client);            
-            SshCommand commandResult = command.GenerateUpdateReport(catalogFile, repositoryAddress, type);
-            List<string> reportLines = new List<string>();
-
-            foreach(string line in commandResult.Result.Split('\n'))
+        private IEnumerable<string> GetUpdateReport(string catalogFile, Repository repository)
+        {         
+            using(SshClient client = new SshClient(server.Host, server.User, server.Password))
             {
-                reportLines.Add(line);
+                client.Connect();
+                IdracSshCommand command = new IdracSshCommand(client);
+                SshCommand commandResult = command.GenerateUpdateReport(catalogFile, repository);
+                List<string> reportLines = new List<string>();
+
+                foreach (string line in commandResult.Result.Split('\n'))
+                {
+                    reportLines.Add(line);
+                }
+                return reportLines;
             }
-            return reportLines;
         }
 
-        public void UpdateFirmware(string firmwarePath, string repositoryAddress, RepositoryType type, bool reboot)
+        public void UpdateFirmware(string firmwarePath, Repository repository, bool reboot)
         {
-            IdracSshCommand idrac = new IdracSshCommand(client);
-            idrac.UpdateFirmware(firmwarePath, repositoryAddress, type, reboot);
+            using (SshClient client = new SshClient(server.Host, server.User, server.Password))
+            {
+                client.Connect();
+                IdracSshCommand idrac = new IdracSshCommand(client);
+                idrac.UpdateFirmware(firmwarePath, repository, reboot);
+            }
         }
 
-        public IEnumerable<IdracFirmware> GetUpdates(string catalogFile, string repositoryAddress, RepositoryType type)
+        public IEnumerable<IdracFirmware> GetUpdates(string catalogFile, Repository repository)
         {
-            IEnumerable<string> reportResult = GetUpdateReport(catalogFile, repositoryAddress, type);
-            var catalogItems = GetCatalogItems(FileHelper.ReadXmlFtpFile(repositoryAddress + "/" + catalogFile));
-            var serverItems = ReadReportFile(reportResult);
-            return CompareServerToCatalog(catalogItems, serverItems);
+            IEnumerable<string> reportResult = GetUpdateReport(catalogFile, repository);
+            //var catalogItems = GetCatalogItems(FileHelper.ReadXmlFtpFile(repository.Address + "/" + catalogFile));
+            return ReadReportFile(reportResult);
+            //return CompareServerToCatalog(catalogItems, serverItems);
         }
     }
 }

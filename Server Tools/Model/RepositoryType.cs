@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Server_Tools.Control
+namespace Server_Tools.Model
 {
     enum RepositoryType
     {
-        NFS_Share, 
+        NFS, 
         FTP,
         TFTP,
     }

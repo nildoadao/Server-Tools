@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Server_Tools.Model;
 
 namespace Server_Tools.Control
 {
@@ -16,75 +17,173 @@ namespace Server_Tools.Control
             this.client = client;
         }
 
-        public SshCommand UpdateFirmware(string firmwarePath, string repositoryAddress, RepositoryType type, bool reboot)
+        public SshCommand UpdateFirmware(string firmwarePath, Repository repository, bool reboot)
         {
-            switch (type)
+            switch (repository.Type)
             {
-                case RepositoryType.NFS_Share:
-                    return UpdateFirmwareFromNfs(firmwarePath, repositoryAddress, reboot);
+                case RepositoryType.NFS:
+                    return UpdateFirmwareFromNFS(firmwarePath, repository, reboot);
                 case RepositoryType.FTP:
-                    return UpdateFirmwareFromFtp(firmwarePath, repositoryAddress, reboot);
+                    return UpdateFirmwareFromFTP(firmwarePath, repository, reboot);
                 case RepositoryType.TFTP:
-                    return UpdateFirmwareFromTftp(firmwarePath, repositoryAddress, reboot);
+                    return UpdateFirmwareFromTFTP(firmwarePath, repository, reboot);
                 default:
                     throw new Exception("Tipo invalido de repositório informado");
             }
         }
 
-        private SshCommand UpdateFirmwareFromTftp(string firmwarePath, string repositoryAddress, bool reboot)
+        private SshCommand UpdateFirmwareFromTFTP(string firmwarePath, Repository repository,  bool reboot)
         {
             string rebootAfter = reboot ? "TRUE" : "FALSE";
-            string command = String.Format("racadm update -f {0} -e {1} -a {2} -t TFTP", firmwarePath, repositoryAddress, rebootAfter);
-            return client.RunCommand(command);
-        }
-
-        private SshCommand UpdateFirmwareFromNfs(string firmwarePath, string repositoryAddress, bool reboot)
-        {
-            string command = String.Format("racadm update -f {0} -l {1}", firmwarePath, repositoryAddress);
-            return client.RunCommand(command);
-        }
-
-        private SshCommand UpdateFirmwareFromFtp(string firmwarePath, string repositoryAddress, bool reboot)
-        {
-            string rebootAfter = reboot ? "TRUE" : "FALSE";
-            string command = String.Format("racadm update -f {0} -e {1} -a {2} -t FTP", firmwarePath, repositoryAddress, rebootAfter);
-            return client.RunCommand(command);
-        }
-
-        public SshCommand GenerateUpdateReport(string catalogFile, string repositoryAddress, RepositoryType type)
-        {
-            switch (type)
+            string command = "";
+            SshCommand commandResult;
+            if (repository.IsPasswordProtected)
             {
-                case RepositoryType.NFS_Share:
-                    return GenerateReportFromNFS(catalogFile, repositoryAddress);
+                command = String.Format("racadm update -f {0} -e {1} -u {2} -p {3} -a {4} -t TFTP", firmwarePath, repository.Address, repository.User, repository.Password, rebootAfter);
+            }
+            else
+            {
+                command = String.Format("racadm update -f {0} -e {1} -a {2} -t TFTP", firmwarePath, repository.Address, rebootAfter);
+            }
+            commandResult = client.RunCommand(command);
+            if(commandResult.ExitStatus != 0 | commandResult.Result.Contains("ERROR"))
+            {
+                throw new RacadmException(commandResult.Result);
+            }
+            return commandResult;
+        }
+
+        private SshCommand UpdateFirmwareFromNFS(string firmwarePath, Repository repository, bool reboot)
+        {
+            string command = "";
+            string rebootAfter = reboot ? "TRUE" : "FALSE";
+            SshCommand commandResult;
+            if (repository.IsPasswordProtected)
+            {
+                command = String.Format("racadm -f {0} -l {1} -u {2} -p {3} -t NFS -a {4}", firmwarePath, repository.Address, repository.User, repository.Password, rebootAfter);
+            }
+            else
+            {
+                command = String.Format("racadm -f {0} -l {1} -t NFS -a {2}", firmwarePath, repository.Address, rebootAfter);
+            }
+            commandResult = client.RunCommand(command);
+            if (commandResult.ExitStatus != 0 | commandResult.Result.Contains("ERROR"))
+            {
+                throw new RacadmException(commandResult.Result);
+            }
+            return commandResult;
+        }
+
+        private SshCommand UpdateFirmwareFromFTP(string firmwarePath, Repository repository, bool reboot)
+        {
+            string rebootAfter = reboot ? "TRUE" : "FALSE";
+            string command = "";
+            SshCommand commandResult;
+            if (repository.IsPasswordProtected)
+            {
+                command = String.Format("racadm update -f {0} -e {1} -u {2} -p {3} -a {4} -t FTP", firmwarePath, repository.Address, repository.User, repository.Password, rebootAfter);
+            }
+            else
+            {
+                command = String.Format("racadm update -f {0} -e {1} -a {2} -t FTP", firmwarePath, repository.Address, rebootAfter);
+            }
+            commandResult = client.RunCommand(command);
+            if (commandResult.ExitStatus != 0 | commandResult.Result.Contains("ERROR"))
+            {
+                throw new RacadmException(commandResult.Result);
+            }
+            return commandResult;
+        }
+
+        public SshCommand GenerateUpdateReport(string catalogFile, Repository repository)
+        {
+            switch (repository.Type)
+            {
+                case RepositoryType.NFS:
+                    return GenerateReportFromNFS(catalogFile, repository);
                 case RepositoryType.FTP:
-                    return GenerateReportFromFtp(catalogFile, repositoryAddress);
+                    return GenerateReportFromFTP(catalogFile, repository);
                 case RepositoryType.TFTP:
-                    return GenerateReportFromTftp(catalogFile, repositoryAddress);
+                    return GenerateReportFromTFTP(catalogFile, repository);
                 default:
                     throw new Exception("Tipo invalido de repositório informado");
             }
         }
 
-        private SshCommand GenerateReportFromFtp(string catalogFile, string repositoryAddress)
+        private SshCommand GenerateReportFromNFS(string catalogFile, Repository repository)
         {
-            string command = String.Format("racadm -f {0} -t FTP -e {1} -a FALSE --verifycatalog", catalogFile, repositoryAddress);
-            client.RunCommand(command);
-            return client.RunCommand("racadm update viewreport");
+            string command = "";
+            SshCommand commandResult;
+            if (repository.IsPasswordProtected)
+            {
+                command = String.Format("racadm -f {0} -l {1} -u {2} -p {3} -t NFS -a FALSE --verifycatalog",catalogFile, repository.Address, repository.User, repository.Password);
+            }
+            else
+            {
+                command = String.Format("racadm -f {0} -l {1} -t NFS -a FALSE --verifycatalog", catalogFile, repository.Address);
+            }
+            commandResult = client.RunCommand(command);
+            if (commandResult.ExitStatus != 0 | commandResult.Result.Contains("ERROR"))
+            {
+                throw new RacadmException(commandResult.Result);
+            }
+            commandResult = client.RunCommand("racadm update viewreport");
+            if (commandResult.ExitStatus != 0 | commandResult.Result.Contains("ERROR"))
+            {
+                throw new RacadmException(commandResult.Result);
+            }
+            return commandResult;
         }
 
-        private SshCommand GenerateReportFromTftp(string catalogFile, string repositoryAddress)
+        private SshCommand GenerateReportFromFTP(string catalogFile, Repository repository)
         {
-            string command = String.Format("racadm -f {0} -t TFTP -e {1} -a FALSE --verifycatalog", catalogFile, repositoryAddress);
-            client.RunCommand(command);
-            return client.RunCommand("racadm update viewreport");
+            string command = "";
+            SshCommand commandResult;
+            if (repository.IsPasswordProtected)
+            {
+                command = String.Format("racadm -f {0} -t FTP -e {1} -u {2} -p {3} -a FALSE --verifycatalog", catalogFile, repository.Address, repository.User, repository.Password);
+            }
+            else
+            {
+                command = String.Format("racadm -f {0} -t FTP -e {1} -a FALSE --verifycatalog", catalogFile, repository.Address);
+            }
+            commandResult = client.RunCommand(command);
+            if (commandResult.ExitStatus != 0 | commandResult.Result.Contains("ERROR"))
+            {
+                throw new RacadmException(commandResult.Result);
+            }
+            commandResult = client.RunCommand("racadm update viewreport");
+            if (commandResult.ExitStatus != 0 | commandResult.Result.Contains("ERROR"))
+            {
+                throw new RacadmException(commandResult.Result);
+            }
+            return commandResult;
         }
 
-        private SshCommand GenerateReportFromNFS(string catalogFile, string repositoryAddress)
+        private SshCommand GenerateReportFromTFTP(string catalogFile, Repository repository)
         {
-            string command = String.Format("racadm -f {0} -l {1} -t NFS -a FALSE --verifycatalog", catalogFile, repositoryAddress);
-            client.RunCommand(command);
-            return client.RunCommand("racadm update viewreport");
+            string command = "";
+            SshCommand commandResult;
+            if (repository.IsPasswordProtected)
+            {
+                command = String.Format("racadm -f {0} -t TFTP -e {1} -u {2} -p {3} -a FALSE --verifycatalog", catalogFile, repository.Address, repository.User, repository.Password);
+            }
+            else
+            {
+                command = String.Format("racadm -f {0} -t TFTP -e {1} -a FALSE --verifycatalog", catalogFile, repository.Address);
+            }
+            commandResult = client.RunCommand(command);
+            if (commandResult.ExitStatus != 0 | commandResult.Result.Contains("ERROR"))
+            {
+                throw new RacadmException(commandResult.Result);
+            }
+            commandResult = client.RunCommand("racadm update viewreport");
+            if (commandResult.ExitStatus != 0 | commandResult.Result.Contains("ERROR"))
+            {
+                throw new RacadmException(commandResult.Result);
+            }
+            return commandResult;
         }
+
     }
 }

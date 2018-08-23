@@ -22,5 +22,10 @@ namespace Server_Tools.Model
             this.user = user;
             this.password = password;
         }
+
+        public override string ToString()
+        {
+            return Host;
+        }
     }
 }

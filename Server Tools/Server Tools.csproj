@@ -58,8 +58,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Control\RepositoryType.cs" />
+    <Compile Include="Model\RepositoryType.cs" />
+    <Compile Include="Model\Repository.cs" />
     <Compile Include="Util\FileHelper.cs" />
+    <Compile Include="View\FirmwarePage.xaml.cs">
+      <DependentUpon>FirmwarePage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\FirmwareUpdatePage.xaml.cs">
       <DependentUpon>FirmwareUpdatePage.xaml</DependentUpon>
     </Compile>
@@ -76,6 +80,10 @@
     <Compile Include="Model\RacadmException.cs" />
     <Compile Include="Model\Server.cs" />
     <Compile Include="Model\IdracUpdateItem.cs" />
+    <Page Include="View\FirmwarePage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\FirmwareUpdatePage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -135,6 +143,11 @@
   <ItemGroup>
     <Resource Include="Resources\icons8-repository-32.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Resources\icons8-back-arrow-filled-50.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\icons8-document-64.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -16,21 +16,21 @@ using System.Windows.Shapes;
 namespace Server_Tools.View
 {
     /// <summary>
-    /// Interação lógica para HomePage.xam
+    /// Interação lógica para FirmwarePage.xam
     /// </summary>
-    public partial class HomePage : Page
+    public partial class FirmwarePage : Page
     {
-        public HomePage()
+        public FirmwarePage()
         {
-            InitializeComponent();            
+            InitializeComponent();
         }
 
-        private void UpdateFirmwareButton_Click(object sender, RoutedEventArgs e)
+        private void UpdateFromRepositoryButton_Click(object sender, RoutedEventArgs e)
         {
-            NavigationService.Navigate(new FirmwarePage());
+            NavigationService.Navigate(new FirmwareUpdatePage());
         }
 
-        private void DiskButton_Click(object sender, RoutedEventArgs e)
+        private void UpdateFromFile_Click(object sender, RoutedEventArgs e)
         {
 
         }

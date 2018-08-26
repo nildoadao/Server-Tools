@@ -7,6 +7,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
+using LumenWorks.Framework.IO.Csv;
+using Server_Tools.Model;
 
 namespace Server_Tools.Util
 {
@@ -57,6 +59,20 @@ namespace Server_Tools.Util
             }
 
             return file;
+        }
+
+        public static IEnumerable<Server> ReadCsvFile(string filePath)
+        {
+            List<Server> servers = new List<Server>();
+            
+            using (CsvReader csv = new CsvReader(new StreamReader(filePath), false, ';'))
+            {
+                while (csv.ReadNextRecord())
+                {
+                    servers.Add(new Server(csv[0], csv[1], csv[2]));
+                }
+            }
+            return servers;
         }
     }
 }

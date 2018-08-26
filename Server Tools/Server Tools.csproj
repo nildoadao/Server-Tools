@@ -34,6 +34,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="LumenWorks.Framework.IO">
+      <HintPath>..\..\..\..\..\Downloads\LumenWorks.Framework.IO\obj\Debug\LumenWorks.Framework.IO.dll</HintPath>
+    </Reference>
     <Reference Include="Renci.SshNet, Version=2016.1.0.0, Culture=neutral, PublicKeyToken=1cee9f8bde3db106, processorArchitecture=MSIL">
       <HintPath>..\packages\SSH.NET.2016.1.0\lib\net40\Renci.SshNet.dll</HintPath>
     </Reference>
@@ -61,11 +64,17 @@
     <Compile Include="Model\RepositoryType.cs" />
     <Compile Include="Model\Repository.cs" />
     <Compile Include="Util\FileHelper.cs" />
+    <Compile Include="View\CustomScriptPage.xaml.cs">
+      <DependentUpon>CustomScriptPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\FileUpdatePage.xaml.cs">
+      <DependentUpon>FileUpdatePage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\FirmwarePage.xaml.cs">
       <DependentUpon>FirmwarePage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\FirmwareUpdatePage.xaml.cs">
-      <DependentUpon>FirmwareUpdatePage.xaml</DependentUpon>
+    <Compile Include="View\RepositoryUpdatePage.xaml.cs">
+      <DependentUpon>RepositoryUpdatePage.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\HomePage.xaml.cs">
       <DependentUpon>HomePage.xaml</DependentUpon>
@@ -80,11 +89,22 @@
     <Compile Include="Model\RacadmException.cs" />
     <Compile Include="Model\Server.cs" />
     <Compile Include="Model\IdracUpdateItem.cs" />
+    <Compile Include="View\TemplatesPage.xaml.cs">
+      <DependentUpon>TemplatesPage.xaml</DependentUpon>
+    </Compile>
+    <Page Include="View\CustomScriptPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\FileUpdatePage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\FirmwarePage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="View\FirmwareUpdatePage.xaml">
+    <Page Include="View\RepositoryUpdatePage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -100,6 +120,10 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="View\TemplatesPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -148,6 +172,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\icons8-document-64.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\icons8-template-50.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

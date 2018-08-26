@@ -60,11 +60,11 @@ namespace Server_Tools.Control
             SshCommand commandResult;
             if (repository.IsPasswordProtected)
             {
-                command = String.Format("racadm -f {0} -l {1} -u {2} -p {3} -t NFS -a {4}", firmwarePath, repository.Address, repository.User, repository.Password, rebootAfter);
+                command = String.Format("racadm update -f {0} -l {1} -u {2} -p {3} -t NFS -a {4}", firmwarePath, repository.Address, repository.User, repository.Password, rebootAfter);
             }
             else
             {
-                command = String.Format("racadm -f {0} -l {1} -t NFS -a {2}", firmwarePath, repository.Address, rebootAfter);
+                command = String.Format("racadm update -f {0} -l {1} -t NFS -a {2}", firmwarePath, repository.Address, rebootAfter);
             }
             commandResult = client.RunCommand(command);
             if (commandResult.ExitStatus != 0 | commandResult.Result.Contains("ERROR"))
@@ -116,11 +116,11 @@ namespace Server_Tools.Control
             SshCommand commandResult;
             if (repository.IsPasswordProtected)
             {
-                command = String.Format("racadm -f {0} -l {1} -u {2} -p {3} -t NFS -a FALSE --verifycatalog",catalogFile, repository.Address, repository.User, repository.Password);
+                command = String.Format("racadm update -f {0} -l {1} -u {2} -p {3} -t NFS -a FALSE --verifycatalog",catalogFile, repository.Address, repository.User, repository.Password);
             }
             else
             {
-                command = String.Format("racadm -f {0} -l {1} -t NFS -a FALSE --verifycatalog", catalogFile, repository.Address);
+                command = String.Format("racadm update -f {0} -l {1} -t NFS -a FALSE --verifycatalog", catalogFile, repository.Address);
             }
             commandResult = client.RunCommand(command);
             if (commandResult.ExitStatus != 0 | commandResult.Result.Contains("ERROR"))
@@ -141,11 +141,11 @@ namespace Server_Tools.Control
             SshCommand commandResult;
             if (repository.IsPasswordProtected)
             {
-                command = String.Format("racadm -f {0} -t FTP -e {1} -u {2} -p {3} -a FALSE --verifycatalog", catalogFile, repository.Address, repository.User, repository.Password);
+                command = String.Format("racadm update -f {0} -t FTP -e {1} -u {2} -p {3} -a FALSE --verifycatalog", catalogFile, repository.Address, repository.User, repository.Password);
             }
             else
             {
-                command = String.Format("racadm -f {0} -t FTP -e {1} -a FALSE --verifycatalog", catalogFile, repository.Address);
+                command = String.Format("racadm update -f {0} -t FTP -e {1} -a FALSE --verifycatalog", catalogFile, repository.Address);
             }
             commandResult = client.RunCommand(command);
             if (commandResult.ExitStatus != 0 | commandResult.Result.Contains("ERROR"))
@@ -166,11 +166,11 @@ namespace Server_Tools.Control
             SshCommand commandResult;
             if (repository.IsPasswordProtected)
             {
-                command = String.Format("racadm -f {0} -t TFTP -e {1} -u {2} -p {3} -a FALSE --verifycatalog", catalogFile, repository.Address, repository.User, repository.Password);
+                command = String.Format("racadm update -f {0} -t TFTP -e {1} -u {2} -p {3} -a FALSE --verifycatalog", catalogFile, repository.Address, repository.User, repository.Password);
             }
             else
             {
-                command = String.Format("racadm -f {0} -t TFTP -e {1} -a FALSE --verifycatalog", catalogFile, repository.Address);
+                command = String.Format("racadm update -f {0} -t TFTP -e {1} -a FALSE --verifycatalog", catalogFile, repository.Address);
             }
             commandResult = client.RunCommand(command);
             if (commandResult.ExitStatus != 0 | commandResult.Result.Contains("ERROR"))

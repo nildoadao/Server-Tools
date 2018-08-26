@@ -16,10 +16,6 @@ namespace Server_Tools.Control
     {
         private Server server;
 
-
-        internal Server Server { get => server; set => server = value; }
-
-
         public IdracUpdateController(Server server)
         {
             this.server = server;
@@ -139,6 +135,11 @@ namespace Server_Tools.Control
                 IdracSshCommand idrac = new IdracSshCommand(client);
                 idrac.UpdateFirmware(firmwarePath, repository, reboot);
             }
+        }
+
+        public void UpdateFirmware(Repository repository, bool reboot)
+        {
+
         }
 
         public IEnumerable<IdracFirmware> GetUpdates(string catalogFile, Repository repository)

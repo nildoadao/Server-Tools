@@ -34,5 +34,15 @@ namespace Server_Tools.View
         {
 
         }
+
+        private void CustomScriptButton_Click(object sender, RoutedEventArgs e)
+        {
+            NavigationService.Navigate(new CustomScriptPage());
+        }
+
+        private void TemplateFileButton_Click(object sender, RoutedEventArgs e)
+        {
+            NavigationService.Navigate(new TemplatesPage());
+        }
     }
 }

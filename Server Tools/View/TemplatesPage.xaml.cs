@@ -16,23 +16,13 @@ using System.Windows.Shapes;
 namespace Server_Tools.View
 {
     /// <summary>
-    /// Interação lógica para FirmwarePage.xam
+    /// Interação lógica para TemplatesPage.xam
     /// </summary>
-    public partial class FirmwarePage : Page
+    public partial class TemplatesPage : Page
     {
-        public FirmwarePage()
+        public TemplatesPage()
         {
             InitializeComponent();
-        }
-
-        private void UpdateFromRepositoryButton_Click(object sender, RoutedEventArgs e)
-        {
-            NavigationService.Navigate(new RepositoryUpdatePage());
-        }
-
-        private void UpdateFromFile_Click(object sender, RoutedEventArgs e)
-        {
-            NavigationService.Navigate(new FileUpdatePage());
         }
     }
 }

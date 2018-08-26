@@ -20,20 +20,26 @@ using System.Windows.Shapes;
 using System.Xml.Linq;
 using System.Threading;
 using System.ComponentModel;
+using Microsoft.Win32;
 
 namespace Server_Tools.View
 {
     /// <summary>
     /// Interação lógica para FirmwareUpdatePage.xam
     /// </summary>
-    public partial class FirmwareUpdatePage : Page
+    public partial class RepositoryUpdatePage : Page
     {
         ObservableCollection<IdracUpdateItem> datagridItems;
+        bool operationCancelled;
+        OpenFileDialog dialog;
 
-        public FirmwareUpdatePage()
+        public RepositoryUpdatePage()
         {
             datagridItems = new ObservableCollection<IdracUpdateItem>();
             InitializeComponent();
+            operationCancelled = false;
+            dialog = new OpenFileDialog();
+            dialog.FileOk += Dialog_FileOk;
         }
 
         private void AddServerButton_Click(object sender, RoutedEventArgs e)
@@ -67,7 +73,7 @@ namespace Server_Tools.View
                 return;
             }
             OutputTextBox.Clear();
-            UpdatesDataGrid.Items.Clear();
+            UpdatesDataGrid.ItemsSource = null;
             SearchUpdates();         
         }
 
@@ -109,7 +115,7 @@ namespace Server_Tools.View
                         Dispatcher.Invoke(() =>
                         {
                             OutputTextBox.AppendText("Servidor " + server.Host + " inacessivel\n");
-                        });                       
+                        });
                     }
                     else
                     {
@@ -118,7 +124,7 @@ namespace Server_Tools.View
                             IdracUpdateController idrac = new IdracUpdateController(server);
                             firmwaresToUpdate = idrac.GetUpdates(catalogFile, repository);
                         }
-                        catch(Exception ex)
+                        catch (Exception ex)
                         {
                             Dispatcher.Invoke(() =>
                             {
@@ -127,12 +133,19 @@ namespace Server_Tools.View
                         }
 
                     }
-                });
+                });                           
                 foreach (IdracFirmware firmwareItem in firmwaresToUpdate)
                 {
                     datagridItems.Add(new IdracUpdateItem(server, firmwareItem));
                 }
+                if (operationCancelled)
+                {
+                    OutputTextBox.AppendText("Operação cancelada pelo usuario\n");
+                    operationCancelled = false;
+                    break;
+                }
             }
+            UpdatesDataGrid.ItemsSource = datagridItems;
             OutputTextBox.AppendText("Finalizada buscas por updates " + datagridItems.Count + " updates encontrados\n");
         }
 
@@ -161,7 +174,70 @@ namespace Server_Tools.View
 
         private void UpdateButton_Click(object sender, RoutedEventArgs e)
         {
-            
+            if(UpdatesDataGrid.Items.Count > 0)
+            {
+                UpdateFirmware();
+            }
+        }
+
+        private async void UpdateFirmware()
+        {
+            IEnumerable<IdracUpdateItem> firmwares = (IEnumerable<IdracUpdateItem>) UpdatesDataGrid.ItemsSource;
+            string catalog = CatalogTextBox.Text;
+            bool reboot = RebootCheckBox.IsChecked.Value;
+
+            RepositoryType repositoryType;
+
+            if (FtpRadioButton.IsChecked.Value)
+            {
+                repositoryType = RepositoryType.FTP;
+            }
+            else if (TftpRadioButton.IsChecked.Value)
+            {
+                repositoryType = RepositoryType.TFTP;
+            }
+            else
+            {
+                repositoryType = RepositoryType.NFS;
+            }
+
+            Repository repository = new Repository(RepositoryTextBox.Text, repositoryType);
+
+            if (AnonymousCheckBox.IsPressed)
+            {
+                repository.User = RepositoryUserTextBox.Text;
+                repository.Password = RepositoryPasswordBox.Password;
+            }
+
+            OutputTextBox.AppendText("Iniciando Update de firmwares");
+
+            foreach (Server server in ServersListBox.Items)
+            {
+                await Task.Run(() =>
+                {
+                    try
+                    {
+                        IdracUpdateController idrac = new IdracUpdateController(server);
+                        foreach (IdracUpdateItem firmware in firmwares)
+                        {
+                            idrac.UpdateFirmware(catalog, repository, reboot);
+                        }
+                    }
+                    catch(Exception ex)
+                    {
+                        Dispatcher.Invoke(() =>
+                        {
+                            OutputTextBox.AppendText("Falha ao atualizar " + server + " " + ex.Message);
+                        });
+                    }
+                });
+
+                if (operationCancelled)
+                {
+                    OutputTextBox.AppendText("Operação cancelada pelo usuário");
+                    break;
+                }
+            }
         }
 
         private void AnonymousCheckBox_Checked(object sender, RoutedEventArgs e)
@@ -174,6 +250,36 @@ namespace Server_Tools.View
         {
             RepositoryUserTextBox.IsEnabled = true;
             RepositoryPasswordBox.IsEnabled = true;
+        }
+
+        private void CancelButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (!operationCancelled)
+            {
+                operationCancelled = true;
+            }
+        }
+
+        private void AddCsvButton_Click(object sender, RoutedEventArgs e)
+        {
+            dialog.Filter = "Arquivos CSV|*csv";
+            dialog.ShowDialog();
+        }
+
+        private void Dialog_FileOk(object sender, CancelEventArgs e)
+        {
+            try
+            {
+                IEnumerable<Server> servers = FileHelper.ReadCsvFile(dialog.FileName);
+                foreach(Server server in servers)
+                {
+                    ServersListBox.Items.Add(server);
+                }
+            }
+            catch(Exception ex)
+            {
+                OutputTextBox.AppendText("Falha ao carregar CSV " + ex.Message);
+            }
         }
     }
 }

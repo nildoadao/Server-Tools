@@ -185,5 +185,14 @@ namespace Server_Tools.Control
             return commandResult;
         }
 
+        public SshCommand RunCommand(string command)
+        {
+            SshCommand commandResult = client.RunCommand(command);
+            if(commandResult.ExitStatus != 0 | commandResult.Result.Contains("ERROR"))
+            {
+                throw new RacadmException(commandResult.Result);
+            }
+            return commandResult;
+        }
     }
 }

@@ -89,6 +89,9 @@
     <Compile Include="Model\RacadmException.cs" />
     <Compile Include="Model\Server.cs" />
     <Compile Include="Model\IdracUpdateItem.cs" />
+    <Compile Include="View\StorageRaidPage.xaml.cs">
+      <DependentUpon>StorageRaidPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\TemplatesPage.xaml.cs">
       <DependentUpon>TemplatesPage.xaml</DependentUpon>
     </Compile>
@@ -120,6 +123,10 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="View\StorageRaidPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\TemplatesPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

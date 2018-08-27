@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using LumenWorks.Framework.IO.Csv;
@@ -73,6 +69,11 @@ namespace Server_Tools.Util
                 }
             }
             return servers;
+        }
+
+        public static IEnumerable<string> ReadTxtFile(string filePath)
+        {
+            return File.ReadLines(filePath);
         }
     }
 }

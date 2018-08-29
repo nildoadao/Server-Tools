@@ -82,7 +82,7 @@ namespace Server_Tools.View
 
         private void ApplyButton_Click(object sender, RoutedEventArgs e)
         {
-            if(ServersListBox.Items.Count == 0)
+            if (ServersListBox.Items.Count == 0)
             {
                 MessageBox.Show("Insira ao menos um servidor para aplicar o script", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
@@ -95,7 +95,8 @@ namespace Server_Tools.View
             ApplyButton.IsEnabled = false;
             ApplyScript();
         }
-
+        
+        //Metodo assincrono para aplicar o script, evita que a GUI fique travada durante a execução
         private async void ApplyScript()
         {
             IEnumerable<string> commands;

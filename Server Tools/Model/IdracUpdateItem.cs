@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace Server_Tools.Model
 {
     class IdracUpdateItem
@@ -11,15 +6,15 @@ namespace Server_Tools.Model
 
         private Server server;
         private IdracFirmware firmware;
-        private string serverName;
-        private string firmwareName;
-        private string currentVersion;
-        private string avaliableVersion;
+        private bool update;
 
-        public string ServerName { get => serverName; set => serverName = value; }
-        public string FirmwareName { get => firmwareName; set => firmwareName = value; }
-        public string CurrentVersion { get => currentVersion; set => currentVersion = value; }
-        public string AvaliableVersion { get => avaliableVersion; set => avaliableVersion = value; }
+        public bool Update { get => update; set => update = value; }
+        public string ServerName { get => server.Host; }
+        public string FirmwareName { get => firmware.Firmware;  }
+        public string CurrentVersion { get => firmware.CurrentVersion;  }
+        public string AvaliableVersion { get => firmware.AvaliableVersion; }
+        public string FirmwarePath { get => firmware.FirmwarePath; }      
+
         internal Server Server { get => server; set => server = value; }
         internal IdracFirmware Firmware { get => firmware; set => firmware = value; }
 
@@ -27,10 +22,7 @@ namespace Server_Tools.Model
         {
             this.server = server;
             this.firmware = firmware;
-            serverName = server.Host;
-            firmwareName = firmware.Firmware;
-            currentVersion = firmware.CurrentVersion;
-            avaliableVersion = firmware.AvaliableVersion;
+            update = false;
         }
 
 

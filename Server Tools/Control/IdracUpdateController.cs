@@ -3,11 +3,7 @@ using Server_Tools.Model;
 using Server_Tools.Util;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace Server_Tools.Control
@@ -145,9 +141,10 @@ namespace Server_Tools.Control
         public IEnumerable<IdracFirmware> GetUpdates(string catalogFile, Repository repository)
         {
             IEnumerable<string> reportResult = GetUpdateReport(catalogFile, repository);
-            //var catalogItems = GetCatalogItems(FileHelper.ReadXmlFtpFile(repository.Address + "/" + catalogFile));
-            return ReadReportFile(reportResult);
-            //return CompareServerToCatalog(catalogItems, serverItems);
+            var catalogItems = GetCatalogItems(FileHelper.ReadXmlFtpFile(repository.Address + @"/" + catalogFile));
+            var serverItems = ReadReportFile(reportResult);
+            //return ReadReportFile(reportResult);
+            return CompareServerToCatalog(catalogItems, serverItems);
         }
     }
 }

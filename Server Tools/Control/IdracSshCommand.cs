@@ -190,5 +190,25 @@ namespace Server_Tools.Control
             }
             return commandResult;
         }
+
+        public SshCommand GetPhysicalDisksNames()
+        {
+            SshCommand commandResult = client.RunCommand("racadm storage get pdisks");
+            if (commandResult.ExitStatus != 0 | commandResult.Result.Contains("ERROR"))
+            {
+                throw new RacadmException(commandResult.Result);
+            }
+            return commandResult;
+        }
+
+        public SshCommand GetPhysicalDisksPropreties()
+        {
+            SshCommand commandResult = client.RunCommand("racadm storage get pdisks -o");
+            if (commandResult.ExitStatus != 0 | commandResult.Result.Contains("ERROR"))
+            {
+                throw new RacadmException(commandResult.Result);
+            }
+            return commandResult;
+        }
     }
 }

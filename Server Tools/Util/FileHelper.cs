@@ -26,11 +26,11 @@ namespace Server_Tools.Util
             request.Credentials = new NetworkCredential("anonymous", "anonymous@anonymous.com");
             FtpWebResponse response = (FtpWebResponse)request.GetResponse();
 
-            using (Stream responseStream = response.GetResponseStream())
-            using (StreamReader reader = new StreamReader(responseStream))
+            using (StreamReader reader = new StreamReader(response.GetResponseStream()))
             {
                 file = reader.ReadToEnd();
             }
+
             List<string> fileLines = new List<string>();
 
             foreach (string line in file.Split('\n'))

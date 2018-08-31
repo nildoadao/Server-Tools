@@ -8,6 +8,7 @@ namespace Server_Tools.Model
     /// <summary>
     /// Exeção gerada quando um comando racadm retorna != 0 ou ERROR
     /// </summary>
+    [Serializable]
     class RacadmException : Exception
     {
         public RacadmException(){}

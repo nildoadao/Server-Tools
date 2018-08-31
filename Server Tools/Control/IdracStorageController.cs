@@ -18,24 +18,67 @@ namespace Server_Tools.Control
         public IEnumerable<IdracPhysicalDisk> GetPhysicalDisks()
         {
             List<IdracPhysicalDisk> disks = new List<IdracPhysicalDisk>();
+            List<string> disksNames = new List<string>();
+
             using (SshClient client = new SshClient(server.Host, server.User, server.Password))
             {
                 client.Connect();
                 IdracSshCommand idrac = new IdracSshCommand(client);
-                SshCommand commandResult = idrac.RunCommand("racadm storage get pdisks");
-                foreach(string disk in commandResult.Result.Split('\n'))
+                SshCommand command = idrac.GetPhysicalDisksNames();
+
+                // Carrega uma lista com os nomes dos discos
+                foreach(string disk in command.Result.Split('\n'))
                 {
                     if (!disk.Trim().Equals(""))
-                    {
-                        string size = GetDiskProperty(disk, "Size");
+                        disksNames.Add(disk);                     
+                }
 
-                        disks.Add(new IdracPhysicalDisk(disk, size)
+                command = idrac.GetPhysicalDisksPropreties();
+                string currentDisk = "";
+
+                foreach(string line in command.Result.Split('\n'))
+                {
+                    if (disksNames.Contains(line.Trim()))
+                    {
+                        disks.Add(new IdracPhysicalDisk(line));
+                        currentDisk = line.Trim();
+                        continue;
+                    }
+                    string[] property = line.Split('=');
+
+                    if (property[0].Trim().Equals("Status"))
+                    {
+                        IdracPhysicalDisk disk = disks.Find(x => x.Name.Equals(currentDisk));
+                        disk.Status = property[1].Trim();                      
+                    }
+                    else if (property[0].Trim().Equals("State"))
+                    {
+                        IdracPhysicalDisk disk = disks.Find(x => x.Name.Equals(currentDisk));
+                        disk.State = property[1].Trim();
+                    }
+                    else if (property[0].Trim().Equals("Size"))
+                    {
+                        IdracPhysicalDisk disk = disks.Find(x => x.Name.Equals(currentDisk));
+                        disk.Size = property[1].Trim();
+                    }
+                    else if (property[0].Trim().Equals("UsedRaidDiskSpace"))
+                    {
+                        IdracPhysicalDisk disk = disks.Find(x => x.Name.Equals(currentDisk));
+                        disk.UsedRaidSpace = property[1].Trim();
+                    }
+                    else if (property[0].Trim().Equals("AvailableRaidDiskSpace"))
+                    {
+                        IdracPhysicalDisk disk = disks.Find(x => x.Name.Equals(currentDisk));
+                        disk.FreeRaidSpace = property[1].Trim();
+                        if(disk.FreeRaidSpace.Equals("0.00 GB"))
                         {
-                            UsedRaidSpace = GetDiskProperty(disk, "UsedRaidDiskSpace"),
-                            FreeRaidSpace = GetDiskProperty(disk, "AvailableRaidDiskSpace"),
-                            IsAssigned = IsUnassigned(disk)
-                        });
-                    }                       
+                            disk.IsAssigned = true;
+                        }
+                        else
+                        {
+                            disk.IsAssigned = false;
+                        }
+                    }
                 }
             }
             return disks;
@@ -48,7 +91,7 @@ namespace Server_Tools.Control
             {
                 client.Connect();
                 IdracSshCommand idrac = new IdracSshCommand(client);
-                string command = String.Format("racadm storage get pdisks --refkey {0} -o - p {1}", diskName, property);
+                string command = String.Format("racadm storage get pdisks --refkey {0} -o -p {1}", diskName, property);
                 result = idrac.RunCommand(command).Result;
             }
             return result;
@@ -68,24 +111,6 @@ namespace Server_Tools.Control
                 }
             }
             return vDisks;
-        }
-
-        public bool IsUnassigned(string diskName)
-        {
-            bool unassigned = true;
-
-            using (SshClient client = new SshClient(server.Host, server.User, server.Password))
-            {
-                client.Connect();
-                IdracSshCommand idrac = new IdracSshCommand(client);
-                string command = String.Format("racadm storage get pdisks --refkey {0} -o - p AvailableraidDiskSpace", diskName);
-                SshCommand commandResult = idrac.RunCommand(command);
-                if(commandResult.Result.Trim().Equals("0.00 GB"))
-                {
-                    unassigned = false;
-                }
-            }
-            return unassigned;
         }
     }
 }

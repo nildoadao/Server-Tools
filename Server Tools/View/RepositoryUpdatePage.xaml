@@ -89,10 +89,10 @@
         <ListBox Name="ServersListBox" HorizontalAlignment="Left" Grid.Column="4" Grid.Row="1" Width="300" Grid.RowSpan="7" Margin="5,5,0,40" MinHeight="234" MaxHeight="235"/>
         <StackPanel Grid.Column="4" Grid.Row="8" Width="Auto" Orientation="Horizontal">
             <Button Name="UpdateButton" Content="Atualizar Selecionados" Margin="5" Height="20" Width="150" HorizontalAlignment="Left" Click="UpdateButton_Click"/>
-            <Button Name="CancelButton" Content="Cancelar" Margin="5" Height="20" Width="150"  HorizontalAlignment="Left" Click="CancelButton_Click"/>
+            <Button Name="CancelButton" Content="Cancelar" Margin="5,12,5,11" Height="20" Width="108"  HorizontalAlignment="Left" Click="CancelButton_Click"/>
         </StackPanel>
         <CheckBox Name="RebootCheckBox" Grid.Row="9" Grid.Column="5" Content="Reinicar caso necessário" Margin="5" />
-        <TabControl Name="OutputTabControl" Grid.Row="11" Height="Auto" Width="Auto" Grid.ColumnSpan="5" Margin="5">
+        <TabControl Name="OutputTabControl" Grid.Row="11" Height="Auto" Width="650" Grid.ColumnSpan="5" Margin="5" HorizontalAlignment="Left">
             <TabItem Header="Updates">
                 <DataGrid Name="UpdatesDataGrid" Height="200"/>
             </TabItem>

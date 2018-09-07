@@ -54,6 +54,10 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
                     <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+
+
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -94,12 +98,12 @@
         <Button Name="CreateVdButton" Content="Criar VD" Height="20" Width="Auto" Grid.Row="9" Grid.ColumnSpan="2" Margin="152,6,58,1"/>
         <StackPanel Orientation="Horizontal" Grid.Column="4"/>
         <StackPanel Grid.Column="4" Grid.Row="8" Width="Auto" Orientation="Horizontal"/>
-        <TabControl Name="OutputTabControl" Grid.Row="12" Height="Auto" Width="Auto" Grid.ColumnSpan="5" Margin="5">
+        <TabControl Name="OutputTabControl" Grid.Row="12" Height="Auto" Width="600" Grid.ColumnSpan="5" Margin="5">
             <TabItem Header="Discos">
-                <DataGrid Name="DisksDataGrid" Height="200"/>
+                <DataGrid Name="DisksDataGrid" Height="200" MaxWidth="600"/>
             </TabItem>
             <TabItem Header="Saída">
-                <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" CanContentScroll="True" MaxWidth="640" BorderBrush="Transparent">
+                <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" CanContentScroll="True" MaxWidth="600" BorderBrush="Transparent">
                     <TextBox Name="OutputTextBox"  Height="200" TextWrapping="Wrap" Width="Auto" IsReadOnly="True" BorderBrush="Transparent" />
                 </ScrollViewer>
             </TabItem>

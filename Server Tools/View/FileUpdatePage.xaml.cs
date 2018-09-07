@@ -1,17 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Server_Tools.Control;
+using Server_Tools.Model;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace Server_Tools.View
 {
@@ -22,7 +12,28 @@ namespace Server_Tools.View
     {
         public FileUpdatePage()
         {
-            InitializeComponent();
+            InitializeComponent();            
+        }
+
+        private void UpdateButton_Click(object sender, RoutedEventArgs e)
+        {
+            CheckRedfishSupport();
+        }
+
+        private async void CheckRedfishSupport()
+        {
+            IdracRedfishController idrac = new IdracRedfishController(new Server("", "", ""));
+            var support = await idrac.CheckRedfishSupport();
+            {
+                if (support)
+                {
+                    OutputTextBox.AppendText("Suporta RedFish\n");
+                }
+                else
+                {
+                    OutputTextBox.AppendText("Não suporta Redfish\n");
+                }
+            }
         }
     }
 }

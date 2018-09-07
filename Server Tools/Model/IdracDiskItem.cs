@@ -8,6 +8,8 @@ namespace Server_Tools.Model
 
         public bool IsSelected { get => isSelected; set => isSelected = value; }
         public string DiskName { get => disk.Name; }
+        public string DiskState { get => disk.State; }
+        public string DiskStatus { get => disk.Status; }
         public string Size { get => disk.Size; }
         public bool IsAssigned { get => disk.IsAssigned; }
 

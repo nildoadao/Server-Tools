@@ -198,7 +198,7 @@ namespace Server_Tools.View
                 repository.Password = RepositoryPasswordBox.Password;
             }
 
-            OutputTextBox.AppendText("Iniciando Update de firmwares");
+            OutputTextBox.AppendText("Iniciando Update de firmwares...");
 
             foreach (Server server in ServersListBox.Items)
             {
@@ -212,7 +212,11 @@ namespace Server_Tools.View
                             if (firmware.Update)
                             {
                                 idrac.UpdateFirmware(firmware.FirmwarePath, repository, reboot);
-                            }                            
+                            }
+                            Dispatcher.Invoke(() =>
+                            {
+                            OutputTextBox.AppendText("Criado Job para atualização de " + firmware.FirmwareName);
+                            });
                         }
                     }
                     catch(Exception ex)
@@ -230,6 +234,7 @@ namespace Server_Tools.View
                     break;
                 }
             }
+            OutputTextBox.AppendText("Finalizada atualização");
         }
 
         private void AnonymousCheckBox_Checked(object sender, RoutedEventArgs e)

@@ -143,7 +143,6 @@ namespace Server_Tools.Control
             IEnumerable<string> reportResult = GetUpdateReport(catalogFile, repository);
             var catalogItems = GetCatalogItems(FileHelper.ReadXmlFtpFile(repository.Address + @"/" + catalogFile));
             var serverItems = ReadReportFile(reportResult);
-            //return ReadReportFile(reportResult);
             return CompareServerToCatalog(catalogItems, serverItems);
         }
     }

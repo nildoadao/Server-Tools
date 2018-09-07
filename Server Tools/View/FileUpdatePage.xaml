@@ -88,7 +88,7 @@
         </StackPanel>
         <ListBox Name="ServersListBox" HorizontalAlignment="Left" Grid.Column="4" Grid.Row="1" Width="300" Grid.RowSpan="7" Margin="5,5,0,40"/>
         <StackPanel Grid.Column="4" Grid.Row="8" Width="Auto" Orientation="Horizontal">
-            <Button Name="UpdateButton" Content="Atualizar Selecionados" Margin="5" Height="20" Width="150" HorizontalAlignment="Left"/>
+            <Button Name="UpdateButton" Content="Atualizar Selecionados" Margin="5" Height="20" Width="150" HorizontalAlignment="Left" Click="UpdateButton_Click"/>
             <Button Name="CancelButton" Content="Cancelar" Margin="5" Height="20" Width="150"  HorizontalAlignment="Left"/>
         </StackPanel>
         <CheckBox Name="RebootCheckBox" Grid.Row="9" Grid.Column="5" Content="Reinicar caso necessário" Margin="5" />

@@ -20,26 +20,43 @@ namespace Server_Tools.Util
 
         private const string IDRAC_USER = "root";
         private const string IDRAC_PASSWORD = "calvin";
+        private const string USER_AGENT = "Server Tools";
+        private const bool PRE_AUTHENTICATE = true;
 
         #endregion
 
+        /// <summary>
+        /// Retorna uma instancia HttpClient 
+        /// </summary>
+        /// <returns></returns>
         public static HttpClient GetClient()
         {
             if(_client == null)
             {
-                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Ssl3;
-                _handler = new HttpClientHandler();
-                SecureString password = new SecureString();
-                foreach (char c in IDRAC_PASSWORD.ToCharArray())
-                {
-                    password.AppendChar(c);
-                }
-                _handler.Credentials = new NetworkCredential(IDRAC_USER, password);
-                _handler.PreAuthenticate = true;
-                _client = new HttpClient(_handler);
-                _client.DefaultRequestHeaders.Add("User-Agent", "Server Tools");
+                Init();
             }
             return _client;
+        }
+
+        private static void Init()
+        {
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Ssl3;
+            // Desabilitar validação de Cert. SSL
+            _handler = new HttpClientHandler();
+            _handler.Credentials = new NetworkCredential(IDRAC_USER, ConvertToSecureString(IDRAC_PASSWORD));
+            _handler.PreAuthenticate = PRE_AUTHENTICATE;
+            _client = new HttpClient(_handler);
+            _client.DefaultRequestHeaders.Add("User-Agent", USER_AGENT);
+        }
+
+        private static SecureString ConvertToSecureString(string text)
+        {
+            SecureString secureString = new SecureString();
+            foreach (char c in text.ToCharArray())
+            {
+                secureString.AppendChar(c);
+            }
+            return secureString;
         }
     }
 }

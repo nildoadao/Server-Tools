@@ -41,7 +41,7 @@ namespace Server_Tools.Util
         private static void Init()
         {
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Ssl3;
-            // Desabilitar validação de Cert. SSL
+            ServicePointManager.ServerCertificateValidationCallback += (sender, certificate, chain, sslPolicyErrors) => true;
             _handler = new HttpClientHandler();
             _handler.Credentials = new NetworkCredential(IDRAC_USER, ConvertToSecureString(IDRAC_PASSWORD));
             _handler.PreAuthenticate = PRE_AUTHENTICATE;

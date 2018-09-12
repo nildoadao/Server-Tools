@@ -94,7 +94,10 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Control\IdracInstallOption.cs" />
+    <Compile Include="Control\IdracJob.cs" />
     <Compile Include="Control\IdracRedfishController.cs" />
+    <Compile Include="Control\IdracScpExportUse.cs" />
+    <Compile Include="Control\IdracScpOption.cs" />
     <Compile Include="Control\IdracStorageController.cs" />
     <Compile Include="Model\IdracDiskItem.cs" />
     <Compile Include="Model\IdracPhysicalDisk.cs" />
@@ -127,6 +130,9 @@
     <Compile Include="Model\RacadmException.cs" />
     <Compile Include="Model\Server.cs" />
     <Compile Include="Model\IdracUpdateItem.cs" />
+    <Compile Include="View\ScpExportPage.xaml.cs">
+      <DependentUpon>ScpExportPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\StorageRaidPage.xaml.cs">
       <DependentUpon>StorageRaidPage.xaml</DependentUpon>
     </Compile>
@@ -161,6 +167,10 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="View\ScpExportPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\StorageRaidPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

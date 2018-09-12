@@ -38,7 +38,7 @@ namespace Server_Tools.View
             IdracRedfishController idrac = new IdracRedfishController(new Server(ServerTextBox.Text, UserTextBox.Text, PasswordBox.Password));
             try
             {
-                string jobId = await idrac.UploadIdracFirmware(FirmwareTextBox.Text, IdracInstallOption.NextReboot);
+                string jobId = await idrac.UpdateIdracFirmware(FirmwareTextBox.Text, IdracInstallOption.NextReboot);
                 OutputTextBox.AppendText(jobId);
             }
             catch(Exception ex)

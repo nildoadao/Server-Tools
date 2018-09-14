@@ -24,7 +24,8 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>1</ApplicationRevision>
+    <AutorunEnabled>true</AutorunEnabled>
+    <ApplicationRevision>2</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -138,6 +139,9 @@
     <Compile Include="View\ScpExportPage.xaml.cs">
       <DependentUpon>ScpExportPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\ScpImportPage.xaml.cs">
+      <DependentUpon>ScpImportPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\StorageRaidPage.xaml.cs">
       <DependentUpon>StorageRaidPage.xaml</DependentUpon>
     </Compile>
@@ -173,6 +177,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="View\ScpExportPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\ScpImportPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

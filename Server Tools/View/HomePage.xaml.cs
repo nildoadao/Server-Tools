@@ -52,7 +52,7 @@ namespace Server_Tools.View
 
         private void ImportScpButton_Click(object sender, RoutedEventArgs e)
         {
-
+            NavigationService.Navigate(new ScpImportPage());
         }
     }
 }

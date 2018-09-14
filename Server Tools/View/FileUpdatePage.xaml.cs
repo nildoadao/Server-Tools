@@ -34,31 +34,18 @@ namespace Server_Tools.View
 
         private async void UpdateFirmware()
         {
-            IdracRedfishController idrac = new IdracRedfishController(new Server(ServerTextBox.Text, UserTextBox.Text, PasswordBox.Password));
+            Server server = new Server(ServerTextBox.Text, UserTextBox.Text, PasswordBox.Password);
+            IdracRedfishController idrac = new IdracRedfishController(server);
+            OutputTextBox.AppendText("Iniciando upload do arquivo " + FirmwareTextBox.Text + " para " + server.Host);
             try
             {
-                string jobId = await idrac.UpdateIdracFirmware(FirmwareTextBox.Text, IdracInstallOption.NextReboot);
-                OutputTextBox.AppendText(jobId);
+                OutputTextBox.AppendText(await idrac.UpdateIdracFirmware(FirmwareTextBox.Text, IdracInstallOption.NextReboot));
             }
             catch(Exception ex)
             {
                 OutputTextBox.AppendText("Erro: " + ex.Message + "\n");
             }
-        }
-
-        private async void ExportScpFile(IdracScpTarget target)
-        {
-            Server server = new Server(ServerTextBox.Text, UserTextBox.Text, PasswordBox.Password);
-            IdracRedfishController idrac = new IdracRedfishController(server);
-            OutputTextBox.AppendText("Exportando configurações de " + server.Host + "...\n");
-            try
-            {
-                OutputTextBox.AppendText(await idrac.ExportScpFile(target) + "\n");
-            }
-            catch (Exception ex)
-            {
-                OutputTextBox.AppendText("Falha ao exportar arquivo: " + ex.Message + "\n");
-            }
+            
         }
 
         private void OpenFirmwareButton_Click(object sender, RoutedEventArgs e)

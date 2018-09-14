@@ -21,6 +21,7 @@ namespace Server_Tools.Control
     {
         Server server;
         string baseUri;
+        private const double JOB_TIMEOUT = 5; 
 
         #region Redfish URLs
 
@@ -63,53 +64,45 @@ namespace Server_Tools.Control
             return support;
         }
 
-        private async Task<HttpResponseMessage> UploadFirmwareToIdrac(string firmwarePath)
+        public async Task<string> UpdateIdracFirmware(string firmwarePath, IdracInstallOption option)
         {
-            HttpClient client = HttpUtil.GetClient();
-            var content = new MultipartFormDataContent(Guid.NewGuid().ToString());
+            string location = "";
+            var firmwareContent = new MultipartFormDataContent(Guid.NewGuid().ToString());
             var firmwareFile = File.ReadAllBytes(firmwarePath);
-            content.Add(new StreamContent(new MemoryStream(firmwareFile)), "Firmware", Path.GetFileName(firmwarePath));
-            return await client.PostAsync(baseUri + FIRMWARE_INVENTORY, content);
-        }
+            firmwareContent.Add(new StreamContent(new MemoryStream(firmwareFile)), "Firmware", Path.GetFileName(firmwarePath));
 
-        private async Task<HttpResponseMessage> InstallFirmware(string location, IdracInstallOption option)
-        {
+            using (HttpResponseMessage response = await HttpUtil.GetClient().PostAsync(baseUri + FIRMWARE_INVENTORY, firmwareContent))
+            {
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw new HttpRequestException("Falha no upload do arquivo " + response.Content);
+                }
+                var locations = response.Content.Headers.GetValues("Location") as List<string>;
+                location = locations[0];
+            }
+
             var content = new
             {
                 SoftwareIdentityURIs = location,
                 InstallUpon = option
             };
+
             var jsonContent = JsonConvert.SerializeObject(content);
             var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-            HttpClient client = HttpUtil.GetClient();
-            return await client.PostAsync(baseUri + FIRMWARE_INSTALL, httpContent);
-        }
+            string jobId = await CreateJob(baseUri + FIRMWARE_INSTALL, httpContent);
+            bool jobOk = false;
+            DateTime startTime = DateTime.Now;
 
-        public async Task<string> UpdateIdracFirmware(string firmwarePath, IdracInstallOption option)
-        {
-            bool support = await CheckRedfishSupport(FIRMWARE_INVENTORY);
-            if (!support)
+            while (!jobOk)
             {
-                throw new NotSupportedException("Host não suporta o recurso solicitado");
-            }
-            string location = "";
-            using (HttpResponseMessage response = await UploadFirmwareToIdrac(firmwarePath))
-            {
-                if (!response.IsSuccessStatusCode)
+                jobOk = await CheckJobStatus(jobId);
+                if (DateTime.Now >= startTime.AddMinutes(JOB_TIMEOUT))
                 {
-                    throw new HttpRequestException("Falha no upload do firmware: " + response.RequestMessage);
-                }
-                List<string> locations = (List<string>) response.Headers.GetValues("Location");
-                location = locations[0];
-            }
-            using (HttpResponseMessage response = await InstallFirmware(location, option))
-            {
-                if (!response.IsSuccessStatusCode)
-                {
-                    throw new HttpRequestException("Falha ao instalar o firmware: " + response.RequestMessage);
+                    throw new TimeoutException("Excedido tempo para conclusão do Job " + jobId);
                 }
             }
-            return "Job Criado com sucesso !";
+
+            return "Firmware Atualizado com sucesso !";
         }
 
         public async Task<string> ExportScpFile(IdracScpTarget target)
@@ -128,19 +121,32 @@ namespace Server_Tools.Control
             string jobId = await CreateJob(baseUri + EXPORT_SYSTEM_CONFIGURATION, httpContent);
             DateTime startTime = DateTime.Now;
             bool jobOk = false;
-            while (!jobOk)// Aguarda o Job ser concluido, Timeout de 5 minutos
+
+            while (!jobOk)
             {
                 jobOk = await CheckJobStatus(jobId);
-                if (DateTime.Now >= startTime.AddMinutes(5))
+                if (DateTime.Now >= startTime.AddMinutes(JOB_TIMEOUT))
                 {
                     throw new TimeoutException("Excedido tempo para conclusão do Job " + jobId);
                 }
-            } 
-            string path = await SaveScpFile(jobId);
-            return "Arquivo exportado com sucesso !\nArquivo salvo em :" + path;
+            }
+            string path;
+            using (HttpResponseMessage response = await HttpUtil.GetClient().GetAsync(baseUri + JOB_RESULT + jobId))
+            {
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw new HttpRequestException("Falha ao receber dados do Export: " + response.RequestMessage);
+                }
+                string jobData = await response.Content.ReadAsStringAsync();
+                string currentTime = DateTime.Now.ToString().Replace(":", "").Replace("/", "").Replace(" ", "");
+                string dowloadsFolder = KnownFolders.Downloads.Path;
+                path = Path.Combine(dowloadsFolder, "SCP_" + currentTime + ".xml");
+                File.WriteAllText(path, jobData);
+            }
+            return "Arquivo exportado com sucesso !\nArquivo salvo em " + path;
         }
 
-        public async void ImportScpFile(string file, IdracScpTarget target, IdracShutdownType shutdown, IdracHostPowerStatus status)
+        public async Task<string> ImportScpFile(string file, IdracScpTarget target, IdracShutdownType shutdown, IdracHostPowerStatus status)
         {
             string fileLines = File.ReadAllText(file);
             var content = new
@@ -161,11 +167,12 @@ namespace Server_Tools.Control
             while (!jobOk)// Aguarda o Job ser concluido, Timeout de 5 minutos
             {
                 jobOk = await CheckJobStatus(jobId);
-                if (DateTime.Now >= startTime.AddMinutes(5))
+                if (DateTime.Now >= startTime.AddMinutes(JOB_TIMEOUT))
                 {
                     throw new TimeoutException("Excedido tempo para conclusão do Job " + jobId);
                 }
             }
+            return "Arquivo importado com sucesso !";
         }
 
         private async Task<string> CreateJob(string uri, HttpContent content)
@@ -203,24 +210,6 @@ namespace Server_Tools.Control
             {
                 return false;
             }
-        }
-
-        private async Task<string> SaveScpFile(string jobId)
-        {
-            string path;
-            using (HttpResponseMessage response = await HttpUtil.GetClient().GetAsync(baseUri + JOB_RESULT + jobId))
-            {
-                if (!response.IsSuccessStatusCode)
-                {
-                    throw new HttpRequestException("Falha ao receber dados do Export: " + response.RequestMessage);
-                }
-                string jobData = await response.Content.ReadAsStringAsync();
-                string currentTime = DateTime.Now.ToString().Replace(":", "").Replace("/", "");
-                string dowloadsFolder = KnownFolders.Downloads.Path;
-                path = Path.Combine(dowloadsFolder, "SCP_" + currentTime + ".xml");
-                File.WriteAllText(path, jobData);
-            }
-            return path;
         }
     }
 }

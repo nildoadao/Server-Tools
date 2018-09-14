@@ -44,5 +44,15 @@ namespace Server_Tools.View
         {
             NavigationService.Navigate(new TemplatesPage());
         }
+
+        private void ExportScpButton_Click(object sender, RoutedEventArgs e)
+        {
+            NavigationService.Navigate(new ScpExportPage());
+        }
+
+        private void ImportScpButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

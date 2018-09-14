@@ -29,8 +29,7 @@ namespace Server_Tools.View
 
         private void UpdateButton_Click(object sender, RoutedEventArgs e)
         {
-            CheckRedfishSupport();
-            //UpdateFirmware();
+            UpdateFirmware();
         }
 
         private async void UpdateFirmware()
@@ -47,26 +46,18 @@ namespace Server_Tools.View
             }
         }
 
-        private async void CheckRedfishSupport()
+        private async void ExportScpFile(IdracScpTarget target)
         {
-            IdracRedfishController idrac = new IdracRedfishController(new Server(ServerTextBox.Text, UserTextBox.Text, PasswordBox.Password));
+            Server server = new Server(ServerTextBox.Text, UserTextBox.Text, PasswordBox.Password);
+            IdracRedfishController idrac = new IdracRedfishController(server);
+            OutputTextBox.AppendText("Exportando configurações de " + server.Host + "...\n");
             try
             {
-                bool support = await idrac.CheckRedfishSupport(IdracRedfishController.FIRMWARE_INVENTORY);
-                {
-                    if (support)
-                    {
-                        OutputTextBox.AppendText("Suporta RedFish\n");
-                    }
-                    else
-                    {
-                        OutputTextBox.AppendText("Não suporta Redfish\n");
-                    }
-                }
+                OutputTextBox.AppendText(await idrac.ExportScpFile(target) + "\n");
             }
             catch (Exception ex)
             {
-                OutputTextBox.AppendText("Falha ao consultar suporte a API " + ex.Message + "\n");
+                OutputTextBox.AppendText("Falha ao exportar arquivo: " + ex.Message + "\n");
             }
         }
 

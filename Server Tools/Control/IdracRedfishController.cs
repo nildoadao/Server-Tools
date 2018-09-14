@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using Server_Tools.Model;
 using Server_Tools.Util;
+using Syroot.Windows.IO;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -26,9 +27,10 @@ namespace Server_Tools.Control
         public const string REDFISH_ROOT = @"/redfish/v1";
         public const string FIRMWARE_INVENTORY = @"/UpdateService/FirmwareInventory/";
         public const string FIRMWARE_INSTALL = @"/UpdateService/Actions/Oem/DellUpdateService.Install";
-        public const string JOB_RESULT = @"/Managers/iDRAC.Embedded.1/Jobs/";
-        public const string JOB_STATUS = @"/TaskService/Tasks/";
-        public const string EXPORT_SYSTEM_CONFIGURATION = @"Managers/iDRAC.Embedded.1/Actions/Oem/EID_674_Manager.ExportSystemConfiguration";
+        public const string JOB_STATUS = @"/Managers/iDRAC.Embedded.1/Jobs/";
+        public const string JOB_RESULT = @"/TaskService/Tasks/";
+        public const string EXPORT_SYSTEM_CONFIGURATION = @"/Managers/iDRAC.Embedded.1/Actions/Oem/EID_674_Manager.ExportSystemConfiguration";
+        public const string IMPORT_SYSTEM_CONFIGURATION = @"/Managers/iDRAC.Embedded.1/Actions/Oem/EID_674_Manager.ImportSystemConfiguration";
 
         #endregion
 
@@ -104,7 +106,7 @@ namespace Server_Tools.Control
             {
                 if (!response.IsSuccessStatusCode)
                 {
-                        throw new HttpRequestException("Falha ao instalar o firmware: " + response.RequestMessage);
+                    throw new HttpRequestException("Falha ao instalar o firmware: " + response.RequestMessage);
                 }
             }
             return "Job Criado com sucesso !";
@@ -112,70 +114,111 @@ namespace Server_Tools.Control
 
         public async Task<string> ExportScpFile(IdracScpTarget target)
         {
-            bool support = await CheckRedfishSupport(EXPORT_SYSTEM_CONFIGURATION);
-
-            if (!support)
-            {
-                throw new NotSupportedException("Host não suporta o recurso solicitado");
-            }
-
             var content = new
             {
                 ExportFormat = "XML",
                 ShareParameters = new
                 {
-                    Target = target
+                    Target = target.ToString()
                 }
             };
 
+            var jsonContent = JsonConvert.SerializeObject(content);            
+            var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+            string jobId = await CreateJob(baseUri + EXPORT_SYSTEM_CONFIGURATION, httpContent);
+            DateTime startTime = DateTime.Now;
+
+            while (await CheckJobStatus(jobId))// Aguarda o Job ser concluido, Timeout de 5 minutos
+            {
+                if(DateTime.Now >= startTime.AddMinutes(5))
+                {
+                    throw new TimeoutException("Excedido tempo para conclusão do Job " + jobId);
+                }
+            } 
+            string path = await SaveScpFile(jobId);
+            return "Arquivo exportado com sucesso !\nArquivo salvo em :" + path;
+        }
+
+        public async void ImportScpFile(string file, IdracScpTarget target, IdracShutdownType shutdown, IdracHostPowerStatus status)
+        {
+            string fileLines = File.ReadAllText(file);
+            var content = new
+            {
+                ImportBuffer = fileLines,
+                ShareParameters = new
+                {
+                    Target = target.ToString()
+                },
+                ShutdownType = shutdown.ToString(),
+                HostPowerState = status.ToString()
+            };
             var jsonContent = JsonConvert.SerializeObject(content);
             var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-            string jobId = "";
+            string jobId = await CreateJob(baseUri + IMPORT_SYSTEM_CONFIGURATION, httpContent);
+            DateTime startTime = DateTime.Now;
 
-            using(HttpResponseMessage response = await HttpUtil.GetClient().PostAsync(baseUri + EXPORT_SYSTEM_CONFIGURATION, httpContent))
+            while (await CheckJobStatus(jobId))// Aguarda o Job ser concluido, Timeout de 5 minutos
+            {
+                if (DateTime.Now >= startTime.AddMinutes(5))
+                {
+                    throw new TimeoutException("Excedido tempo para conclusão do Job " + jobId);
+                }
+            }
+        }
+
+        private async Task<string> CreateJob(string uri, HttpContent content)
+        {
+            string jobId = "";
+            using (HttpResponseMessage response = await HttpUtil.GetClient().PostAsync(uri, content))
             {
                 if (!response.IsSuccessStatusCode)
                 {
-                    throw new HttpRequestException("Falha ao criar Job: " + response.RequestMessage);
+                    throw new HttpRequestException("Falha ao criar Job: " + response.Content);
                 }
-                jobId = Regex.Match(response.Content.ToString(), "JID_.+?r").Captures[0].Value.Replace("\r", "");
+                jobId = Regex.Match(response.Headers.Location.ToString(), "JID_.*").Captures[0].Value.Replace("\r", "");
             }
+            return jobId;
+        }
 
-            var startTime = DateTime.Now;
-            bool jobOk = false;
-
-            while (!jobOk) // Aguarda o Job ser concluido, Timeout de 5 minutos
+        private async Task<bool> CheckJobStatus(string jobId)
+        {
+            IdracJob job;
+            using (HttpResponseMessage response = await HttpUtil.GetClient().GetAsync(baseUri + JOB_STATUS + jobId))
             {
-                using (HttpResponseMessage response = await HttpUtil.GetClient().GetAsync(baseUri + JOB_RESULT + jobId))
-                {
-                    var exportJob = JsonConvert.DeserializeObject<IdracJob>(response.Content.ToString());
-                    if (exportJob.TaskState.Equals("Failed"))
-                    {
-                        throw new HttpRequestException("Falha ao executar Job: " + response.RequestMessage);
-                    }
-                    else if (startTime.AddMinutes(5) >= DateTime.Now)
-                    {
-                        throw new TimeoutException("Execedido tempo para execução do JOB" + response.RequestMessage);
-                    }
-                    else if (exportJob.TaskState.Equals("Completed"))
-                    {
-                        jobOk = true;
-                    }
-                }
+                string jsonBody = await response.Content.ReadAsStringAsync();
+                job = JsonConvert.DeserializeObject<IdracJob>(jsonBody);
             }
 
-            // Le os dados do Job e salva em um arquivo .xml
+            if (job.JobState.Equals("Failed"))
+            {
+                throw new HttpRequestException("Falha ao executar Job: " + job.Message);
+            }
+            else if (job.JobState.Equals("Completed"))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        private async Task<string> SaveScpFile(string jobId)
+        {
+            string path;
             using (HttpResponseMessage response = await HttpUtil.GetClient().GetAsync(baseUri + JOB_RESULT + jobId))
             {
                 if (!response.IsSuccessStatusCode)
                 {
                     throw new HttpRequestException("Falha ao receber dados do Export: " + response.RequestMessage);
                 }
-                var jobData = response.Content.ToString();
-                File.WriteAllText(DateTime.Now.ToString() + ".xml", jobData);
+                string jobData = await response.Content.ReadAsStringAsync();
+                string currentTime = DateTime.Now.ToString().Replace(":", "").Replace("/", "");
+                string dowloadsFolder = KnownFolders.Downloads.Path;
+                path = Path.Combine(dowloadsFolder, "SCP_" + currentTime + ".xml");
+                File.WriteAllText(path, jobData);
             }
-
-            return "Arquivo exportado com sucesso !";
+            return path;
         }
     }
 }

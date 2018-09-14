@@ -42,6 +42,18 @@
                     <TextBlock Text="Templates" VerticalAlignment="Center"/>
                 </StackPanel>
             </Button>
+            <Button Height="50" Width="150" Background="Transparent " Margin="50" Name="ExportScpButton" Click="ExportScpButton_Click">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/Server Tools;component/Resources/icons8-export-filled-50.png"/>
+                    <TextBlock Text="Exportar SCP" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+            <Button Height="50" Width="150" Background="Transparent " Margin="50" Name="ImportScpButton" Click="ImportScpButton_Click">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/Server Tools;component/Resources/icons8-import-filled-50.png"/>
+                    <TextBlock Text="Importar SCP" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
         </WrapPanel>
     </Grid>
 </Page>

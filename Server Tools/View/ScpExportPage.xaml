@@ -48,15 +48,23 @@
         </GroupBox>
         <GroupBox Grid.Row="1" Grid.Column="1" Height="Auto" Header="Items a serem exportados" FontSize="13" Margin="5" HorizontalAlignment="Center">
             <StackPanel>
-                <RadioButton Content="ALL" GroupName="ExportType" IsChecked="True"/>
-                <RadioButton Content="System" GroupName="ExportType"/>
-                <RadioButton Content="BIOS" GroupName="ExportType"/>
-                <RadioButton Content="IDRAC" GroupName="ExportType"/>
-                <RadioButton Content="NIC" GroupName="ExportType"/>
-                <RadioButton Content="FC" GroupName="ExportType"/>
-                <RadioButton Content="LifecycleController" GroupName="ExportType"/>
-                <RadioButton Content="RAID" GroupName="ExportType"/>
+                <RadioButton Content="ALL" GroupName="ExportType" Name="AllRadioButton" IsChecked="True"/>
+                <RadioButton Content="System" GroupName="ExportType" Name="SystemRadioButton"/>
+                <RadioButton Content="BIOS" GroupName="ExportType" Name="BiosRadioButton"/>
+                <RadioButton Content="IDRAC" GroupName="ExportType" Name="IdracRadioButton"/>
+                <RadioButton Content="NIC" GroupName="ExportType" Name="NicRadioButton"/>
+                <RadioButton Content="FC" GroupName="ExportType" Name="FcRadioButton"/>
+                <RadioButton Content="LifecycleController" GroupName="ExportType" Name="LifeCycleRadioButton"/>
+                <RadioButton Content="RAID" GroupName="ExportType" Name="RaidRadioButton"/>
             </StackPanel>
         </GroupBox>
+        <StackPanel Grid.Column="4" Grid.Row="8" Width="Auto" Orientation="Horizontal">
+            <Button Name="ExportButton" Content="Exportar Arquivo" Margin="5" Height="20" Width="150" HorizontalAlignment="Left" Click="ExportButton_Click"/>
+            <Button Name="CancelButton" Content="Cancelar" Margin="5" Height="20" Width="150"  HorizontalAlignment="Left"/>
+        </StackPanel>
+        <TextBlock Text="Saida" Grid.Row="10" Margin="5" />
+        <ScrollViewer Margin="5" HorizontalContentAlignment="Left"  HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" CanContentScroll="True" MaxWidth="700" BorderBrush="Transparent" Grid.Row="11" Grid.ColumnSpan="2">
+            <TextBox Name="OutputTextBox"  Height="200" TextWrapping="Wrap" IsReadOnly="True" BorderBrush="Transparent"  HorizontalScrollBarVisibility="Auto" Width="700" />
+        </ScrollViewer>
     </Grid>
 </Page>

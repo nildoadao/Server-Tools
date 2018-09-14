@@ -127,10 +127,11 @@ namespace Server_Tools.Control
             var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
             string jobId = await CreateJob(baseUri + EXPORT_SYSTEM_CONFIGURATION, httpContent);
             DateTime startTime = DateTime.Now;
-
-            while (await CheckJobStatus(jobId))// Aguarda o Job ser concluido, Timeout de 5 minutos
+            bool jobOk = false;
+            while (!jobOk)// Aguarda o Job ser concluido, Timeout de 5 minutos
             {
-                if(DateTime.Now >= startTime.AddMinutes(5))
+                jobOk = await CheckJobStatus(jobId);
+                if (DateTime.Now >= startTime.AddMinutes(5))
                 {
                     throw new TimeoutException("Excedido tempo para conclusão do Job " + jobId);
                 }
@@ -156,9 +157,10 @@ namespace Server_Tools.Control
             var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
             string jobId = await CreateJob(baseUri + IMPORT_SYSTEM_CONFIGURATION, httpContent);
             DateTime startTime = DateTime.Now;
-
-            while (await CheckJobStatus(jobId))// Aguarda o Job ser concluido, Timeout de 5 minutos
+            bool jobOk = false;
+            while (!jobOk)// Aguarda o Job ser concluido, Timeout de 5 minutos
             {
+                jobOk = await CheckJobStatus(jobId);
                 if (DateTime.Now >= startTime.AddMinutes(5))
                 {
                     throw new TimeoutException("Excedido tempo para conclusão do Job " + jobId);

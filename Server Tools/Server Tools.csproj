@@ -97,14 +97,13 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Control\IdracHostPowerStatus.cs" />
-    <Compile Include="Control\IdracInstallOption.cs" />
-    <Compile Include="Control\IdracJob.cs" />
+    <Compile Include="Model\IdracHostPowerStatus.cs" />
+    <Compile Include="Model\IdracInstallOption.cs" />
+    <Compile Include="Model\IdracJob.cs" />
     <Compile Include="Control\IdracRedfishController.cs" />
-    <Compile Include="Control\IdracScpExportUse.cs" />
-    <Compile Include="Control\IdracScpOption.cs" />
-    <Compile Include="Control\IdracShutdownType.cs" />
-    <Compile Include="Control\IdracStorageController.cs" />
+    <Compile Include="Model\IdracScpExportUse.cs" />
+    <Compile Include="Model\IdracScpOption.cs" />
+    <Compile Include="Model\IdracShutdownType.cs" />
     <Compile Include="Model\IdracDiskItem.cs" />
     <Compile Include="Model\IdracPhysicalDisk.cs" />
     <Compile Include="Model\RepositoryType.cs" />
@@ -131,7 +130,6 @@
     </Compile>
     <Compile Include="Model\IdracFirmware.cs" />
     <Compile Include="Control\IdracSshCommand.cs" />
-    <Compile Include="Control\IdracUpdateController.cs" />
     <Compile Include="Util\NetworkHelper.cs" />
     <Compile Include="Model\RacadmException.cs" />
     <Compile Include="Model\Server.cs" />

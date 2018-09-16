@@ -39,7 +39,7 @@ namespace Server_Tools.View
             OutputTextBox.AppendText("Iniciando upload do arquivo " + FirmwareTextBox.Text + " para " + server.Host);
             try
             {
-                OutputTextBox.AppendText(await idrac.UpdateIdracFirmware(FirmwareTextBox.Text, IdracInstallOption.NextReboot));
+                OutputTextBox.AppendText(await idrac.UpdateFirmware(FirmwareTextBox.Text, IdracInstallOption.NextReboot));
             }
             catch(Exception ex)
             {

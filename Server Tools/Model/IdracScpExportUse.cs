@@ -1,5 +1,5 @@
 ﻿
-namespace Server_Tools.Control
+namespace Server_Tools.Model
 {
     enum IdracScpExportUse
     {

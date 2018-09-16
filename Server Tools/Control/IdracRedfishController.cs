@@ -64,45 +64,58 @@ namespace Server_Tools.Control
             return support;
         }
 
-        public async Task<string> UpdateIdracFirmware(string firmwarePath, IdracInstallOption option)
+        public async Task<string> UpdateFirmware(string firmwarePath, IdracInstallOption option)
         {
-            string location = "";
             var firmwareContent = new MultipartFormDataContent(Guid.NewGuid().ToString());
             var firmwareFile = File.ReadAllBytes(firmwarePath);
             firmwareContent.Add(new StreamContent(new MemoryStream(firmwareFile)), "Firmware", Path.GetFileName(firmwarePath));
-
-            using (HttpResponseMessage response = await HttpUtil.GetClient().PostAsync(baseUri + FIRMWARE_INVENTORY, firmwareContent))
-            {
-                if (!response.IsSuccessStatusCode)
-                {
-                    throw new HttpRequestException("Falha no upload do arquivo " + response.Content);
-                }
-                var locations = response.Content.Headers.GetValues("Location") as List<string>;
-                location = locations[0];
-            }
-
+            var location = await UploadFile(baseUri + FIRMWARE_INVENTORY, firmwareContent);
             var content = new
             {
                 SoftwareIdentityURIs = location,
                 InstallUpon = option
             };
-
             var jsonContent = JsonConvert.SerializeObject(content);
             var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
             string jobId = await CreateJob(baseUri + FIRMWARE_INSTALL, httpContent);
+
             bool jobOk = false;
             DateTime startTime = DateTime.Now;
 
             while (!jobOk)
             {
-                jobOk = await CheckJobStatus(jobId);
+                var job = await GetJob(jobId);
+                if (job.JobState.Equals("Completed"))
+                {
+                    jobOk = true;
+                }
+                else if (job.JobState.Equals("Failed"))
+                {
+                    throw new HttpRequestException("Falha ao executar o Job: " + job.Message);
+                }
                 if (DateTime.Now >= startTime.AddMinutes(JOB_TIMEOUT))
                 {
                     throw new TimeoutException("Excedido tempo para conclusão do Job " + jobId);
                 }
             }
+            /* To do
+             * Após a Atualização, ler os dados do firmware e retornar um objeto IdracFirmware
+             */
+            return "Firmware Name";
+        }
 
-            return "Firmware Atualizado com sucesso !";
+        private async Task<Uri> UploadFile(string uri, HttpContent content)
+        {
+            Uri location;
+            using (HttpResponseMessage response = await HttpUtil.GetClient().PostAsync(uri, content))
+            {
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw new HttpRequestException("Falha no upload do arquivo " + response.ReasonPhrase);
+                }
+                location = response.Headers.Location;
+            }
+            return location;
         }
 
         public async Task<string> ExportScpFile(IdracScpTarget target)
@@ -120,11 +133,18 @@ namespace Server_Tools.Control
             var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
             string jobId = await CreateJob(baseUri + EXPORT_SYSTEM_CONFIGURATION, httpContent);
             DateTime startTime = DateTime.Now;
-            bool jobOk = false;
 
-            while (!jobOk)
+            while (true)
             {
-                jobOk = await CheckJobStatus(jobId);
+                var job = await GetJob(jobId);
+                if (job.JobState.Equals("Completed"))
+                {
+                    break;
+                }
+                else if (job.JobState.Equals("Failed"))
+                {
+                    throw new HttpRequestException("Falha ao executar o Job: " + job.Message);
+                }
                 if (DateTime.Now >= startTime.AddMinutes(JOB_TIMEOUT))
                 {
                     throw new TimeoutException("Excedido tempo para conclusão do Job " + jobId);
@@ -143,10 +163,10 @@ namespace Server_Tools.Control
                 path = Path.Combine(dowloadsFolder, "SCP_" + currentTime + ".xml");
                 File.WriteAllText(path, jobData);
             }
-            return "Arquivo exportado com sucesso !\nArquivo salvo em " + path;
+            return path;
         }
 
-        public async Task<string> ImportScpFile(string file, IdracScpTarget target, IdracShutdownType shutdown, IdracHostPowerStatus status)
+        public async Task<IdracJob> ImportScpFile(string file, IdracScpTarget target, IdracShutdownType shutdown, IdracHostPowerStatus status)
         {
             string fileLines = File.ReadAllText(file);
             var content = new
@@ -163,18 +183,37 @@ namespace Server_Tools.Control
             var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
             string jobId = await CreateJob(baseUri + IMPORT_SYSTEM_CONFIGURATION, httpContent);
             DateTime startTime = DateTime.Now;
-            bool jobOk = false;
-            while (!jobOk)// Aguarda o Job ser concluido, Timeout de 5 minutos
+            IdracJob job = new IdracJob();
+
+            while(true)
             {
-                jobOk = await CheckJobStatus(jobId);
+                job = await GetJob(jobId);
+                if (job.JobState.Equals("Completed"))
+                {
+                    break;
+                }
+                else if (job.JobState.Equals("Failed"))
+                {
+                    throw new HttpRequestException("Falha ao executar o Job: " + job.Message);
+                }
+                else if(job.JobState.Equals("Pending") & shutdown == IdracShutdownType.NoReboot)
+                {
+                    break;
+                }
                 if (DateTime.Now >= startTime.AddMinutes(JOB_TIMEOUT))
                 {
                     throw new TimeoutException("Excedido tempo para conclusão do Job " + jobId);
                 }
-            }
-            return "Arquivo importado com sucesso !";
+            }        
+            return job;
         }
 
+        /// <summary>
+        /// Cria um Job na Idrac
+        /// </summary>
+        /// <param name="uri">String contento o enderço do recurso</param>
+        /// <param name="content">Conteudo Http da requisição</param>
+        /// <returns></returns>
         private async Task<string> CreateJob(string uri, HttpContent content)
         {
             string jobId = "";
@@ -189,7 +228,12 @@ namespace Server_Tools.Control
             return jobId;
         }
 
-        private async Task<bool> CheckJobStatus(string jobId)
+        /// <summary>
+        /// Retorna um objeto contendo os dados do Job da Idrac
+        /// </summary>
+        /// <param name="jobId">Identificação do Job</param>
+        /// <returns>O Job corresponde ao ID</returns>
+        private async Task<IdracJob> GetJob(string jobId)
         {
             IdracJob job;
             using (HttpResponseMessage response = await HttpUtil.GetClient().GetAsync(baseUri + JOB_STATUS + jobId))
@@ -197,19 +241,7 @@ namespace Server_Tools.Control
                 string jsonBody = await response.Content.ReadAsStringAsync();
                 job = JsonConvert.DeserializeObject<IdracJob>(jsonBody);
             }
-
-            if (job.JobState.Equals("Failed"))
-            {
-                throw new HttpRequestException("Falha ao executar Job: " + job.Message);
-            }
-            else if (job.JobState.Equals("Completed"))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return job;
         }
     }
 }

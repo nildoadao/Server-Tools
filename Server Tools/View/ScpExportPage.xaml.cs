@@ -35,7 +35,8 @@ namespace Server_Tools.View
             OutputTextBox.AppendText("Exportando configurações de " + server.Host + "...\n");
             try
             {
-                OutputTextBox.AppendText(await idrac.ExportScpFile(target) + "\n");
+                string file = await idrac.ExportScpFile(target);
+                OutputTextBox.AppendText("Arquivo importado com sucesso, salvo em: " + file + "\n");
             }
             catch (Exception ex)
             {

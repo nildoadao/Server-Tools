@@ -62,7 +62,7 @@
                     <RadioButton Content="RAID" GroupName="ImportType" Name="RaidRadioButton"/>
                 </StackPanel>
             </GroupBox>
-            <GroupBox Height="Auto" Header="Modo de Instalação">
+            <GroupBox Height="Auto" Header="Modo de Instalação" Margin="5">
                 <StackPanel Margin="5">
                     <RadioButton Content="Graceful" GroupName="ShutdownType" Name="GracefulRadioButton" IsChecked="True"/>
                     <RadioButton Content="Forced" GroupName="ShutdownType" Name="ForcedRadioButton"/>

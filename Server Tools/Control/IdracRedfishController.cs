@@ -21,7 +21,7 @@ namespace Server_Tools.Control
     {
         Server server;
         string baseUri;
-        private const double JOB_TIMEOUT = 5; 
+        private const double JOB_TIMEOUT = 5; // Timeout de 5 minutos para conclusão dos Jobs
 
         #region Redfish URLs
 
@@ -64,6 +64,12 @@ namespace Server_Tools.Control
             return support;
         }
 
+        /// <summary>
+        /// Realiza um update de firmware em um servidor que suporta Redfish
+        /// </summary>
+        /// <param name="firmwarePath">Caminho completo para o arquvi do firmware</param>
+        /// <param name="option">Modo de instalação</param>
+        /// <returns></returns>
         public async Task<string> UpdateFirmware(string firmwarePath, IdracInstallOption option)
         {
             var firmwareContent = new MultipartFormDataContent(Guid.NewGuid().ToString());
@@ -78,16 +84,14 @@ namespace Server_Tools.Control
             var jsonContent = JsonConvert.SerializeObject(content);
             var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
             string jobId = await CreateJob(baseUri + FIRMWARE_INSTALL, httpContent);
-
-            bool jobOk = false;
             DateTime startTime = DateTime.Now;
 
-            while (!jobOk)
+            while (true)
             {
                 var job = await GetJob(jobId);
                 if (job.JobState.Equals("Completed"))
                 {
-                    jobOk = true;
+                    break;
                 }
                 else if (job.JobState.Equals("Failed"))
                 {
@@ -104,6 +108,12 @@ namespace Server_Tools.Control
             return "Firmware Name";
         }
 
+        /// <summary>
+        /// Realiza o upload de um arquivo para um servidor que suporta Redfish
+        /// </summary>
+        /// <param name="uri">URL do recurso</param>
+        /// <param name="content">Conteudo Http contendo o arquivo</param>
+        /// <returns>Uri do novo recurso</returns>
         private async Task<Uri> UploadFile(string uri, HttpContent content)
         {
             Uri location;
@@ -118,6 +128,11 @@ namespace Server_Tools.Control
             return location;
         }
 
+        /// <summary>
+        /// Exporta um Server Configuration Profile para um servidor que suporta Redfish
+        /// </summary>
+        /// <param name="target">Parametros que serão incluidos no arquivo</param>
+        /// <returns></returns>
         public async Task<string> ExportScpFile(IdracScpTarget target)
         {
             var content = new
@@ -166,6 +181,14 @@ namespace Server_Tools.Control
             return path;
         }
 
+        /// <summary>
+        /// Importa um arquivo do tipo Server Configuration Profile para um servidor com suporte a Redfish
+        /// </summary>
+        /// <param name="file">Caminho completo do arquvio SCP</param>
+        /// <param name="target">Atributos que sofrerão alteração</param>
+        /// <param name="shutdown">Método de desligamento, caso necessario</param>
+        /// <param name="status">Status do servidor On/Off</param>
+        /// <returns></returns>
         public async Task<IdracJob> ImportScpFile(string file, IdracScpTarget target, IdracShutdownType shutdown, IdracHostPowerStatus status)
         {
             string fileLines = File.ReadAllText(file);
@@ -235,13 +258,27 @@ namespace Server_Tools.Control
         /// <returns>O Job corresponde ao ID</returns>
         private async Task<IdracJob> GetJob(string jobId)
         {
-            IdracJob job;
-            using (HttpResponseMessage response = await HttpUtil.GetClient().GetAsync(baseUri + JOB_STATUS + jobId))
+            return await GetResource<IdracJob>(baseUri + JOB_STATUS + jobId);
+        }
+
+        /// <summary>
+        /// Retorna um objeto genérico a partir de uma Uri da API Redfish
+        /// </summary>
+        /// <typeparam name="T">Tipo do Objeto de retorno</typeparam>
+        /// <param name="uri">Localização do recurso</param>
+        /// <returns></returns>
+        private async Task<T> GetResource<T>(string uri)
+        {
+            string jsonBody;
+            using (HttpResponseMessage response = await HttpUtil.GetClient().GetAsync(uri))
             {
-                string jsonBody = await response.Content.ReadAsStringAsync();
-                job = JsonConvert.DeserializeObject<IdracJob>(jsonBody);
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw new HttpRequestException("Falha ao obter recurso: " + uri + " " + response.ReasonPhrase);
+                }
+                jsonBody = await response.Content.ReadAsStringAsync();
             }
-            return job;
+            return JsonConvert.DeserializeObject<T>(jsonBody);
         }
     }
 }

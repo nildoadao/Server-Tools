@@ -21,7 +21,7 @@ namespace Server_Tools.Control
     {
         Server server;
         string baseUri;
-        private const double JOB_TIMEOUT = 5; // Timeout de 5 minutos para conclusão dos Jobs
+        private const double JOB_TIMEOUT = 10; // Timeout de 5 minutos para conclusão dos Jobs
 
         #region Redfish URLs
 
@@ -67,29 +67,19 @@ namespace Server_Tools.Control
         /// <summary>
         /// Realiza um update de firmware em um servidor que suporta Redfish
         /// </summary>
-        /// <param name="firmwarePath">Caminho completo para o arquvi do firmware</param>
+        /// <param name="path">Caminho completo para o arquvi do firmware</param>
         /// <param name="option">Modo de instalação</param>
-        /// <returns></returns>
-        public async Task<string> UpdateFirmware(string firmwarePath, IdracInstallOption option)
+        /// <returns>IdracJob</returns>
+        public async Task<IdracJob> UpdateFirmware(string path, IdracInstallOption option)
         {
-            var firmwareContent = new MultipartFormDataContent(Guid.NewGuid().ToString());
-            var firmwareFile = File.ReadAllBytes(firmwarePath);
-            firmwareContent.Add(new StreamContent(new MemoryStream(firmwareFile)), "Firmware", Path.GetFileName(firmwarePath));
-            var location = await UploadFile(baseUri + FIRMWARE_INVENTORY, firmwareContent);
-            var content = new
-            {
-                SoftwareIdentityURIs = location,
-                InstallUpon = option
-            };
-            var jsonContent = JsonConvert.SerializeObject(content);
-            var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-            string jobId = await CreateJob(baseUri + FIRMWARE_INSTALL, httpContent);
+            Uri location = await UploadFile(path);
             DateTime startTime = DateTime.Now;
+            IdracJob job = await InstallFirmware(location, option);
 
             while (true)
             {
-                var job = await GetJob(jobId);
-                if (job.JobState.Equals("Completed"))
+                job = await GetJob(job.Id);
+                if (job.JobState.Contains("Completed"))
                 {
                     break;
                 }
@@ -99,31 +89,61 @@ namespace Server_Tools.Control
                 }
                 if (DateTime.Now >= startTime.AddMinutes(JOB_TIMEOUT))
                 {
-                    throw new TimeoutException("Excedido tempo para conclusão do Job " + jobId);
+                    throw new TimeoutException("Excedido tempo para conclusão do Job " + job.Id);
                 }
             }
             /* To do
              * Após a Atualização, ler os dados do firmware e retornar um objeto IdracFirmware
              */
-            return "Firmware Name";
+            return job;
         }
 
-        /// <summary>
-        /// Realiza o upload de um arquivo para um servidor que suporta Redfish
-        /// </summary>
-        /// <param name="uri">URL do recurso</param>
-        /// <param name="content">Conteudo Http contendo o arquivo</param>
-        /// <returns>Uri do novo recurso</returns>
-        private async Task<Uri> UploadFile(string uri, HttpContent content)
+        private async Task<IdracJob> InstallFirmware(Uri location, IdracInstallOption option)
         {
-            Uri location;
-            using (HttpResponseMessage response = await HttpUtil.GetClient().PostAsync(uri, content))
+            var content = new
             {
-                if (!response.IsSuccessStatusCode)
+                SoftwareIdentityURIs = location,
+                InstallUpon = option
+            };
+            var jsonContent = JsonConvert.SerializeObject(content);
+            var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+            string jobId = await CreateJob(baseUri + FIRMWARE_INSTALL, httpContent);
+            return await GetJob(jobId);
+        }
+
+        private async Task<Uri> UploadFile(string path)
+        {
+            string etag;
+            using(HttpResponseMessage response = await HttpUtil.GetClient().GetAsync(baseUri + FIRMWARE_INVENTORY))
+            {
+                etag = response.Headers.ETag.Tag;
+            }
+            Uri location;
+            using (var content = new MultipartFormDataContent(Guid.NewGuid().ToString()))
+            using (var fileStream = File.OpenRead(path))
+            using (var fileContent = new StreamContent(fileStream))
+            {
+                fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse("application/octet-stream");
+                fileContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
                 {
-                    throw new HttpRequestException("Falha no upload do arquivo " + response.ReasonPhrase);
+                    Name = "file",
+                    FileName = Path.GetFileName(path),
+                };
+                fileContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
+                {
+                    Name = "importConfig",
+                    FileName = Path.GetFileName(path),
+                };
+                content.Add(fileContent);
+                content.Headers.Add("if-match", etag);
+                using(HttpResponseMessage response = await HttpUtil.GetClient().PostAsync(baseUri + FIRMWARE_INVENTORY, content))
+                {
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        throw new HttpRequestException("Falha no upload do arquivo: " + response.ReasonPhrase);
+                    }
+                    location = response.Headers.Location;
                 }
-                location = response.Headers.Location;
             }
             return location;
         }
@@ -152,7 +172,7 @@ namespace Server_Tools.Control
             while (true)
             {
                 var job = await GetJob(jobId);
-                if (job.JobState.Equals("Completed"))
+                if (job.JobState.Contains("Completed"))
                 {
                     break;
                 }
@@ -211,7 +231,7 @@ namespace Server_Tools.Control
             while(true)
             {
                 job = await GetJob(jobId);
-                if (job.JobState.Equals("Completed"))
+                if (job.JobState.Contains("Completed"))
                 {
                     break;
                 }
@@ -219,7 +239,7 @@ namespace Server_Tools.Control
                 {
                     throw new HttpRequestException("Falha ao executar o Job: " + job.Message);
                 }
-                else if(job.JobState.Equals("Pending") & shutdown == IdracShutdownType.NoReboot)
+                else if(job.JobState.Equals("Paused") & shutdown == IdracShutdownType.NoReboot)
                 {
                     break;
                 }

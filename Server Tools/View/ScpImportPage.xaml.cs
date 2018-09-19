@@ -100,7 +100,7 @@ namespace Server_Tools.View
             try
             {
                 IdracJob job = await idrac.ImportScpFile(FileTextBox.Text, target, shutdown, IdracHostPowerStatus.On);
-                OutputTextBox.AppendText("Job Status: " + job.JobState + " " + job.Message);
+                OutputTextBox.AppendText("Job Status: " + job.JobState + " " + job.Message + "\n");
             }
             catch(Exception ex)
             {

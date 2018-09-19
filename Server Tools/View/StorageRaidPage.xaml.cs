@@ -15,13 +15,9 @@ namespace Server_Tools.View
     /// </summary>
     public partial class StorageRaidPage : Page
     {
-
-        private ObservableCollection<IdracDiskItem> datagridItems;
-
         public StorageRaidPage()
         {
             InitializeComponent();
-            datagridItems = new ObservableCollection<IdracDiskItem>();
         }
 
         private void CheckPhysicalDiskButton_Click(object sender, RoutedEventArgs e)

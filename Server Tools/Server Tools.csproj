@@ -104,10 +104,7 @@
     <Compile Include="Model\IdracScpExportUse.cs" />
     <Compile Include="Model\IdracScpOption.cs" />
     <Compile Include="Model\IdracShutdownType.cs" />
-    <Compile Include="Model\IdracDiskItem.cs" />
     <Compile Include="Model\IdracPhysicalDisk.cs" />
-    <Compile Include="Model\RepositoryType.cs" />
-    <Compile Include="Model\Repository.cs" />
     <Compile Include="Util\FileHelper.cs" />
     <Compile Include="Util\HttpUtil.cs" />
     <Compile Include="View\CustomScriptPage.xaml.cs">
@@ -133,7 +130,6 @@
     <Compile Include="Util\NetworkHelper.cs" />
     <Compile Include="Model\RacadmException.cs" />
     <Compile Include="Model\Server.cs" />
-    <Compile Include="Model\IdracUpdateItem.cs" />
     <Compile Include="View\ScpExportPage.xaml.cs">
       <DependentUpon>ScpExportPage.xaml</DependentUpon>
     </Compile>

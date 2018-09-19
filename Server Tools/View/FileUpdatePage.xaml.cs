@@ -36,10 +36,11 @@ namespace Server_Tools.View
         {
             Server server = new Server(ServerTextBox.Text, UserTextBox.Text, PasswordBox.Password);
             IdracRedfishController idrac = new IdracRedfishController(server);
-            OutputTextBox.AppendText("Iniciando upload do arquivo " + FirmwareTextBox.Text + " para " + server.Host);
+            OutputTextBox.AppendText("Iniciando upload do arquivo " + FirmwareTextBox.Text + " para " + server.Host + "\n");
             try
             {
-                OutputTextBox.AppendText(await idrac.UpdateFirmware(FirmwareTextBox.Text, IdracInstallOption.NextReboot));
+                IdracJob job = await idrac.UpdateFirmware(FirmwareTextBox.Text, IdracInstallOption.NextReboot);
+                OutputTextBox.AppendText("JOb Status: " + job.Message + "\n");
             }
             catch(Exception ex)
             {

@@ -18,13 +18,11 @@ namespace Server_Tools.View
     /// </summary>
     public partial class RepositoryUpdatePage : Page
     {
-        ObservableCollection<IdracUpdateItem> datagridItems;
         bool operationCancelled;
         OpenFileDialog dialog;
 
         public RepositoryUpdatePage()
         {
-            datagridItems = new ObservableCollection<IdracUpdateItem>();
             InitializeComponent();
             operationCancelled = false;
             dialog = new OpenFileDialog();

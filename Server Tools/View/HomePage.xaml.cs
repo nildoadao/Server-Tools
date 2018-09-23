@@ -40,11 +40,6 @@ namespace Server_Tools.View
             NavigationService.Navigate(new CustomScriptPage());
         }
 
-        private void TemplateFileButton_Click(object sender, RoutedEventArgs e)
-        {
-            NavigationService.Navigate(new TemplatesPage());
-        }
-
         private void ExportScpButton_Click(object sender, RoutedEventArgs e)
         {
             NavigationService.Navigate(new ScpExportPage());

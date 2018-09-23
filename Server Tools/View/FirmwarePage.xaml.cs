@@ -25,12 +25,12 @@ namespace Server_Tools.View
             InitializeComponent();
         }
 
-        private void UpdateFromRepositoryButton_Click(object sender, RoutedEventArgs e)
+        private void RepositoryButton_Click(object sender, RoutedEventArgs e)
         {
-            NavigationService.Navigate(new RepositoryUpdatePage());
+
         }
 
-        private void UpdateFromFile_Click(object sender, RoutedEventArgs e)
+        private void FileButton_Click(object sender, RoutedEventArgs e)
         {
             NavigationService.Navigate(new FileUpdatePage());
         }

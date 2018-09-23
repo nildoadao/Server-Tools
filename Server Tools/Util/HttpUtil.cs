@@ -18,32 +18,23 @@ namespace Server_Tools.Util
 
         #region Parametros default
 
-        private const string IDRAC_USER = "root";
-        private const string IDRAC_PASSWORD = "calvin";
         private const string USER_AGENT = "Server Tools";
         private const bool PRE_AUTHENTICATE = true;
 
         #endregion
 
-        /// <summary>
-        /// Retorna uma instancia HttpClient 
-        /// </summary>
-        /// <returns></returns>
-        public static HttpClient GetClient()
+        public static HttpClient GetClient(string user, string password)
         {
-            if(_client == null)
-            {
-                Init();
-            }
+            Init(user, password);
             return _client;
         }
 
-        private static void Init()
+        private static void Init(string user, string password)
         {
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Ssl3;
             ServicePointManager.ServerCertificateValidationCallback += (sender, certificate, chain, sslPolicyErrors) => true;
             _handler = new HttpClientHandler();
-            _handler.Credentials = new NetworkCredential(IDRAC_USER, ConvertToSecureString(IDRAC_PASSWORD));
+            _handler.Credentials = new NetworkCredential(user, ConvertToSecureString(password));
             _handler.PreAuthenticate = PRE_AUTHENTICATE;
             _client = new HttpClient(_handler);
             _client.DefaultRequestHeaders.Add("User-Agent", USER_AGENT);

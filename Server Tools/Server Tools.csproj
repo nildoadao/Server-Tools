@@ -139,9 +139,6 @@
     <Compile Include="View\StorageRaidPage.xaml.cs">
       <DependentUpon>StorageRaidPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\TemplatesPage.xaml.cs">
-      <DependentUpon>TemplatesPage.xaml</DependentUpon>
-    </Compile>
     <Page Include="View\CustomScriptPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -179,10 +176,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\StorageRaidPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="View\TemplatesPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

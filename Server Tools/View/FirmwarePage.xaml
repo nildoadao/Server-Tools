@@ -5,28 +5,31 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:Server_Tools.View"
       mc:Ignorable="d" 
-      d:DesignHeight="300" d:DesignWidth="300"
+      d:DesignHeight="600" d:DesignWidth="800"
       Title="FirmwarePage">
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="8*"/>
+            <RowDefinition Height="5*"/>
         </Grid.RowDefinitions>
-        <TextBlock Text="Atualização de Firmware" HorizontalAlignment="Center" Margin="5" FontSize="20"/>
-        <StackPanel Grid.Row="1" Margin="5">
-            <Button Name="UpdateFromRepositoryButton" Height="45" Width="200" Margin="5" Background="Transparent" Click="UpdateFromRepositoryButton_Click">
-                <StackPanel Orientation="Horizontal" Width="200">
-                    <Image Margin="5" Source="/Server Tools;component/Resources/icons8-repository-32.png" Stretch="None" HorizontalAlignment="Left"/>
-                    <TextBlock Margin="5" Text="Atualizar via repositório" VerticalAlignment="Center"/>
+        <TextBlock Text="Update de Firmware" FontSize="28" HorizontalAlignment="Center" Margin="20" Height="50" FontWeight="DemiBold"/>
+        <WrapPanel Grid.Row="1">
+            <Button Height="50" Width="auto" Background="Transparent"  Margin="50" Name="RepositoryButton" Click="RepositoryButton_Click">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/Server Tools;component/Resources/icons8-repository-32.png"/>
+                    <TextBlock Text="Atualizar via repositorio" VerticalAlignment="Center" Margin="5"/>
                 </StackPanel>
             </Button>
-            <Button Name="UpdateFromFile" Height="45" Width="200" Margin="5" Background="Transparent" Click="UpdateFromFile_Click">
-                <StackPanel Orientation="Horizontal" Width="200">
-                    <Image Margin="5" Source="/Server Tools;component/Resources/icons8-document-64.png" Stretch="Fill" Height="32" Width="32" HorizontalAlignment="Left"/>
-                    <TextBlock Margin="5"  Text="Atualizar via arquivo" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <Button Height="50" Width="auto" Background="Transparent " Margin="50" Name="FileButton" Click="FileButton_Click" >
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/Server Tools;component/Resources/icons8-document-64.png"/>
+                    <TextBlock Text="Atualizar via arquivo" VerticalAlignment="Center" Margin="5"/>
                 </StackPanel>
             </Button>
-        </StackPanel>
+        </WrapPanel>
     </Grid>
 
 </Page>

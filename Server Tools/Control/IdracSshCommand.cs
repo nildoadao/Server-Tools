@@ -5,7 +5,6 @@ namespace Server_Tools.Control
 {
     class IdracSshCommand
     {
-        private SshClient client;
         private Server server;
 
         public IdracSshCommand(Server server)

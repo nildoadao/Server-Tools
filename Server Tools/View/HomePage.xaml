@@ -36,12 +36,6 @@
                     <TextBlock Text="Script Customizado" VerticalAlignment="Center"/>
                 </StackPanel>
             </Button>
-            <Button Height="50" Width="150" Background="Transparent " Margin="50" Name="TemplateFileButton" Click="TemplateFileButton_Click">
-                <StackPanel Orientation="Horizontal">
-                    <Image Source="/Server Tools;component/Resources/icons8-template-50.png"/>
-                    <TextBlock Text="Templates" VerticalAlignment="Center"/>
-                </StackPanel>
-            </Button>
             <Button Height="50" Width="150" Background="Transparent " Margin="50" Name="ExportScpButton" Click="ExportScpButton_Click">
                 <StackPanel Orientation="Horizontal">
                     <Image Source="/Server Tools;component/Resources/icons8-export-filled-50.png"/>

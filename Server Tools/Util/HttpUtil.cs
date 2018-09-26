@@ -37,6 +37,7 @@ namespace Server_Tools.Util
             _handler.Credentials = new NetworkCredential(user, ConvertToSecureString(password));
             _handler.PreAuthenticate = PRE_AUTHENTICATE;
             _client = new HttpClient(_handler);
+            _client.DefaultRequestHeaders.ExpectContinue = false;
             _client.DefaultRequestHeaders.Add("User-Agent", USER_AGENT);
         }
 

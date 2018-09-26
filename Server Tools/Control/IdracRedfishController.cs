@@ -6,10 +6,8 @@ using Syroot.Windows.IO;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Security;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -27,13 +25,14 @@ namespace Server_Tools.Control
         #region Redfish URLs
 
         public const string REDFISH_ROOT = @"/redfish/v1";
-        public const string FIRMWARE_INVENTORY = @"/UpdateService/FirmwareInventory/";
+        public const string FIRMWARE_INVENTORY = @"/UpdateService/FirmwareInventory";
         public const string FIRMWARE_UPDATE = @"/UpdateService";
         public const string FIRMWARE_INSTALL = @"/UpdateService/Actions/Oem/DellUpdateService.Install";
         public const string JOB_STATUS = @"/Managers/iDRAC.Embedded.1/Jobs/";
         public const string JOB_RESULT = @"/TaskService/Tasks/";
         public const string EXPORT_SYSTEM_CONFIGURATION = @"/Managers/iDRAC.Embedded.1/Actions/Oem/EID_674_Manager.ExportSystemConfiguration";
         public const string IMPORT_SYSTEM_CONFIGURATION = @"/Managers/iDRAC.Embedded.1/Actions/Oem/EID_674_Manager.ImportSystemConfiguration";
+        public const string PUSH_URI = "";
 
         #endregion
 
@@ -46,6 +45,7 @@ namespace Server_Tools.Control
             this.server = server;
             baseUri = String.Format(@"https://{0}{1}", server.Host, REDFISH_ROOT);
             client = HttpUtil.GetClient(server.User, server.Password);
+            client.BaseAddress = new Uri(baseUri);
         }
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace Server_Tools.Control
         public async Task<bool> CheckRedfishSupport(string resource)
         {
             bool support = false;
-            using (var response = await client.GetAsync(baseUri + resource))
+            using (var response = await client.GetAsync(resource))
             {
                 if (response.IsSuccessStatusCode)
                 {
@@ -75,29 +75,7 @@ namespace Server_Tools.Control
         public async Task<IdracJob> UpdateFirmware(string path, IdracInstallOption option)
         {
             Uri location = await UploadFile(path);
-            DateTime startTime = DateTime.Now;
-            IdracJob job = await InstallFirmware(location, option);
-
-            while (true)
-            {
-                job = await GetJob(job.Id);
-                if (job.JobState.Contains("Completed"))
-                {
-                    break;
-                }
-                else if (job.JobState.Equals("Failed"))
-                {
-                    throw new HttpRequestException("Falha ao executar o Job: " + job.Message);
-                }
-                if (DateTime.Now >= startTime.AddMinutes(JOB_TIMEOUT))
-                {
-                    throw new TimeoutException("Excedido tempo para conclusão do Job " + job.Id);
-                }
-            }
-            /* To do
-             * Após a Atualização, ler os dados do firmware e retornar um objeto IdracFirmware
-             */
-            return job;
+            return await InstallFirmware(location, option);
         }
 
         /// <summary>
@@ -110,12 +88,12 @@ namespace Server_Tools.Control
         {
             var content = new
             {
-                SoftwareIdentityURIs = location,
+                SoftwareIdentityURIs = location.ToString(),
                 InstallUpon = option
             };
             var jsonContent = JsonConvert.SerializeObject(content);
             var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-            string jobId = await CreateJob(baseUri + FIRMWARE_INSTALL, httpContent);
+            string jobId = await CreateJob(FIRMWARE_INSTALL, httpContent);
             return await GetJob(jobId);
         }
 
@@ -127,7 +105,7 @@ namespace Server_Tools.Control
         private async Task<Uri> UploadFile(string path)
         {
             string etag = "";
-            using(HttpResponseMessage response = await client.GetAsync(baseUri + FIRMWARE_INVENTORY))
+            using(HttpResponseMessage response = await client.GetAsync(FIRMWARE_INVENTORY))
             {
                 foreach(string item in response.Headers.GetValues("ETag"))
                 {
@@ -135,18 +113,27 @@ namespace Server_Tools.Control
                 }
             }
             Uri location;
-            byte[] fileBytes = File.ReadAllBytes(path);
-            using (var content = new MultipartFormDataContent(new Guid().ToString()))
+            using (var content = new MultipartFormDataContent(Guid.NewGuid().ToString()))
+            using (var fileContent = new StreamContent(File.Open(path, FileMode.Open, FileAccess.Read)))
+            using (var stringContent = new StringContent(""))
             {
-                content.Headers.ContentType = MediaTypeHeaderValue.Parse("multipart/form-data");
-                content.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
+                var fileName = Path.GetFileName(path).ToLower();
+                fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse("application/octet-stream");
+                fileContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
                 {
                     Name = "file",
-                    FileName = Path.GetFileName(path).ToLower()
+                    FileName = fileName
                 };
-                content.Add(new StreamContent(new MemoryStream(fileBytes)), "Firmware", Path.GetFileName(path));
-                content.Headers.Add("ifMatch", etag);
-                using (HttpResponseMessage response = await client.PostAsync(baseUri + FIRMWARE_UPDATE, content))
+                stringContent.Headers.ContentType = MediaTypeHeaderValue.Parse("application/octet-stream");
+                stringContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
+                {
+                    Name = "importConfig",
+                    FileName = fileName
+                };
+                content.Headers.ContentType = MediaTypeHeaderValue.Parse("multipart/form-data");
+                content.Add(fileContent, "Firmware", fileName);
+                content.Add(stringContent);
+                using (HttpResponseMessage response = await client.PostAsync(FIRMWARE_INVENTORY, content))
                 {
                     if (!response.IsSuccessStatusCode)
                     {
@@ -176,7 +163,7 @@ namespace Server_Tools.Control
 
             var jsonContent = JsonConvert.SerializeObject(content);            
             var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-            string jobId = await CreateJob(baseUri + EXPORT_SYSTEM_CONFIGURATION, httpContent);
+            string jobId = await CreateJob(EXPORT_SYSTEM_CONFIGURATION, httpContent);
             DateTime startTime = DateTime.Now;
 
             while (true)
@@ -196,7 +183,7 @@ namespace Server_Tools.Control
                 }
             }
             string path;
-            using (HttpResponseMessage response = await client.GetAsync(baseUri + JOB_RESULT + jobId))
+            using (HttpResponseMessage response = await client.GetAsync(JOB_RESULT + jobId))
             {
                 if (!response.IsSuccessStatusCode)
                 {
@@ -234,7 +221,7 @@ namespace Server_Tools.Control
             };
             var jsonContent = JsonConvert.SerializeObject(content);
             var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-            string jobId = await CreateJob(baseUri + IMPORT_SYSTEM_CONFIGURATION, httpContent);
+            string jobId = await CreateJob(IMPORT_SYSTEM_CONFIGURATION, httpContent);
             DateTime startTime = DateTime.Now;
             IdracJob job = new IdracJob();
 
@@ -288,7 +275,7 @@ namespace Server_Tools.Control
         /// <returns>O Job corresponde ao ID</returns>
         private async Task<IdracJob> GetJob(string jobId)
         {
-            return await GetResource<IdracJob>(baseUri + JOB_STATUS + jobId);
+            return await GetResource<IdracJob>(JOB_STATUS + jobId);
         }
 
         /// <summary>

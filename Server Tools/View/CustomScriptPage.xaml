@@ -9,7 +9,7 @@
       Title="CustomScriptPage">
 
     <Grid Margin="0,10,0,0">
-        <TextBlock Text="Script Customizado" FontSize="28" HorizontalAlignment="Center" Margin="302,13,250,527" Height="50" FontWeight="DemiBold" Width="248"/>
+        <TextBlock Text="Script Customizado" FontSize="28" HorizontalAlignment="Center" Margin="266,13,250,527" Height="50" FontWeight="DemiBold" Width="284"/>
         <GroupBox Header="Dados da Idrac" HorizontalAlignment="Left" Height="Auto" Margin="21,83,0,0" VerticalAlignment="Top" Width="Auto">
             <Grid>
                 <Grid.RowDefinitions>

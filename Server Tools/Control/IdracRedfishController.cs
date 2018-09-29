@@ -25,14 +25,13 @@ namespace Server_Tools.Control
         #region Redfish URLs
 
         public const string REDFISH_ROOT = @"/redfish/v1";
-        public const string FIRMWARE_INVENTORY = @"/UpdateService/FirmwareInventory";
-        public const string FIRMWARE_UPDATE = @"/UpdateService";
-        public const string FIRMWARE_INSTALL = @"/UpdateService/Actions/Oem/DellUpdateService.Install";
-        public const string JOB_STATUS = @"/Managers/iDRAC.Embedded.1/Jobs/";
-        public const string JOB_RESULT = @"/TaskService/Tasks/";
-        public const string EXPORT_SYSTEM_CONFIGURATION = @"/Managers/iDRAC.Embedded.1/Actions/Oem/EID_674_Manager.ExportSystemConfiguration";
-        public const string IMPORT_SYSTEM_CONFIGURATION = @"/Managers/iDRAC.Embedded.1/Actions/Oem/EID_674_Manager.ImportSystemConfiguration";
-        public const string PUSH_URI = "";
+        public const string FIRMWARE_INVENTORY = @"/redfish/v1/UpdateService/FirmwareInventory";
+        public const string FIRMWARE_UPDATE = @"/redfish/v1/UpdateService";
+        public const string FIRMWARE_INSTALL = @"/redfish/v1/UpdateService/Actions/Oem/DellUpdateService.Install";
+        public const string JOB_STATUS = @"/redfish/v1/Managers/iDRAC.Embedded.1/Jobs/";
+        public const string JOB_RESULT = @"/redfish/v1/TaskService/Tasks/";
+        public const string EXPORT_SYSTEM_CONFIGURATION = @"/redfish/v1/Managers/iDRAC.Embedded.1/Actions/Oem/EID_674_Manager.ExportSystemConfiguration";
+        public const string IMPORT_SYSTEM_CONFIGURATION = @"/redfish/v1/Managers/iDRAC.Embedded.1/Actions/Oem/EID_674_Manager.ImportSystemConfiguration";
 
         #endregion
 
@@ -43,8 +42,8 @@ namespace Server_Tools.Control
         public IdracRedfishController(Server server)
         {
             this.server = server;
-            baseUri = String.Format(@"https://{0}{1}", server.Host, REDFISH_ROOT);
-            client = HttpUtil.GetClient(server.User, server.Password);
+            baseUri = String.Format(@"https://{0}", server.Host);
+            client = HttpUtil.GetClient();
             client.BaseAddress = new Uri(baseUri);
         }
 
@@ -56,14 +55,16 @@ namespace Server_Tools.Control
         public async Task<bool> CheckRedfishSupport(string resource)
         {
             bool support = false;
-            using (var response = await client.GetAsync(resource))
+            using (var request = new HttpRequestMessage(HttpMethod.Get, resource))          
             {
-                if (response.IsSuccessStatusCode)
+                request.Headers.Authorization = HttpUtil.GetCredentialHeader(server.User, server.Password);
+                using (var response = await client.SendAsync(request))
                 {
-                    support = true;
+                    if (response.IsSuccessStatusCode)
+                        support = true;
                 }
+                return support;
             }
-            return support;
         }
 
         /// <summary>
@@ -92,9 +93,9 @@ namespace Server_Tools.Control
                 InstallUpon = option
             };
             var jsonContent = JsonConvert.SerializeObject(content);
-            var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+            var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");              
             string jobId = await CreateJob(FIRMWARE_INSTALL, httpContent);
-            return await GetJob(jobId);
+            return await GetJob(jobId);            
         }
 
         /// <summary>
@@ -104,45 +105,30 @@ namespace Server_Tools.Control
         /// <returns>Uri com a localização do recurso</returns>
         private async Task<Uri> UploadFile(string path)
         {
-            string etag = "";
-            using(HttpResponseMessage response = await client.GetAsync(FIRMWARE_INVENTORY))
-            {
-                foreach(string item in response.Headers.GetValues("ETag"))
-                {
-                    etag = item;
-                }
-            }
-            Uri location;
+            using (var request = new HttpRequestMessage(HttpMethod.Post, FIRMWARE_INVENTORY))
             using (var content = new MultipartFormDataContent(Guid.NewGuid().ToString()))
-            using (var fileContent = new StreamContent(File.Open(path, FileMode.Open, FileAccess.Read)))
-            using (var stringContent = new StringContent(""))
+            using (var fileContent = new StreamContent(File.Open(path, FileMode.Open)))
             {
-                var fileName = Path.GetFileName(path).ToLower();
+                string etag = await GetHeaderValue("ETag", FIRMWARE_INVENTORY);
                 fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse("application/octet-stream");
+                request.Headers.Authorization = HttpUtil.GetCredentialHeader(server.User, server.Password);
+                request.Headers.TryAddWithoutValidation("If-Match", etag);
                 fileContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
                 {
                     Name = "file",
-                    FileName = fileName
+                    FileName = Path.GetFileName(path).ToLower()
                 };
-                stringContent.Headers.ContentType = MediaTypeHeaderValue.Parse("application/octet-stream");
-                stringContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
-                {
-                    Name = "importConfig",
-                    FileName = fileName
-                };
-                content.Headers.ContentType = MediaTypeHeaderValue.Parse("multipart/form-data");
-                content.Add(fileContent, "Firmware", fileName);
-                content.Add(stringContent);
-                using (HttpResponseMessage response = await client.PostAsync(FIRMWARE_INVENTORY, content))
+                content.Add(fileContent);
+                request.Content = content;
+                using (HttpResponseMessage response = await client.SendAsync(request))
                 {
                     if (!response.IsSuccessStatusCode)
                     {
                         throw new HttpRequestException("Falha no upload do arquivo: " + response.ReasonPhrase);
                     }
-                    location = response.Headers.Location;
+                    return response.Headers.Location;
                 }
             }
-            return location;
         }
 
         /// <summary>
@@ -182,20 +168,23 @@ namespace Server_Tools.Control
                     throw new TimeoutException("Excedido tempo para conclusão do Job " + jobId);
                 }
             }
-            string path;
-            using (HttpResponseMessage response = await client.GetAsync(JOB_RESULT + jobId))
+            using (var request = new HttpRequestMessage(HttpMethod.Get, JOB_RESULT + jobId))
             {
-                if (!response.IsSuccessStatusCode)
+                request.Headers.Authorization = HttpUtil.GetCredentialHeader(server.User, server.Password);
+                using(var response = await client.SendAsync(request))
                 {
-                    throw new HttpRequestException("Falha ao receber dados do Export: " + response.RequestMessage);
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        throw new HttpRequestException("Falha ao receber dados do Export: " + response.RequestMessage);
+                    }
+                    string jobData = await response.Content.ReadAsStringAsync();
+                    string currentTime = DateTime.Now.ToString().Replace(":", "").Replace("/", "").Replace(" ", "");
+                    string dowloadsFolder = KnownFolders.Downloads.Path;
+                    string path = Path.Combine(dowloadsFolder, "SCP_" + currentTime + ".xml");
+                    File.WriteAllText(path, jobData);
+                    return path;
                 }
-                string jobData = await response.Content.ReadAsStringAsync();
-                string currentTime = DateTime.Now.ToString().Replace(":", "").Replace("/", "").Replace(" ", "");
-                string dowloadsFolder = KnownFolders.Downloads.Path;
-                path = Path.Combine(dowloadsFolder, "SCP_" + currentTime + ".xml");
-                File.WriteAllText(path, jobData);
             }
-            return path;
         }
 
         /// <summary>
@@ -256,16 +245,18 @@ namespace Server_Tools.Control
         /// <returns></returns>
         private async Task<string> CreateJob(string uri, HttpContent content)
         {
-            string jobId = "";
-            using (HttpResponseMessage response = await client.PostAsync(uri, content))
+            using(var request = new HttpRequestMessage(HttpMethod.Post, uri))
             {
-                if (!response.IsSuccessStatusCode)
+                request.Headers.Authorization = HttpUtil.GetCredentialHeader(server.User, server.Password);
+                using (var response = await client.SendAsync(request))
                 {
-                    throw new HttpRequestException("Falha ao criar Job: " + response.Content);
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        throw new HttpRequestException("Falha ao criar Job: " + response.Content);
+                    }
+                    return Regex.Match(response.Headers.Location.ToString(), "JID_.*").Captures[0].Value.Replace("\r", "");
                 }
-                jobId = Regex.Match(response.Headers.Location.ToString(), "JID_.*").Captures[0].Value.Replace("\r", "");
             }
-            return jobId;
         }
 
         /// <summary>
@@ -286,16 +277,46 @@ namespace Server_Tools.Control
         /// <returns></returns>
         private async Task<T> GetResource<T>(string uri)
         {
-            string jsonBody;
-            using (HttpResponseMessage response = await client.GetAsync(uri))
+            using(var request = new HttpRequestMessage(HttpMethod.Get, uri))
             {
-                if (!response.IsSuccessStatusCode)
+                request.Headers.Authorization = HttpUtil.GetCredentialHeader(server.User, server.Password);
+                using (var response = await client.SendAsync(request))
                 {
-                    throw new HttpRequestException("Falha ao obter recurso: " + uri + " " + response.ReasonPhrase);
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        throw new HttpRequestException("Falha ao obter recurso: " + uri + " " + response.ReasonPhrase);
+                    }
+                    string jsonBody = await response.Content.ReadAsStringAsync();
+                    return JsonConvert.DeserializeObject<T>(jsonBody);
                 }
-                jsonBody = await response.Content.ReadAsStringAsync();
             }
-            return JsonConvert.DeserializeObject<T>(jsonBody);
+        
+        }
+
+        /// <summary>
+        /// Retorna o valor de um cabeçalho especifico
+        /// </summary>
+        /// <param name="header">Cabeçalho a ser buscado</param>
+        /// <param name="uri">Uri do recurso</param>
+        /// <returns>O valor de cabeçalho</returns>
+        private async Task<string> GetHeaderValue(string header, string uri)
+        {
+            using (var request = new HttpRequestMessage(HttpMethod.Get, uri))
+            {
+                request.Headers.Authorization = HttpUtil.GetCredentialHeader(server.User, server.Password);
+                using (var response = await client.SendAsync(request))
+                {
+                    if (!response.IsSuccessStatusCode)
+                        throw new HttpRequestException(string.Format("Falha ao obter o cabeçalho {0} {1}", header, response.ReasonPhrase));
+
+                    string result = "";
+                    foreach(string item in response.Headers.GetValues(header))
+                    {
+                        result = item;
+                    }
+                    return result;
+                }
+            }
         }
     }
 }

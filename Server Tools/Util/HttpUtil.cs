@@ -14,41 +14,35 @@ namespace Server_Tools.Util
     class HttpUtil
     {
         private static HttpClient _client;
-        private static HttpClientHandler _handler;
 
         #region Parametros default
 
         private const string USER_AGENT = "Server Tools";
-        private const bool PRE_AUTHENTICATE = true;
 
         #endregion
 
-        public static HttpClient GetClient(string user, string password)
+        public static HttpClient GetClient()
         {
-            Init(user, password);
+            if(_client == null)
+            {
+                Init();
+            }
             return _client;
         }
 
-        private static void Init(string user, string password)
+        private static void Init()
         {
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Ssl3;
             ServicePointManager.ServerCertificateValidationCallback += (sender, certificate, chain, sslPolicyErrors) => true;
-            _handler = new HttpClientHandler();
-            _handler.Credentials = new NetworkCredential(user, ConvertToSecureString(password));
-            _handler.PreAuthenticate = PRE_AUTHENTICATE;
-            _client = new HttpClient(_handler);
+            _client = new HttpClient();
             _client.DefaultRequestHeaders.ExpectContinue = false;
             _client.DefaultRequestHeaders.Add("User-Agent", USER_AGENT);
         }
 
-        private static SecureString ConvertToSecureString(string text)
+        public static AuthenticationHeaderValue GetCredentialHeader(string user, string password)
         {
-            SecureString secureString = new SecureString();
-            foreach (char c in text.ToCharArray())
-            {
-                secureString.AppendChar(c);
-            }
-            return secureString;
+            var credentials = string.Format("{0}:{1}", user, password);
+            return new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes(credentials)));
         }
     }
 }

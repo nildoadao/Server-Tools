@@ -16,22 +16,17 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
-        <GroupBox  Grid.Row="1" Grid.RowSpan="2" Height="Auto" Header="Dados da Idrac" FontSize="13" Margin="5">
+        <TextBlock Text="Exportar Arquivo SCP" HorizontalAlignment="Center" Margin="10" FontSize="28" FontWeight="DemiBold" Height="50" Grid.ColumnSpan="2"/>
+        <GroupBox  Grid.Row="1" Height="Auto" Width="Auto" Header="Dados da Idrac" FontSize="13" Margin="5">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -46,25 +41,22 @@
                 <PasswordBox Name="PasswordBox" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="5" Height="Auto" Width="150"/>
             </Grid>
         </GroupBox>
-        <GroupBox Grid.Row="1" Grid.Column="1" Height="Auto" Header="Items a serem exportados" FontSize="13" Margin="5" HorizontalAlignment="Center">
-            <StackPanel>
-                <RadioButton Content="ALL" GroupName="ExportType" Name="AllRadioButton" IsChecked="True"/>
-                <RadioButton Content="System" GroupName="ExportType" Name="SystemRadioButton"/>
-                <RadioButton Content="BIOS" GroupName="ExportType" Name="BiosRadioButton"/>
-                <RadioButton Content="IDRAC" GroupName="ExportType" Name="IdracRadioButton"/>
-                <RadioButton Content="NIC" GroupName="ExportType" Name="NicRadioButton"/>
-                <RadioButton Content="FC" GroupName="ExportType" Name="FcRadioButton"/>
-                <RadioButton Content="LifecycleController" GroupName="ExportType" Name="LifeCycleRadioButton"/>
-                <RadioButton Content="RAID" GroupName="ExportType" Name="RaidRadioButton"/>
+        <GroupBox Grid.Row="1" Grid.Column="1" Height="Auto" Header="Items a serem exportados" FontSize="13" Margin="5" HorizontalAlignment="Left">
+            <StackPanel Margin="5">
+                <CheckBox Content="ALL" Name="AllCheckBox"/>
+                <CheckBox Content="System" Name="SystemCheckBox"/>
+                <CheckBox Content="BIOS" Name="BiosCheckBox"/>
+                <CheckBox Content="IDRAC" Name="IdracCheckBox"/>
+                <CheckBox Content="NIC" Name="NicCheckBox"/>
+                <CheckBox Content="FC" Name="FcCheckBox"/>
+                <CheckBox Content="LifecycleController" Name="LifeCycleCheckBox"/>
+                <CheckBox Content="RAID" Name="RaidCheckBox"/>
             </StackPanel>
         </GroupBox>
-        <StackPanel Grid.Column="4" Grid.Row="8" Width="Auto" Orientation="Horizontal">
-            <Button Name="ExportButton" Content="Exportar Arquivo" Margin="5" Height="20" Width="150" HorizontalAlignment="Left" Click="ExportButton_Click"/>
-            <Button Name="CancelButton" Content="Cancelar" Margin="5" Height="20" Width="150"  HorizontalAlignment="Left"/>
-        </StackPanel>
-        <TextBlock Text="Saida" Grid.Row="10" Margin="5" />
-        <ScrollViewer Margin="5" HorizontalContentAlignment="Left"  HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" CanContentScroll="True" MaxWidth="700" BorderBrush="Transparent" Grid.Row="11" Grid.ColumnSpan="2">
-            <TextBox Name="OutputTextBox"  Height="200" TextWrapping="Wrap" IsReadOnly="True" BorderBrush="Transparent"  HorizontalScrollBarVisibility="Auto" Width="700" />
+        <Button Name="ExportButton" Content="Exportar Arquivo" Grid.Row="2" Grid.Column="2" Height="20" Width="150" HorizontalAlignment="Left" Click="ExportButton_Click" Margin="5" Background="#FF686868" Foreground="White" BorderBrush="#FFB8A9A9"/>
+        <TextBlock Text="Saida" Grid.Row="2" Margin="5" Width="Auto"/>
+        <ScrollViewer Margin="5" HorizontalContentAlignment="Left"  HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" CanContentScroll="True" MaxWidth="700" BorderBrush="Transparent" Grid.Row="3" Grid.ColumnSpan="2">
+            <TextBox Name="OutputTextBox"  Height="200" TextWrapping="Wrap" IsReadOnly="True" BorderBrush="Black"  HorizontalScrollBarVisibility="Auto" Width="Auto" />
         </ScrollViewer>
     </Grid>
 </Page>

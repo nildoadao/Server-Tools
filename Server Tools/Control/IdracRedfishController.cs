@@ -20,13 +20,12 @@ namespace Server_Tools.Control
         Server server;
         string baseUri;
         HttpClient client;
-        private const double JOB_TIMEOUT = 10; // Timeout de 5 minutos para conclusão dos Jobs
+        const double JOB_TIMEOUT = 10; // Timeout de 5 minutos para conclusão dos Jobs
 
         #region Redfish URLs
 
         public const string REDFISH_ROOT = @"/redfish/v1";
         public const string FIRMWARE_INVENTORY = @"/redfish/v1/UpdateService/FirmwareInventory";
-        public const string FIRMWARE_UPDATE = @"/redfish/v1/UpdateService";
         public const string FIRMWARE_INSTALL = @"/redfish/v1/UpdateService/Actions/Oem/DellUpdateService.Install";
         public const string JOB_STATUS = @"/redfish/v1/Managers/iDRAC.Embedded.1/Jobs/";
         public const string JOB_RESULT = @"/redfish/v1/TaskService/Tasks/";
@@ -284,7 +283,7 @@ namespace Server_Tools.Control
                 {
                     if (!response.IsSuccessStatusCode)
                     {
-                        throw new HttpRequestException("Falha ao obter recurso: " + uri + " " + response.ReasonPhrase);
+                        throw new HttpRequestException(string.Format("Falha ao obter recurso {0} {1}", uri, response.ReasonPhrase));
                     }
                     string jsonBody = await response.Content.ReadAsStringAsync();
                     return JsonConvert.DeserializeObject<T>(jsonBody);

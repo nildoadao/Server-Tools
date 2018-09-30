@@ -8,81 +8,87 @@
       d:DesignHeight="600" d:DesignWidth="800"
       Title="ScpImportPage">
 
-    <Grid HorizontalAlignment="Center">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-        <GroupBox Grid.ColumnSpan="2" Grid.Row="1"  Height="Auto" Header="Dados da Idrac" FontSize="13" Margin="5">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-                <TextBlock Text="Host/IP:" HorizontalAlignment="Right" VerticalAlignment="Bottom" FontSize="13" Margin="5"/>
-                <TextBox Name="ServerTextBox" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="5" Height="Auto" Width="200"/>
-                <TextBlock Text="Usuario:" Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5"  FontSize="13"/>
-                <TextBox Name="UserTextBox" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="5" Height="Auto" Width="150"/>
-                <TextBlock Text="Senha:" Grid.Row="2"  HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5"  FontSize="13"/>
-                <PasswordBox Name="PasswordBox" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="5" Height="Auto" Width="150"/>
-            </Grid>
-        </GroupBox>
-        <StackPanel Grid.Row="1" Grid.Column="4" Orientation="Horizontal">
-            <GroupBox  Height="Auto" Header="Items a serem importados" FontSize="13" Margin="5" HorizontalAlignment="Center">
-                <StackPanel Margin="5">
-                    <RadioButton Content="ALL" GroupName="ImportType" Name="AllRadioButton" IsChecked="True"/>
-                    <RadioButton Content="System" GroupName="ImportType" Name="SystemRadioButton"/>
-                    <RadioButton Content="BIOS" GroupName="ImportType" Name="BiosRadioButton"/>
-                    <RadioButton Content="IDRAC" GroupName="ImportType" Name="IdracRadioButton"/>
-                    <RadioButton Content="NIC" GroupName="ImportType" Name="NicRadioButton"/>
-                    <RadioButton Content="FC" GroupName="ImportType" Name="FcRadioButton"/>
-                    <RadioButton Content="LifecycleController" GroupName="ImportType" Name="LifeCycleRadioButton"/>
-                    <RadioButton Content="RAID" GroupName="ImportType" Name="RaidRadioButton"/>
-                </StackPanel>
+    <ScrollViewer HorizontalAlignment="Center" VerticalAlignment="Center" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto">
+        <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="Importar Arquivo SCP" FontSize="28" FontWeight="DemiBold" Margin="20" HorizontalAlignment="Center" Grid.ColumnSpan="3"/>
+            <GroupBox  Grid.Row="1"  Height="Auto" Header="Dados da Idrac" FontSize="13" Margin="5">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="Host/IP:" HorizontalAlignment="Right" VerticalAlignment="Bottom" FontSize="13" Margin="5"/>
+                    <TextBox Name="ServerTextBox" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="5" Height="Auto" Width="200"/>
+                    <TextBlock Text="Usuario:" Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5"  FontSize="13"/>
+                    <TextBox Name="UserTextBox" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="5" Height="Auto" Width="150"/>
+                    <TextBlock Text="Senha:" Grid.Row="2"  HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5"  FontSize="13"/>
+                    <PasswordBox Name="PasswordBox" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="5" Height="Auto" Width="150"/>
+                </Grid>
             </GroupBox>
-            <GroupBox Height="Auto" Header="Modo de Instalação" Margin="5">
-                <StackPanel Margin="5">
-                    <RadioButton Content="Graceful" GroupName="ShutdownType" Name="GracefulRadioButton" IsChecked="True"/>
-                    <RadioButton Content="Forced" GroupName="ShutdownType" Name="ForcedRadioButton"/>
-                    <RadioButton Content="No Reboot" GroupName="ShutdownType" Name="NoRebootRadioButton"/>
+            <StackPanel Grid.Row="1" Grid.Column="1" Width="Auto" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <Button Name="AddButton" Content="Adicionar" Margin="5" Width="75" Click="AddButton_Click"/>
+                <Button Name="RemoveButton" Content="Remover" Margin="5" Width="75" Click="RemoveButton_Click"/>
+            </StackPanel>
+            <StackPanel Grid.Row="1" Grid.Column="2" Grid.RowSpan="4">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Margin="5" Text="Servidores"/>
+                    <Button Name="AddCsvButton" Content="Adicionar CSV" Margin="5" Width="90" HorizontalAlignment="Left" Click="AddCsvButton_Click"/>
                 </StackPanel>
-            </GroupBox>
-        </StackPanel>
-        <StackPanel Grid.Row="8" Orientation="Horizontal">
-            <TextBlock Text="Arquivo: " Margin="5" Grid.Column="3"/>
-            <TextBox Name="FileTextBox" Width="200" Margin="5"/>
-            <Button Name="OpenFileButton" Content="..." Width="30" Margin="5" Click='OpenFileButton_Click'/>
-        </StackPanel>
-
-        <StackPanel Grid.Column="4" Grid.Row="8" Width="Auto" Orientation="Horizontal">
-            <Button Name="ImportButton" Content="Importar" Margin="5" Height="20" Width="150" HorizontalAlignment="Left" Click="ImportButton_Click"/>
-            <Button Name="CancelButton" Content="Cancelar" Margin="5" Height="20" Width="150"  HorizontalAlignment="Left"/>
-        </StackPanel>
-        <TextBlock Text="Saida" Grid.Row="10" Margin="5" />
-        <ScrollViewer Margin="5" HorizontalContentAlignment="Left"  HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" CanContentScroll="True" MaxWidth="750" BorderBrush="Transparent" Grid.Row="11" Grid.ColumnSpan="5">
-            <TextBox Name="OutputTextBox"  Height="200" TextWrapping="Wrap" IsReadOnly="True" BorderBrush="Transparent"  HorizontalScrollBarVisibility="Auto" Width="750"/>
-        </ScrollViewer>
-    </Grid>
+                <ListBox Name="ServersListBox" HorizontalAlignment="Left" Height="250" Margin="5" Width="250"/>
+            </StackPanel>
+            <StackPanel Grid.Row="2" Orientation="Horizontal">
+                <GroupBox  Height="Auto" Header="Items a serem importados" FontSize="13" Margin="5" HorizontalAlignment="Center">
+                    <StackPanel Margin="5">
+                        <CheckBox Content="ALL" Name="AllRadioButton" IsChecked="True"/>
+                        <CheckBox Content="System" Name="SystemRadioButton"/>
+                        <CheckBox Content="BIOS" Name="BiosRadioButton"/>
+                        <CheckBox Content="IDRAC" Name="IdracRadioButton"/>
+                        <CheckBox Content="NIC" Name="NicRadioButton"/>
+                        <CheckBox Content="FC" Name="FcRadioButton"/>
+                        <CheckBox Content="LifecycleController" Name="LifeCycleRadioButton"/>
+                        <CheckBox Content="RAID" Name="RaidRadioButton"/>
+                    </StackPanel>
+                </GroupBox>
+                <GroupBox Height="Auto" Header="Modo de Instalação" Margin="5">
+                    <StackPanel Margin="5">
+                        <RadioButton Content="Graceful" GroupName="ShutdownType" Name="GracefulRadioButton" IsChecked="True"/>
+                        <RadioButton Content="Forced" GroupName="ShutdownType" Name="ForcedRadioButton"/>
+                        <RadioButton Content="No Reboot" GroupName="ShutdownType" Name="NoRebootRadioButton"/>
+                    </StackPanel>
+                </GroupBox>
+            </StackPanel>
+            <StackPanel Grid.Row="3" Orientation="Horizontal">
+                <TextBlock Text="Arquivo: " Margin="5" Grid.Column="3"/>
+                <TextBox Name="FileTextBox" Width="200" Margin="5"/>
+                <Button Name="OpenFileButton" Content="..." Width="30" Margin="5" Click='OpenFileButton_Click'/>
+            </StackPanel>
+            <StackPanel Grid.Row="4" Width="Auto" Orientation="Horizontal">
+                <Button Name="ImportButton" Content="Importar" Margin="5" Height="20" Width="150" HorizontalAlignment="Left" Click="ImportButton_Click"/>
+                <Button Name="CancelButton" Content="Cancelar" Margin="5" Height="20" Width="150"  HorizontalAlignment="Left"/>
+            </StackPanel>
+            <TextBlock Text="Saida" Grid.Row="5" Margin="5" />
+            <ScrollViewer Margin="5" HorizontalAlignment="Left" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" CanContentScroll="True" MaxWidth="650" BorderBrush="Transparent" Grid.Row="6" Grid.ColumnSpan="3">
+                <TextBox Name="OutputTextBox"  Height="200" TextWrapping="Wrap" IsReadOnly="True" BorderBrush="Transparent"  HorizontalScrollBarVisibility="Auto" Width="650"/>
+            </ScrollViewer>
+        </Grid>
+    </ScrollViewer>
 </Page>

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
 using Server_Tools.Control;
 using Server_Tools.Model;
+using Server_Tools.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,6 +25,7 @@ namespace Server_Tools.View
     public partial class ScpImportPage : Page
     {
         OpenFileDialog fileDialog;
+        OpenFileDialog csvDialog;
 
         public ScpImportPage()
         {
@@ -31,11 +33,43 @@ namespace Server_Tools.View
             fileDialog = new OpenFileDialog();
             fileDialog.Filter = "Arquivos SCP (*.xml)|*.xml";
             fileDialog.FileOk += FileDialog_FileOk;
+            csvDialog = new OpenFileDialog();
+            csvDialog.Filter = "Arquivos CSV|*csv";
+            csvDialog.FileOk += CsvDialog_FileOk;
         }
 
         private void FileDialog_FileOk(object sender, System.ComponentModel.CancelEventArgs e)
         {
             FileTextBox.Text = fileDialog.FileName;
+        }
+
+        private void AddButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (!ServerTextBox.Text.Trim().Equals(""))
+            {
+                if (UserTextBox.Text.Trim().Equals("") | PasswordBox.Password.Trim().Equals(""))
+                {
+                    MessageBox.Show("Insira usuario e senha da Idrac", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                else
+                {
+                    Server server = new Server(ServerTextBox.Text, UserTextBox.Text, PasswordBox.Password);
+                    ServersListBox.Items.Add(server);
+                    ServerTextBox.Clear();
+                    UserTextBox.Clear();
+                    PasswordBox.Clear();
+                }
+            }
+        }
+
+        private void RemoveButton_Click(object sender, RoutedEventArgs e)
+        {
+            ServersListBox.Items.Remove(ServersListBox.SelectedItem);
+        }
+
+        private void AddCsvButton_Click(object sender, RoutedEventArgs e)
+        {
+            csvDialog.ShowDialog();
         }
 
         private void ImportButton_Click(object sender, RoutedEventArgs e)
@@ -49,54 +83,15 @@ namespace Server_Tools.View
             IdracRedfishController idrac = new IdracRedfishController(server);
             OutputTextBox.AppendText("Importando configurações para " + server.Host + "...\n");
 
-            IdracScpTarget target;
+            IdracScpTarget target = IdracScpTarget.ALL;
             IdracShutdownType shutdown;
 
-            if (AllRadioButton.IsChecked.Value)
-            {
-                target = IdracScpTarget.ALL;
-            }
-            else if (SystemRadioButton.IsChecked.Value)
-            {
-                target = IdracScpTarget.System;
-            }
-            else if (BiosRadioButton.IsChecked.Value)
-            {
-                target = IdracScpTarget.BIOS;
-            }
-            else if (FcRadioButton.IsChecked.Value)
-            {
-                target = IdracScpTarget.FC;
-            }
-            else if (IdracRadioButton.IsChecked.Value)
-            {
-                target = IdracScpTarget.IDRAC;
-            }
-            else if (LifeCycleRadioButton.IsChecked.Value)
-            {
-                target = IdracScpTarget.LidecycleController;
-            }
-            else if (NicRadioButton.IsChecked.Value)
-            {
-                target = IdracScpTarget.NIC;
-            }
-            else
-            {
-                target = IdracScpTarget.RAID;
-            }
-
             if (GracefulRadioButton.IsChecked.Value)
-            {
                 shutdown = IdracShutdownType.Graceful;
-            }
             else if (ForcedRadioButton.IsChecked.Value)
-            {
                 shutdown = IdracShutdownType.Forced;
-            }
             else
-            {
                 shutdown = IdracShutdownType.NoReboot;
-            }
             try
             {
                 IdracJob job = await idrac.ImportScpFile(FileTextBox.Text, target, shutdown, IdracHostPowerStatus.On);
@@ -111,6 +106,22 @@ namespace Server_Tools.View
         private void OpenFileButton_Click(object sender, RoutedEventArgs e)
         {
             fileDialog.ShowDialog();
+        }
+
+        private void CsvDialog_FileOk(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            try
+            {
+                IEnumerable<Server> servers = FileHelper.ReadCsvFile(csvDialog.FileName);
+                foreach (Server server in servers)
+                {
+                    ServersListBox.Items.Add(server);
+                }
+            }
+            catch (Exception ex)
+            {
+                OutputTextBox.AppendText("Falha ao carregar CSV: " + ex.Message + "\n");
+            }
         }
 
         private bool ValidateForm()

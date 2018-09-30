@@ -116,9 +116,6 @@
     <Compile Include="View\FirmwarePage.xaml.cs">
       <DependentUpon>FirmwarePage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\RepositoryUpdatePage.xaml.cs">
-      <DependentUpon>RepositoryUpdatePage.xaml</DependentUpon>
-    </Compile>
     <Compile Include="View\HomePage.xaml.cs">
       <DependentUpon>HomePage.xaml</DependentUpon>
     </Compile>
@@ -136,9 +133,6 @@
     <Compile Include="View\ScpImportPage.xaml.cs">
       <DependentUpon>ScpImportPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\StorageRaidPage.xaml.cs">
-      <DependentUpon>StorageRaidPage.xaml</DependentUpon>
-    </Compile>
     <Page Include="View\CustomScriptPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -148,10 +142,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\FirmwarePage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="View\RepositoryUpdatePage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -172,10 +162,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\ScpImportPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="View\StorageRaidPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

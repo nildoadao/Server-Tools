@@ -32,7 +32,7 @@ namespace Server_Tools.View
 
         private void DiskButton_Click(object sender, RoutedEventArgs e)
         {
-            NavigationService.Navigate(new StorageRaidPage());
+
         }
 
         private void CustomScriptButton_Click(object sender, RoutedEventArgs e)

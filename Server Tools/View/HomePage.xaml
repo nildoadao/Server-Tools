@@ -16,7 +16,7 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="5*"/>
         </Grid.RowDefinitions>
-        <TextBlock Text="Configurações" FontSize="28" HorizontalAlignment="Center" Margin="20" Height="50" FontWeight="DemiBold"/>
+        <TextBlock Text="Configurações" FontSize="28" HorizontalAlignment="Center" Margin="10" Height="50" FontWeight="DemiBold"/>
         <WrapPanel Grid.Row="1">
             <Button Height="50" Width="150" Background="Transparent"  Margin="50" Name="UpdateFirmwareButton" Click="UpdateFirmwareButton_Click">
                 <StackPanel Orientation="Horizontal">

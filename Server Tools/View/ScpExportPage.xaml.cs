@@ -74,39 +74,6 @@ namespace Server_Tools.View
             {
                 return;
             }
-
-            if (AllRadioButton.IsChecked.Value)
-            {
-                ExportScpFile(IdracScpTarget.ALL);
-            }
-            else if (SystemRadioButton.IsChecked.Value)
-            {
-                ExportScpFile(IdracScpTarget.System);
-            }
-            else if (BiosRadioButton.IsChecked.Value)
-            {
-                ExportScpFile(IdracScpTarget.BIOS);
-            }
-            else if (FcRadioButton.IsChecked.Value)
-            {
-                ExportScpFile(IdracScpTarget.FC);
-            }
-            else if (IdracRadioButton.IsChecked.Value)
-            {
-                ExportScpFile(IdracScpTarget.IDRAC);
-            }
-            else if (LifeCycleRadioButton.IsChecked.Value)
-            {
-                ExportScpFile(IdracScpTarget.LidecycleController);
-            }
-            else if (NicRadioButton.IsChecked.Value)
-            {
-                ExportScpFile(IdracScpTarget.NIC);
-            }
-            else
-            {
-                ExportScpFile(IdracScpTarget.RAID);
-            }
         }
     }
 }

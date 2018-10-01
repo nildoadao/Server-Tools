@@ -82,19 +82,42 @@ namespace Server_Tools.View
             Server server = new Server(ServerTextBox.Text, UserTextBox.Text, PasswordBox.Password);
             IdracRedfishController idrac = new IdracRedfishController(server);
             OutputTextBox.AppendText("Importando configurações para " + server.Host + "...\n");
-
-            IdracScpTarget target = IdracScpTarget.ALL;
-            IdracShutdownType shutdown;
-
-            if (GracefulRadioButton.IsChecked.Value)
-                shutdown = IdracShutdownType.Graceful;
-            else if (ForcedRadioButton.IsChecked.Value)
-                shutdown = IdracShutdownType.Forced;
+            string target = "";
+            if (AllCheckBox.IsChecked.Value)
+            {
+                target = "ALL";
+            }
             else
-                shutdown = IdracShutdownType.NoReboot;
+            {
+                bool first = true;
+                foreach (CheckBox item in TargetGroup.Children)
+                {
+                    if (item.IsChecked.Value)
+                    {
+                        if (first)
+                        {
+                            target += item.Content.ToString();
+                            first = false;
+                        }
+                        else
+                        {
+                            target += string.Format(", {0}", item.Content.ToString());
+                        }
+                    }
+                }
+            }
+            string shutdown = "";
+            foreach (RadioButton item in ShutdownGroup.Children)
+            {
+                if (item.IsChecked.Value)
+                {
+                    shutdown = item.Content.ToString();
+                    break;
+                }
+            }
             try
             {
-                IdracJob job = await idrac.ImportScpFile(FileTextBox.Text, target, shutdown, IdracHostPowerStatus.On);
+                IdracJob job = await idrac.ImportScpFile(FileTextBox.Text, target, shutdown, "On");
                 OutputTextBox.AppendText("Job Status: " + job.JobState + " " + job.Message + "\n");
             }
             catch(Exception ex)
@@ -149,6 +172,29 @@ namespace Server_Tools.View
             else
             {
                 return true;
+            }
+        }
+
+        private void AllCheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            foreach (CheckBox item in TargetGroup.Children)
+            {
+                if (item.Content.ToString() != "ALL")
+                {
+                    item.IsChecked = false;
+                    item.IsEnabled = false;
+                }
+            }
+        }
+
+        private void AllCheckBox_Unchecked(object sender, RoutedEventArgs e)
+        {
+            foreach (CheckBox item in TargetGroup.Children)
+            {
+                if (item.Content.ToString() != "ALL")
+                {
+                    item.IsEnabled = true;
+                }
             }
         }
     }

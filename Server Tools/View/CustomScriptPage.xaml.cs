@@ -76,7 +76,7 @@ namespace Server_Tools.View
             }
             catch(Exception ex)
             {
-                OutputTextBox.AppendText("Falha ao carregar CSV: " + ex.Message + "\n");
+                OutputTextBox.AppendText(string.Format("Falha ao carregar CSV: {0}\n", ex.Message));
             }
         }
 
@@ -93,6 +93,53 @@ namespace Server_Tools.View
                 return;
             }
             ApplyButton.IsEnabled = false;
+            try
+            {
+                ApplyScript();
+            }
+            catch(Exception ex)
+            {
+                OutputTextBox.AppendText(string.Format("Falha ao aplicar o script: {0}\n", ex.Message));
+            }
+        }
+
+        private async void ApplyScript()
+        {
+            foreach (Server server in ServersListBox.Items)
+            {
+                var script = FileHelper.ReadTxtFile(ScriptTextBox.Text);
+                await Task.Run(() =>
+                {
+                    try
+                    {
+                        var idrac = new IdracSshCommand(server);
+                        foreach (var command in script)
+                        {
+                            idrac.RunCommand(command);
+                        }
+                        Dispatcher.Invoke(() =>
+                        {
+                            OutputTextBox.AppendText(string.Format("Script com sucesso para {0}\n", server));
+                        });
+                    }
+                    catch(Exception ex)
+                    {
+                        Dispatcher.Invoke(() =>
+                        {
+                            OutputTextBox.AppendText(string.Format("Falha ao aplicar script para {0}: {1}\n", server, ex.Message));
+                        });
+                    }
+                });
+
+                if (operationCancelled)
+                {
+                    OutputTextBox.AppendText("Operação cancelada pelo usuário\n");
+                    operationCancelled = false;
+                    ApplyButton.IsEnabled = true;
+                    break;
+                }
+            }
+            ApplyButton.IsEnabled = true;
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)

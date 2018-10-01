@@ -8,8 +8,8 @@
       d:DesignHeight="600" d:DesignWidth="800"
       Title="ScpImportPage">
 
-    <ScrollViewer HorizontalAlignment="Center" VerticalAlignment="Center" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto">
-        <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+    <ScrollViewer HorizontalAlignment="Center" VerticalAlignment="Top" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto">
+        <Grid HorizontalAlignment="Center" VerticalAlignment="Top">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
@@ -24,12 +24,12 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <TextBlock Text="Importar Arquivo SCP" FontSize="28" FontWeight="DemiBold" Margin="20" HorizontalAlignment="Center" Grid.ColumnSpan="3"/>
-            <GroupBox  Grid.Row="1"  Height="Auto" Header="Dados da Idrac" FontSize="13" Margin="5">
+            <TextBlock Text="Importar Arquivo SCP" FontSize="28" FontWeight="DemiBold" Margin="20" HorizontalAlignment="Center" Grid.ColumnSpan="3" Foreground="White"/>
+            <GroupBox  Grid.Row="1"  Height="Auto" Header="Dados da Idrac" FontSize="13" Margin="5" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White">
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition/>
-                        <ColumnDefinition/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -50,34 +50,34 @@
             </StackPanel>
             <StackPanel Grid.Row="1" Grid.Column="2" Grid.RowSpan="4">
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Margin="5" Text="Servidores"/>
+                    <TextBlock Margin="5" Text="Servidores" Foreground="White"/>
                     <Button Name="AddCsvButton" Content="Adicionar CSV" Margin="5" Width="90" HorizontalAlignment="Left" Click="AddCsvButton_Click"/>
                 </StackPanel>
                 <ListBox Name="ServersListBox" HorizontalAlignment="Left" Height="250" Margin="5" Width="250"/>
             </StackPanel>
             <StackPanel Grid.Row="2" Orientation="Horizontal">
-                <GroupBox  Height="Auto" Header="Items a serem importados" FontSize="13" Margin="5" HorizontalAlignment="Center">
-                    <StackPanel Margin="5">
-                        <CheckBox Content="ALL" Name="AllRadioButton" IsChecked="True"/>
-                        <CheckBox Content="System" Name="SystemRadioButton"/>
-                        <CheckBox Content="BIOS" Name="BiosRadioButton"/>
-                        <CheckBox Content="IDRAC" Name="IdracRadioButton"/>
-                        <CheckBox Content="NIC" Name="NicRadioButton"/>
-                        <CheckBox Content="FC" Name="FcRadioButton"/>
-                        <CheckBox Content="LifecycleController" Name="LifeCycleRadioButton"/>
-                        <CheckBox Content="RAID" Name="RaidRadioButton"/>
+                <GroupBox  Height="Auto" Header="Items a serem importados" FontSize="13" Margin="5" HorizontalAlignment="Center" Foreground="White">
+                    <StackPanel Margin="5" Name="TargetGroup">
+                        <CheckBox Content="ALL" Name="AllCheckBox" Foreground="White" Checked="AllCheckBox_Checked" Unchecked="AllCheckBox_Unchecked"/>
+                        <CheckBox Content="System" Name="SystemCheckBox" Foreground="White"/>
+                        <CheckBox Content="BIOS" Name="BiosCheckBox" Foreground="White"/>
+                        <CheckBox Content="IDRAC" Name="IdracCheckBox" Foreground="White"/>
+                        <CheckBox Content="NIC" Name="NicCheckBox" Foreground="White"/>
+                        <CheckBox Content="FC" Name="FcCheckBox" Foreground="White"/>
+                        <CheckBox Content="LifecycleController" Name="LifeCycleCheckBox" Foreground="White"/>
+                        <CheckBox Content="RAID" Name="RaidCheckBox" Foreground="White"/>
                     </StackPanel>
                 </GroupBox>
-                <GroupBox Height="Auto" Header="Modo de Instalação" Margin="5">
-                    <StackPanel Margin="5">
-                        <RadioButton Content="Graceful" GroupName="ShutdownType" Name="GracefulRadioButton" IsChecked="True"/>
-                        <RadioButton Content="Forced" GroupName="ShutdownType" Name="ForcedRadioButton"/>
-                        <RadioButton Content="No Reboot" GroupName="ShutdownType" Name="NoRebootRadioButton"/>
+                <GroupBox Height="Auto" Header="Modo de Instalação" Margin="5" Foreground="White">
+                    <StackPanel Margin="5" Name="ShutdownGroup">
+                        <RadioButton Content="Graceful" GroupName="ShutdownType" Name="GracefulRadioButton" IsChecked="True" Foreground="White"/>
+                        <RadioButton Content="Forced" GroupName="ShutdownType" Name="ForcedRadioButton" Foreground="White"/>
+                        <RadioButton Content="NoReboot" GroupName="ShutdownType" Name="NoRebootRadioButton" Foreground="White"/>
                     </StackPanel>
                 </GroupBox>
             </StackPanel>
             <StackPanel Grid.Row="3" Orientation="Horizontal">
-                <TextBlock Text="Arquivo: " Margin="5" Grid.Column="3"/>
+                <TextBlock Text="Arquivo: " Margin="5" Grid.Column="3" Foreground="White"/>
                 <TextBox Name="FileTextBox" Width="200" Margin="5"/>
                 <Button Name="OpenFileButton" Content="..." Width="30" Margin="5" Click='OpenFileButton_Click'/>
             </StackPanel>
@@ -85,9 +85,9 @@
                 <Button Name="ImportButton" Content="Importar" Margin="5" Height="20" Width="150" HorizontalAlignment="Left" Click="ImportButton_Click"/>
                 <Button Name="CancelButton" Content="Cancelar" Margin="5" Height="20" Width="150"  HorizontalAlignment="Left"/>
             </StackPanel>
-            <TextBlock Text="Saida" Grid.Row="5" Margin="5" />
+            <TextBlock Text="Saida" Grid.Row="5" Margin="5" Foreground="White" />
             <ScrollViewer Margin="5" HorizontalAlignment="Left" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" CanContentScroll="True" MaxWidth="650" BorderBrush="Transparent" Grid.Row="6" Grid.ColumnSpan="3">
-                <TextBox Name="OutputTextBox"  Height="200" TextWrapping="Wrap" IsReadOnly="True" BorderBrush="Transparent"  HorizontalScrollBarVisibility="Auto" Width="650"/>
+                <TextBox Name="OutputTextBox"  Height="120" TextWrapping="Wrap" IsReadOnly="True" BorderBrush="Transparent"  HorizontalScrollBarVisibility="Auto" Width="650"/>
             </ScrollViewer>
         </Grid>
     </ScrollViewer>

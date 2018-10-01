@@ -29,17 +29,27 @@ namespace Server_Tools.View
 
         private void UpdateButton_Click(object sender, RoutedEventArgs e)
         {
-            UpdateFirmware();
+            string firmware = FirmwareTextBox.Text;
+            string option = "";
+            foreach(RadioButton item in InstallOptionGroup.Children)
+            {
+                if (item.IsChecked.Value)
+                {
+                    option = item.Content.ToString();
+                    break;
+                }
+            }
+            UpdateFirmware(firmware, option);
         }
 
-        private async void UpdateFirmware()
+        private async void UpdateFirmware(string path, string option)
         {
             Server server = new Server(ServerTextBox.Text, UserTextBox.Text, PasswordBox.Password);
             IdracRedfishController idrac = new IdracRedfishController(server);
             OutputTextBox.AppendText("Iniciando upload do arquivo " + FirmwareTextBox.Text + " para " + server.Host + "\n");
             try
             {
-                IdracJob job = await idrac.UpdateFirmware(FirmwareTextBox.Text, IdracInstallOption.NextReboot);
+                IdracJob job = await idrac.UpdateFirmware(path, option);
                 OutputTextBox.AppendText("JOb Status: " + job.Message + "\n");
             }
             catch(Exception ex)

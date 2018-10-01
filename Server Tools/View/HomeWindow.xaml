@@ -5,6 +5,23 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Server_Tools.View"
         mc:Ignorable="d"
-        Title="Server Tools" Height="700" Width="800" WindowStartupLocation="CenterScreen">
-    <Frame Name="MainFrame"/>
+        Title="Server Tools" Height="700" Width="800" WindowStartupLocation="CenterScreen" Background="#FF3E3E42">
+    <Window.Resources>
+        <ControlTemplate x:Key="NavigationTemplate" TargetType="Frame">
+            <DockPanel Margin="10">
+                <StackPanel Margin="5" Orientation="Horizontal" DockPanel.Dock="Top">
+                    <Button Command="{x:Static NavigationCommands.BrowseBack}" IsEnabled="{TemplateBinding CanGoBack}" Height="Auto" Width="Auto" Background="Transparent" BorderBrush="Transparent">
+                        <Image  Width="30" Source="/Server Tools;component/Resources/back.png"/>
+                    </Button>
+                    <Button Command="{x:Static NavigationCommands.BrowseForward}" IsEnabled="{TemplateBinding CanGoForward}" Height="Auto" Width="Auto" Background="Transparent" BorderBrush="Transparent">
+                        <Image  Width="30" Source="/Server Tools;component/Resources/forward.png"/>
+                    </Button>
+                </StackPanel>
+                    <Border BorderBrush="CadetBlue" Margin="7" BorderThickness="5" Padding="5" CornerRadius="5">
+                    <ContentPresenter />
+                </Border>
+            </DockPanel>
+        </ControlTemplate>
+    </Window.Resources>
+    <Frame Name="MainFrame" Template="{StaticResource NavigationTemplate}"/>
 </Window>

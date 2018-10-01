@@ -58,17 +58,16 @@ namespace Server_Tools.Util
         }
 
         public static IEnumerable<Server> ReadCsvFile(string filePath)
-        {
-            List<Server> servers = new List<Server>();
-            
+        {         
             using (CsvReader csv = new CsvReader(new StreamReader(filePath), false, ';'))
             {
+                List<Server> servers = new List<Server>();
                 while (csv.ReadNextRecord())
                 {
                     servers.Add(new Server(csv[0], csv[1], csv[2]));
                 }
+                return servers;
             }
-            return servers;
         }
 
         public static IEnumerable<string> ReadTxtFile(string filePath)

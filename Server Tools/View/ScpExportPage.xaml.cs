@@ -27,7 +27,7 @@ namespace Server_Tools.View
             InitializeComponent();
         }
 
-        private async void ExportScpFile(IdracScpTarget target)
+        private async void ExportScpFile(string target, string exportUse)
         {
             ExportButton.IsEnabled = false;
             Server server = new Server(ServerTextBox.Text, UserTextBox.Text, PasswordBox.Password);
@@ -35,7 +35,7 @@ namespace Server_Tools.View
             OutputTextBox.AppendText("Exportando configurações de " + server.Host + "...\n");
             try
             {
-                string file = await idrac.ExportScpFile(target);
+                string file = await idrac.ExportScpFile(target, exportUse);
                 OutputTextBox.AppendText("Arquivo importado com sucesso, salvo em: " + file + "\n");
             }
             catch (Exception ex)
@@ -73,6 +73,64 @@ namespace Server_Tools.View
             if (!ValidateForm())
             {
                 return;
+            }
+            string target = "";
+
+            if (AllCheckBox.IsChecked.Value)
+            {
+                target = "ALL";
+            }
+            else
+            {
+                bool first = true;
+                foreach (CheckBox item in TargetGroup.Children)
+                {
+                    if (item.IsChecked.Value)
+                    {
+                        if (first)
+                        {
+                            target += item.Content.ToString();
+                            first = false;
+                        }
+                        else
+                        {
+                            target += string.Format(", {0}", item.Content.ToString());
+                        }
+                    }
+                }
+            }
+            string exportUse = "";
+            foreach(RadioButton item in ExportUseGroup.Children)
+            {
+                if (item.IsChecked.Value)
+                {
+                    exportUse = item.Content.ToString();
+                    break;
+                }
+            }
+            ExportScpFile(target, exportUse);
+        }
+
+        private void AllCheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            foreach (CheckBox item in TargetGroup.Children)
+            {
+                if (item.Content.ToString() != "ALL")
+                {
+                    item.IsChecked = false;
+                    item.IsEnabled = false;
+                }
+            }
+        }
+
+        private void AllCheckBox_Unchecked(object sender, RoutedEventArgs e)
+        {
+            foreach (CheckBox item in TargetGroup.Children)
+            {
+                if (item.Content.ToString() != "ALL")
+                {
+                    item.IsEnabled = true;
+                }
             }
         }
     }

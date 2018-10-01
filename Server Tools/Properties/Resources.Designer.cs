@@ -63,9 +63,9 @@ namespace Server_Tools.Properties {
         /// <summary>
         ///   Consulta um recurso localizado do tipo System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Disk {
+        internal static System.Drawing.Bitmap back {
             get {
-                object obj = ResourceManager.GetObject("Disk", resourceCulture);
+                object obj = ResourceManager.GetObject("back", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -73,9 +73,9 @@ namespace Server_Tools.Properties {
         /// <summary>
         ///   Consulta um recurso localizado do tipo System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap icons8_back_arrow_filled_50 {
+        internal static System.Drawing.Bitmap document {
             get {
-                object obj = ResourceManager.GetObject("icons8_back_arrow_filled_50", resourceCulture);
+                object obj = ResourceManager.GetObject("document", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -83,9 +83,9 @@ namespace Server_Tools.Properties {
         /// <summary>
         ///   Consulta um recurso localizado do tipo System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap icons8_document_64 {
+        internal static System.Drawing.Bitmap export {
             get {
-                object obj = ResourceManager.GetObject("icons8_document_64", resourceCulture);
+                object obj = ResourceManager.GetObject("export", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -93,9 +93,9 @@ namespace Server_Tools.Properties {
         /// <summary>
         ///   Consulta um recurso localizado do tipo System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap icons8_export_filled_50 {
+        internal static System.Drawing.Bitmap forward {
             get {
-                object obj = ResourceManager.GetObject("icons8_export_filled_50", resourceCulture);
+                object obj = ResourceManager.GetObject("forward", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -103,9 +103,9 @@ namespace Server_Tools.Properties {
         /// <summary>
         ///   Consulta um recurso localizado do tipo System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap icons8_import_filled_50 {
+        internal static System.Drawing.Bitmap import {
             get {
-                object obj = ResourceManager.GetObject("icons8_import_filled_50", resourceCulture);
+                object obj = ResourceManager.GetObject("import", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -113,9 +113,9 @@ namespace Server_Tools.Properties {
         /// <summary>
         ///   Consulta um recurso localizado do tipo System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap icons8_template_50 {
+        internal static System.Drawing.Bitmap repository1 {
             get {
-                object obj = ResourceManager.GetObject("icons8_template_50", resourceCulture);
+                object obj = ResourceManager.GetObject("repository1", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -123,9 +123,9 @@ namespace Server_Tools.Properties {
         /// <summary>
         ///   Consulta um recurso localizado do tipo System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Repository {
+        internal static System.Drawing.Bitmap script {
             get {
-                object obj = ResourceManager.GetObject("Repository", resourceCulture);
+                object obj = ResourceManager.GetObject("script", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -133,9 +133,9 @@ namespace Server_Tools.Properties {
         /// <summary>
         ///   Consulta um recurso localizado do tipo System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Tools {
+        internal static System.Drawing.Bitmap storage {
             get {
-                object obj = ResourceManager.GetObject("Tools", resourceCulture);
+                object obj = ResourceManager.GetObject("storage", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -143,9 +143,9 @@ namespace Server_Tools.Properties {
         /// <summary>
         ///   Consulta um recurso localizado do tipo System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Update {
+        internal static System.Drawing.Bitmap update1 {
             get {
-                object obj = ResourceManager.GetObject("Update", resourceCulture);
+                object obj = ResourceManager.GetObject("update1", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

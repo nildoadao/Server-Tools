@@ -8,7 +8,7 @@
       d:DesignHeight="600" d:DesignWidth="800"
       Title="ScpExportPage">
 
-    <Grid HorizontalAlignment="Center">
+    <Grid HorizontalAlignment="Center" VerticalAlignment="Top">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -21,8 +21,8 @@
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
-        <TextBlock Text="Exportar Arquivo SCP" HorizontalAlignment="Center" Margin="10" FontSize="28" FontWeight="DemiBold" Height="50" Grid.ColumnSpan="2"/>
-        <GroupBox  Grid.Row="1" Height="Auto" Width="Auto" Header="Dados da Idrac" FontSize="13" Margin="5">
+        <TextBlock Text="Exportar Arquivo SCP" HorizontalAlignment="Center" Margin="20" FontSize="28" FontWeight="DemiBold" Height="50" Grid.ColumnSpan="2" Foreground="White"/>
+        <GroupBox  Grid.Row="1" Height="Auto" Width="Auto" Header="Dados da Idrac" FontSize="13" Margin="5" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -41,22 +41,31 @@
                 <PasswordBox Name="PasswordBox" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="5" Height="Auto" Width="150"/>
             </Grid>
         </GroupBox>
-        <GroupBox Grid.Row="1" Grid.Column="1" Height="Auto" Header="Items a serem exportados" FontSize="13" Margin="5" HorizontalAlignment="Left">
-            <StackPanel Margin="5">
-                <CheckBox Content="ALL" Name="AllCheckBox"/>
-                <CheckBox Content="System" Name="SystemCheckBox"/>
-                <CheckBox Content="BIOS" Name="BiosCheckBox"/>
-                <CheckBox Content="IDRAC" Name="IdracCheckBox"/>
-                <CheckBox Content="NIC" Name="NicCheckBox"/>
-                <CheckBox Content="FC" Name="FcCheckBox"/>
-                <CheckBox Content="LifecycleController" Name="LifeCycleCheckBox"/>
-                <CheckBox Content="RAID" Name="RaidCheckBox"/>
-            </StackPanel>
-        </GroupBox>
+        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal">
+            <GroupBox Grid.Row="1" Grid.Column="1" Height="Auto" Header="Items a serem exportados" FontSize="13" Margin="5" HorizontalAlignment="Left" Foreground="White">
+                <StackPanel Margin="5" Name="TargetGroup">
+                    <CheckBox Content="ALL" Name="AllCheckBox" Checked="AllCheckBox_Checked" Unchecked="AllCheckBox_Unchecked" Foreground="White"/>
+                    <CheckBox Content="System" Name="SystemCheckBox" Foreground="White"/>
+                    <CheckBox Content="BIOS" Name="BiosCheckBox" Foreground="White"/>
+                    <CheckBox Content="IDRAC" Name="IdracCheckBox" Foreground="White"/>
+                    <CheckBox Content="NIC" Name="NicCheckBox" Foreground="White"/>
+                    <CheckBox Content="FC" Name="FcCheckBox" Foreground="White"/>
+                    <CheckBox Content="LifecycleController" Name="LifeCycleCheckBox" Foreground="White"/>
+                    <CheckBox Content="RAID" Name="RaidCheckBox" Foreground="White"/>
+                </StackPanel>
+            </GroupBox >
+            <GroupBox Margin="5" Header="Export Mode" Foreground="White">
+                <StackPanel Margin="5" Name="ExportUseGroup">
+                    <RadioButton Content="Default" IsChecked="True" GroupName="ExportUse" Foreground="White"/>
+                    <RadioButton Content="Clone"  GroupName="ExportUse" Foreground="White"/>
+                    <RadioButton Content="Replace"  GroupName="ExportUse" Background="White" Foreground="White"/>
+                </StackPanel>
+            </GroupBox>
+        </StackPanel>
         <Button Name="ExportButton" Content="Exportar Arquivo" Grid.Row="2" Grid.Column="2" Height="20" Width="150" HorizontalAlignment="Left" Click="ExportButton_Click" Margin="5" Background="#FF686868" Foreground="White" BorderBrush="#FFB8A9A9"/>
-        <TextBlock Text="Saida" Grid.Row="2" Margin="5" Width="Auto"/>
-        <ScrollViewer Margin="5" HorizontalContentAlignment="Left"  HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" CanContentScroll="True" MaxWidth="700" BorderBrush="Transparent" Grid.Row="3" Grid.ColumnSpan="2">
-            <TextBox Name="OutputTextBox"  Height="200" TextWrapping="Wrap" IsReadOnly="True" BorderBrush="Black"  HorizontalScrollBarVisibility="Auto" Width="Auto" />
+        <TextBlock Text="Saida" Grid.Row="2" Margin="5" Width="Auto" HorizontalAlignment="Left" Foreground="White"/>
+        <ScrollViewer Margin="5" HorizontalContentAlignment="Left"  HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" CanContentScroll="True" MaxWidth="650" BorderBrush="Transparent" Grid.Row="3" Grid.ColumnSpan="2">
+            <TextBox Name="OutputTextBox"  Height="200" TextWrapping="Wrap" IsReadOnly="True" BorderBrush="Black"  HorizontalScrollBarVisibility="Auto" Width="650" />
         </ScrollViewer>
     </Grid>
 </Page>

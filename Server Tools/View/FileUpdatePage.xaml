@@ -8,8 +8,9 @@
       d:DesignHeight="600" d:DesignWidth="800"
       Title="FileUpdatePage">
 
-    <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+    <Grid HorizontalAlignment="Center" VerticalAlignment="Top">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -21,8 +22,8 @@
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
-        <TextBlock Text="Atualizar Firmware" FontSize="28" FontWeight="DemiBold" Grid.ColumnSpan="3" HorizontalAlignment="Center" Margin="20"/>
-        <GroupBox Grid.Row="1" Height="Auto" Header="Dados da Idrac" FontSize="13" Margin="5" Width="Auto">
+        <TextBlock Text="Atualizar Firmware" FontSize="28" FontWeight="DemiBold" Grid.ColumnSpan="3" HorizontalAlignment="Center" Margin="20" Foreground="White"/>
+        <GroupBox Grid.Row="1" Height="Auto" Header="Dados da Idrac" FontSize="13" Margin="5" Width="Auto" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White">
             <Grid >
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -41,14 +42,21 @@
                 <PasswordBox Name="PasswordBox" Grid.Row="2" Grid.Column="1" Margin="5" Height="Auto" Width="150" HorizontalAlignment="Left"/>
             </Grid>
         </GroupBox>
-        <Button Name="UpdateButton" Grid.Row="3" Content="Atualizar" Margin="5" Height="20" Width="150" HorizontalAlignment="Left" Click="UpdateButton_Click"/>
-        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <TextBlock Text="Arquivo: " Margin="5" Grid.Column="3"/>
+        <GroupBox Header="Modo de Instalação" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" Margin="5" Foreground="White">
+            <StackPanel Name="InstallOptionGroup">
+                <RadioButton Content="Now" IsChecked="True" GroupName="InstallOption" Foreground="White"/>
+                <RadioButton Content="NowAndReboot" GroupName="InstallOption" Foreground="White"/>
+                <RadioButton Content="NextReboot" GroupName="InstallOption" Background="White" Foreground="White"/>
+            </StackPanel>
+        </GroupBox>
+        <Button Name="UpdateButton" Grid.Row="4" Content="Atualizar" Margin="5" Height="20" Width="150" HorizontalAlignment="Left" Click="UpdateButton_Click"/>
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom">
+            <TextBlock Text="Arquivo: " Margin="5" Foreground="White"/>
             <TextBox Name="FirmwareTextBox" Width="200" Margin="5"/>
             <Button Name="OpenFirmwareButton" Content="..." Width="30" Margin="5" Click="OpenFirmwareButton_Click"/>
         </StackPanel>
-        <TextBlock Text="Saida" Grid.Row="4" Margin="5"/>
-        <ScrollViewer Margin="5" HorizontalContentAlignment="Left"  HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" CanContentScroll="True" MaxWidth="750" BorderBrush="Transparent" Grid.Row="5" Grid.ColumnSpan="3">
+        <TextBlock Text="Saida" Grid.Row="5" Margin="5" Foreground="White"/>
+        <ScrollViewer Margin="5" HorizontalContentAlignment="Left"  HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" CanContentScroll="True" MaxWidth="750" BorderBrush="Transparent" Grid.Row="6" Grid.ColumnSpan="3">
             <TextBox Name="OutputTextBox"  Height="200" IsReadOnly="True" BorderBrush="Transparent"  HorizontalScrollBarVisibility="Auto" Width="750"/>
         </ScrollViewer>
     </Grid>

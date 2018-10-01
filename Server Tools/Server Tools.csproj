@@ -195,30 +195,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\Disk.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\icons8-device-manager-50.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\icons8-downloading-updates-50.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\icons8-hdd-64.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\icons8-repository-32.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\icons8-back-arrow-filled-50.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\icons8-document-64.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\icons8-template-50.png" />
-  </ItemGroup>
-  <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5.2">
       <Visible>False</Visible>
       <ProductName>Microsoft .NET Framework 4.5.2 %28x86 e x64%29</ProductName>
@@ -231,10 +207,31 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\icons8-export-filled-50.png" />
+    <Resource Include="Resources\repository.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\icons8-import-filled-50.png" />
+    <Resource Include="Resources\document.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\import.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\export.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\script.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\storage.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\update.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\back.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\forward.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

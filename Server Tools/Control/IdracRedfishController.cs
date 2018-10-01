@@ -72,7 +72,7 @@ namespace Server_Tools.Control
         /// <param name="path">Caminho completo para o arquvi do firmware</param>
         /// <param name="option">Modo de instalação</param>
         /// <returns>IdracJob</returns>
-        public async Task<IdracJob> UpdateFirmware(string path, IdracInstallOption option)
+        public async Task<IdracJob> UpdateFirmware(string path, string option)
         {
             Uri location = await UploadFile(path);
             return await InstallFirmware(location, option);
@@ -84,7 +84,7 @@ namespace Server_Tools.Control
         /// <param name="location">Uri do recurso</param>
         /// <param name="option">Modo de Instalação</param>
         /// <returns>Job de Instação fo Firmware</returns>
-        private async Task<IdracJob> InstallFirmware(Uri location, IdracInstallOption option)
+        private async Task<IdracJob> InstallFirmware(Uri location, string option)
         {
             var content = new
             {
@@ -135,7 +135,7 @@ namespace Server_Tools.Control
         /// </summary>
         /// <param name="target">Parametros que serão incluidos no arquivo</param>
         /// <returns></returns>
-        public async Task<string> ExportScpFile(IdracScpTarget target)
+        public async Task<string> ExportScpFile(string target, string exportUse)
         {
             var content = new
             {
@@ -143,7 +143,8 @@ namespace Server_Tools.Control
                 ShareParameters = new
                 {
                     Target = target.ToString()
-                }
+                },
+                ExportUse = exportUse
             };
 
             var jsonContent = JsonConvert.SerializeObject(content);            
@@ -194,7 +195,7 @@ namespace Server_Tools.Control
         /// <param name="shutdown">Método de desligamento, caso necessario</param>
         /// <param name="status">Status do servidor On/Off</param>
         /// <returns></returns>
-        public async Task<IdracJob> ImportScpFile(string file, IdracScpTarget target, IdracShutdownType shutdown, IdracHostPowerStatus status)
+        public async Task<IdracJob> ImportScpFile(string file, string target, string shutdown, string status)
         {
             string fileLines = File.ReadAllText(file);
             var content = new
@@ -202,10 +203,10 @@ namespace Server_Tools.Control
                 ImportBuffer = fileLines,
                 ShareParameters = new
                 {
-                    Target = target.ToString()
+                    Target = target
                 },
-                ShutdownType = shutdown.ToString(),
-                HostPowerState = status.ToString()
+                ShutdownType = shutdown,
+                HostPowerState = status
             };
             var jsonContent = JsonConvert.SerializeObject(content);
             var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
@@ -224,7 +225,7 @@ namespace Server_Tools.Control
                 {
                     throw new HttpRequestException("Falha ao executar o Job: " + job.Message);
                 }
-                else if(job.JobState.Equals("Paused") & shutdown == IdracShutdownType.NoReboot)
+                else if(job.JobState.Equals("Paused") & shutdown.Equals("NoReboot"))
                 {
                     break;
                 }

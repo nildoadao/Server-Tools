@@ -98,6 +98,11 @@ namespace Server_Tools.View
                         }
                     }
                 }
+                if (target.Equals(""))
+                {
+                    MessageBox.Show("Selecione uma opção de Export", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
+                    return;
+                }
             }
             string exportUse = "";
             foreach(RadioButton item in ExportUseGroup.Children)

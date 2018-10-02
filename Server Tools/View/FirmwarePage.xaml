@@ -7,29 +7,30 @@
       mc:Ignorable="d" 
       d:DesignHeight="600" d:DesignWidth="800"
       Title="FirmwarePage">
-    <Grid HorizontalAlignment="Center" VerticalAlignment="Top">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
-        <TextBlock Text="Update de Firmware" FontSize="28" HorizontalAlignment="Center" Margin="20" FontWeight="DemiBold" Foreground="White"/>
-        <WrapPanel Grid.Row="1">
-            <Button Height="Auto" Width="Auto" Background="Transparent"  Margin="50" Name="RepositoryButton" Click="RepositoryButton_Click" BorderBrush="Transparent" Cursor="Hand">
-                <StackPanel>
-                    <Image Source="/Server Tools;component/Resources/repository.png" Width="50"/>
-                    <TextBlock Text="Atualizar via repositorio" VerticalAlignment="Center" Margin="5" Foreground="White"/>
-                </StackPanel>
-            </Button>
-            <Button Height="Auto" Width="Auto" Background="Transparent " Margin="50" Name="FileButton" Click="FileButton_Click" BorderBrush="Transparent" Cursor="Hand">
-                <StackPanel>
-                    <Image Source="/Server Tools;component/Resources/document.png" Width="50"/>
-                    <TextBlock Text="Atualizar via arquivo" VerticalAlignment="Center" Margin="5" Foreground="White"/>
-                </StackPanel>
-            </Button>
-        </WrapPanel>
-    </Grid>
-
+    <ScrollViewer ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto">
+        <Grid HorizontalAlignment="Center" VerticalAlignment="Top">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <TextBlock Text="Update de Firmware" FontSize="28" HorizontalAlignment="Center" Margin="20" FontWeight="DemiBold" Foreground="White"/>
+            <WrapPanel Grid.Row="1">
+                <Button Height="Auto" Width="Auto" Background="Transparent"  Margin="50" Name="RepositoryButton" Click="RepositoryButton_Click" BorderBrush="Transparent" Cursor="Hand">
+                    <StackPanel>
+                        <Image Source="/Server Tools;component/Resources/repository.png" Width="50"/>
+                        <TextBlock Text="Atualizar via repositorio" VerticalAlignment="Center" Margin="5" Foreground="White"/>
+                    </StackPanel>
+                </Button>
+                <Button Height="Auto" Width="Auto" Background="Transparent " Margin="50" Name="FileButton" Click="FileButton_Click" BorderBrush="Transparent" Cursor="Hand">
+                    <StackPanel>
+                        <Image Source="/Server Tools;component/Resources/document.png" Width="50"/>
+                        <TextBlock Text="Atualizar via arquivo" VerticalAlignment="Center" Margin="5" Foreground="White"/>
+                    </StackPanel>
+                </Button>
+            </WrapPanel>
+        </Grid>
+    </ScrollViewer>
 </Page>

@@ -74,12 +74,19 @@ namespace Server_Tools.View
 
         private void ImportButton_Click(object sender, RoutedEventArgs e)
         {
-            ImportScp();
+            if(ServersListBox.Items.Count == 0)
+            {
+                MessageBox.Show("Selecione ao menos um servidor para aplicar o template", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+            foreach(Server server in ServersListBox.Items)
+            {
+                ImportScp(server);
+            }
         }
 
-        private async void ImportScp()
+        private async void ImportScp(Server server)
         {
-            Server server = new Server(ServerTextBox.Text, UserTextBox.Text, PasswordBox.Password);
             IdracRedfishController idrac = new IdracRedfishController(server);
             OutputTextBox.AppendText("Importando configurações para " + server.Host + "...\n");
             string target = "";

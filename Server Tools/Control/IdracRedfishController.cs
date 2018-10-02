@@ -43,7 +43,6 @@ namespace Server_Tools.Control
             this.server = server;
             baseUri = String.Format(@"https://{0}", server.Host);
             client = HttpUtil.GetClient();
-            client.BaseAddress = new Uri(baseUri);
         }
 
         /// <summary>
@@ -88,27 +87,27 @@ namespace Server_Tools.Control
         {
             var content = new
             {
-                SoftwareIdentityURIs = location.ToString(),
+                SoftwareIdentityURIs = location,
                 InstallUpon = option
             };
             var jsonContent = JsonConvert.SerializeObject(content);
             var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");              
-            string jobId = await CreateJob(FIRMWARE_INSTALL, httpContent);
+            string jobId = await CreateJob(baseUri + FIRMWARE_INSTALL, httpContent);
             return await GetJob(jobId);            
         }
 
         /// <summary>
-        /// Realiza o update do firmware para a Idrac
+        /// Upload the firmware to Idrac
         /// </summary>
-        /// <param name="path">Localização completa do firmware</param>
-        /// <returns>Uri com a localização do recurso</returns>
+        /// <param name="path">full path of Firwmare</param>
+        /// <returns>Uri with the location</returns>
         private async Task<Uri> UploadFile(string path)
         {
-            using (var request = new HttpRequestMessage(HttpMethod.Post, FIRMWARE_INVENTORY))
+            using (var request = new HttpRequestMessage(HttpMethod.Post, baseUri + FIRMWARE_INVENTORY))
             using (var content = new MultipartFormDataContent(Guid.NewGuid().ToString()))
             using (var fileContent = new StreamContent(File.Open(path, FileMode.Open)))
             {
-                string etag = await GetHeaderValue("ETag", FIRMWARE_INVENTORY);
+                string etag = await GetHeaderValue("ETag", baseUri + FIRMWARE_INVENTORY);
                 fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse("application/octet-stream");
                 request.Headers.Authorization = HttpUtil.GetCredentialHeader(server.User, server.Password);
                 request.Headers.TryAddWithoutValidation("If-Match", etag);
@@ -142,14 +141,14 @@ namespace Server_Tools.Control
                 ExportFormat = "XML",
                 ShareParameters = new
                 {
-                    Target = target.ToString()
+                    Target = target
                 },
                 ExportUse = exportUse
             };
 
             var jsonContent = JsonConvert.SerializeObject(content);            
             var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-            string jobId = await CreateJob(EXPORT_SYSTEM_CONFIGURATION, httpContent);
+            string jobId = await CreateJob(baseUri + EXPORT_SYSTEM_CONFIGURATION, httpContent);
             DateTime startTime = DateTime.Now;
 
             while (true)
@@ -168,7 +167,7 @@ namespace Server_Tools.Control
                     throw new TimeoutException("Excedido tempo para conclusão do Job " + jobId);
                 }
             }
-            using (var request = new HttpRequestMessage(HttpMethod.Get, JOB_RESULT + jobId))
+            using (var request = new HttpRequestMessage(HttpMethod.Get, baseUri + JOB_RESULT + jobId))
             {
                 request.Headers.Authorization = HttpUtil.GetCredentialHeader(server.User, server.Password);
                 using(var response = await client.SendAsync(request))
@@ -210,7 +209,7 @@ namespace Server_Tools.Control
             };
             var jsonContent = JsonConvert.SerializeObject(content);
             var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-            string jobId = await CreateJob(IMPORT_SYSTEM_CONFIGURATION, httpContent);
+            string jobId = await CreateJob(baseUri + IMPORT_SYSTEM_CONFIGURATION, httpContent);
             DateTime startTime = DateTime.Now;
             IdracJob job = new IdracJob();
 
@@ -248,6 +247,7 @@ namespace Server_Tools.Control
             using(var request = new HttpRequestMessage(HttpMethod.Post, uri))
             {
                 request.Headers.Authorization = HttpUtil.GetCredentialHeader(server.User, server.Password);
+                request.Content = content;
                 using (var response = await client.SendAsync(request))
                 {
                     if (!response.IsSuccessStatusCode)
@@ -266,7 +266,7 @@ namespace Server_Tools.Control
         /// <returns>O Job corresponde ao ID</returns>
         private async Task<IdracJob> GetJob(string jobId)
         {
-            return await GetResource<IdracJob>(JOB_STATUS + jobId);
+            return await GetResource<IdracJob>(baseUri + JOB_STATUS + jobId);
         }
 
         /// <summary>

@@ -29,6 +29,10 @@ namespace Server_Tools.View
 
         private void UpdateButton_Click(object sender, RoutedEventArgs e)
         {
+            if (!ValidateForm())
+            {
+                return;
+            }
             string firmware = FirmwareTextBox.Text;
             string option = "";
             foreach(RadioButton item in InstallOptionGroup.Children)
@@ -62,6 +66,31 @@ namespace Server_Tools.View
         private void OpenFirmwareButton_Click(object sender, RoutedEventArgs e)
         {
             firmwareDialog.ShowDialog();
+        }
+
+        private bool ValidateForm()
+        {
+            if (ServerTextBox.Text.Trim().Equals(""))
+            {
+                MessageBox.Show("Informe o hostname do servidor", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
+                return false;
+            }
+            if (UserTextBox.Text.Trim().Equals(""))
+            {
+                MessageBox.Show("Informe o usuário", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
+                return false;
+            }
+            if (PasswordBox.Password.Trim().Equals(""))
+            {
+                MessageBox.Show("Informe a senha", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
+                return false;
+            }
+            if (FirmwareTextBox.Text.Trim().Equals(""))
+            {
+                MessageBox.Show("Selecione um firmware", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
+                return false;
+            }
+            return true;
         }
     }
 }

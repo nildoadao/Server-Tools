@@ -42,7 +42,7 @@ namespace Server_Tools.Control
         {
             this.server = server;
             baseUri = String.Format(@"https://{0}", server.Host);
-            client = HttpUtil.GetClient();
+            client = HttpUtil.Client;
         }
 
         /// <summary>
@@ -97,10 +97,10 @@ namespace Server_Tools.Control
         }
 
         /// <summary>
-        /// Upload the firmware to Idrac
+        /// Realiza o upload do firmware para a Idrac
         /// </summary>
-        /// <param name="path">full path of Firwmare</param>
-        /// <returns>Uri with the location</returns>
+        /// <param name="path">caminho completo do arquivo do firmware</param>
+        /// <returns>Uri com a localização do recurso</returns>
         private async Task<Uri> UploadFile(string path)
         {
             using (var request = new HttpRequestMessage(HttpMethod.Post, baseUri + FIRMWARE_INVENTORY))
@@ -210,30 +210,7 @@ namespace Server_Tools.Control
             var jsonContent = JsonConvert.SerializeObject(content);
             var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
             string jobId = await CreateJob(baseUri + IMPORT_SYSTEM_CONFIGURATION, httpContent);
-            DateTime startTime = DateTime.Now;
-            IdracJob job = new IdracJob();
-
-            while(true)
-            {
-                job = await GetJob(jobId);
-                if (job.JobState.Contains("Completed"))
-                {
-                    break;
-                }
-                else if (job.JobState.Equals("Failed"))
-                {
-                    throw new HttpRequestException("Falha ao executar o Job: " + job.Message);
-                }
-                else if(job.JobState.Equals("Paused") & shutdown.Equals("NoReboot"))
-                {
-                    break;
-                }
-                if (DateTime.Now >= startTime.AddMinutes(JOB_TIMEOUT))
-                {
-                    throw new TimeoutException("Excedido tempo para conclusão do Job " + jobId);
-                }
-            }        
-            return job;
+            return await GetJob(jobId);
         }
 
         /// <summary>
@@ -242,7 +219,7 @@ namespace Server_Tools.Control
         /// <param name="uri">String contento o enderço do recurso</param>
         /// <param name="content">Conteudo Http da requisição</param>
         /// <returns></returns>
-        private async Task<string> CreateJob(string uri, HttpContent content)
+        public async Task<string> CreateJob(string uri, HttpContent content)
         {
             using(var request = new HttpRequestMessage(HttpMethod.Post, uri))
             {
@@ -264,7 +241,7 @@ namespace Server_Tools.Control
         /// </summary>
         /// <param name="jobId">Identificação do Job</param>
         /// <returns>O Job corresponde ao ID</returns>
-        private async Task<IdracJob> GetJob(string jobId)
+        public async Task<IdracJob> GetJob(string jobId)
         {
             return await GetResource<IdracJob>(baseUri + JOB_STATUS + jobId);
         }
@@ -299,7 +276,7 @@ namespace Server_Tools.Control
         /// <param name="header">Cabeçalho a ser buscado</param>
         /// <param name="uri">Uri do recurso</param>
         /// <returns>O valor de cabeçalho</returns>
-        private async Task<string> GetHeaderValue(string header, string uri)
+        public async Task<string> GetHeaderValue(string header, string uri)
         {
             using (var request = new HttpRequestMessage(HttpMethod.Get, uri))
             {

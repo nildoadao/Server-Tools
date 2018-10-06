@@ -36,7 +36,7 @@ namespace Server_Tools.View
             try
             {
                 string file = await idrac.ExportScpFile(target, exportUse);
-                OutputTextBox.AppendText("Arquivo importado com sucesso, salvo em: " + file + "\n");
+                OutputTextBox.AppendText("Arquivo exportado com sucesso, salvo em: " + file + "\n");
             }
             catch (Exception ex)
             {

@@ -21,16 +21,19 @@ namespace Server_Tools.Util
 
         #endregion
 
-        public static HttpClient GetClient()
+        public static HttpClient Client
         {
-            if(_client == null)
+            get
             {
-                Init();
+                if (_client == null)
+                {
+                    BuildClient();
+                }
+                return _client;
             }
-            return _client;
         }
 
-        private static void Init()
+        private static void BuildClient()
         {
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Ssl3;
             ServicePointManager.ServerCertificateValidationCallback += (sender, certificate, chain, sslPolicyErrors) => true;

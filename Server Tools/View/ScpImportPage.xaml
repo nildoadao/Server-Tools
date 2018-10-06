@@ -85,10 +85,23 @@
                 <Button Name="ImportButton" Content="Importar" Margin="5" Height="20" Width="150" HorizontalAlignment="Left" Click="ImportButton_Click"/>
                 <Button Name="CancelButton" Content="Cancelar" Margin="5" Height="20" Width="150"  HorizontalAlignment="Left"/>
             </StackPanel>
-            <TextBlock Text="Saida" Grid.Row="5" Margin="5" Foreground="White" />
-            <ScrollViewer Margin="5" HorizontalAlignment="Left" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" CanContentScroll="True" MaxWidth="650" BorderBrush="Transparent" Grid.Row="6" Grid.ColumnSpan="3">
-                <TextBox Name="OutputTextBox"  Height="200" TextWrapping="Wrap" IsReadOnly="True" BorderBrush="Transparent"  HorizontalScrollBarVisibility="Auto" Width="650"/>
-            </ScrollViewer>
+            <TabControl Grid.Row="5" Grid.ColumnSpan="3">
+                <TabItem Header="Saida">
+                    <ScrollViewer Margin="5" HorizontalAlignment="Left" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" CanContentScroll="True" MaxWidth="650" BorderBrush="Transparent" >
+                        <TextBox Name="OutputTextBox"  Height="200" TextWrapping="Wrap" IsReadOnly="True" BorderBrush="Transparent"  HorizontalScrollBarVisibility="Auto" Width="650"/>
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Header="Jobs">
+                    <DataGrid Name="JobsDataGrid" Height="200" VerticalScrollBarVisibility="Auto" AutoGenerateColumns="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Servidor" Binding="{Binding Server.Host}"/>
+                            <DataGridTextColumn Header="Job ID" Binding="{Binding Job.Id}"/>
+                            <DataGridTextColumn Header="Nome" Binding="{Binding Job.Name}"/>
+                            <DataGridTextColumn Header="Status do Job" Binding="{Binding Job.JobState}"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </TabItem>
+            </TabControl>
         </Grid>
     </ScrollViewer>
 </Page>

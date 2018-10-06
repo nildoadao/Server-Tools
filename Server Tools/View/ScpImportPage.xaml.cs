@@ -4,8 +4,10 @@ using Server_Tools.Model;
 using Server_Tools.Util;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -16,6 +18,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace Server_Tools.View
 {
@@ -26,6 +29,7 @@ namespace Server_Tools.View
     {
         OpenFileDialog fileDialog;
         OpenFileDialog csvDialog;
+        ObservableCollection<ServerJob> jobs;
 
         public ScpImportPage()
         {
@@ -36,6 +40,8 @@ namespace Server_Tools.View
             csvDialog = new OpenFileDialog();
             csvDialog.Filter = "Arquivos CSV|*csv";
             csvDialog.FileOk += CsvDialog_FileOk;
+            jobs = new ObservableCollection<ServerJob>();
+            JobsDataGrid.ItemsSource = jobs;
         }
 
         private void FileDialog_FileOk(object sender, System.ComponentModel.CancelEventArgs e)
@@ -45,9 +51,9 @@ namespace Server_Tools.View
 
         private void AddButton_Click(object sender, RoutedEventArgs e)
         {
-            if (!ServerTextBox.Text.Trim().Equals(""))
+            if (!String.IsNullOrEmpty(ServerTextBox.Text))
             {
-                if (UserTextBox.Text.Trim().Equals("") | PasswordBox.Password.Trim().Equals(""))
+                if (String.IsNullOrEmpty(UserTextBox.Text) | String.IsNullOrEmpty(PasswordBox.Password))
                 {
                     MessageBox.Show("Insira usuario e senha da Idrac", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
@@ -125,7 +131,8 @@ namespace Server_Tools.View
             try
             {
                 IdracJob job = await idrac.ImportScpFile(FileTextBox.Text, target, shutdown, "On");
-                OutputTextBox.AppendText("Job Status: " + job.JobState + " " + job.Message + "\n");
+                OutputTextBox.AppendText(string.Format("Job {0} criado para servidor {1} \n", job.Id, server));
+                jobs.Add(new ServerJob { Server = server, Job = job });
             }
             catch(Exception ex)
             {
@@ -156,22 +163,22 @@ namespace Server_Tools.View
 
         private bool ValidateForm()
         {
-            if (ServerTextBox.Text.Trim().Equals(""))
+            if (String.IsNullOrEmpty(ServerTextBox.Text))
             {
                 MessageBox.Show("Informe o endereço do host", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
                 return false;
             }
-            else if (UserTextBox.Text.Trim().Equals(""))
+            else if (String.IsNullOrEmpty(UserTextBox.Text))
             {
                 MessageBox.Show("Informe o usuario", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
                 return false;
             }
-            else if (PasswordBox.Password.Trim().Equals(""))
+            else if (String.IsNullOrEmpty(PasswordBox.Password))
             {
                 MessageBox.Show("Informe a senha", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
                 return false;
             }
-            else if (FileTextBox.Text.Trim().Equals(""))
+            else if (String.IsNullOrEmpty(FileTextBox.Text))
             {
                 MessageBox.Show("Selecione um arquivo", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
                 return false;

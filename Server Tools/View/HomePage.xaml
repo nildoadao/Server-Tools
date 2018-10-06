@@ -8,7 +8,7 @@
       d:DesignHeight="600" d:DesignWidth="800"
       Title="HomePage">
 
-    <ScrollViewer ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto">
+    <ScrollViewer ScrollViewer.VerticalScrollBarVisibility="Auto">
         <Grid HorizontalAlignment="Center" VerticalAlignment="Top">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>

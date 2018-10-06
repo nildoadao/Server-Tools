@@ -25,7 +25,7 @@
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
     <AutorunEnabled>true</AutorunEnabled>
-    <ApplicationRevision>2</ApplicationRevision>
+    <ApplicationRevision>3</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -98,14 +98,17 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Idrac\Managers\ScpController.cs" />
+    <Compile Include="Idrac\UpdateService\UpdateController.cs" />
     <Compile Include="Model\IdracHostPowerStatus.cs" />
     <Compile Include="Model\IdracInstallOption.cs" />
     <Compile Include="Model\IdracJob.cs" />
-    <Compile Include="Control\IdracRedfishController.cs" />
+    <Compile Include="Idrac\IdracRedfishController.cs" />
     <Compile Include="Model\IdracScpExportUse.cs" />
     <Compile Include="Model\IdracScpOption.cs" />
     <Compile Include="Model\IdracShutdownType.cs" />
     <Compile Include="Model\IdracPhysicalDisk.cs" />
+    <Compile Include="Model\ServerJob.cs" />
     <Compile Include="Util\FileHelper.cs" />
     <Compile Include="Util\HttpUtil.cs" />
     <Compile Include="View\CustomScriptPage.xaml.cs">
@@ -124,7 +127,7 @@
       <DependentUpon>HomeWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Model\IdracFirmware.cs" />
-    <Compile Include="Control\IdracSshCommand.cs" />
+    <Compile Include="Idrac\IdracSshCommand.cs" />
     <Compile Include="Util\NetworkHelper.cs" />
     <Compile Include="Model\RacadmException.cs" />
     <Compile Include="Model\Server.cs" />
@@ -233,6 +236,13 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\forward.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Idrac\Chassis\" />
+    <Folder Include="Idrac\EventService\" />
+    <Folder Include="Idrac\Sessions\" />
+    <Folder Include="Idrac\Systems\" />
+    <Folder Include="Idrac\TaskService\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

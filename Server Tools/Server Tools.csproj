@@ -98,12 +98,13 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Idrac\Managers\ScpController.cs" />
-    <Compile Include="Idrac\UpdateService\UpdateController.cs" />
+    <Compile Include="Idrac\BaseIdrac.cs" />
+    <Compile Include="Idrac\ScpController.cs" />
+    <Compile Include="Idrac\JobController.cs" />
+    <Compile Include="Idrac\UpdateController.cs" />
     <Compile Include="Model\IdracHostPowerStatus.cs" />
     <Compile Include="Model\IdracInstallOption.cs" />
     <Compile Include="Model\IdracJob.cs" />
-    <Compile Include="Idrac\IdracRedfishController.cs" />
     <Compile Include="Model\IdracScpExportUse.cs" />
     <Compile Include="Model\IdracScpOption.cs" />
     <Compile Include="Model\IdracShutdownType.cs" />
@@ -237,12 +238,6 @@
   <ItemGroup>
     <Resource Include="Resources\forward.png" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Idrac\Chassis\" />
-    <Folder Include="Idrac\EventService\" />
-    <Folder Include="Idrac\Sessions\" />
-    <Folder Include="Idrac\Systems\" />
-    <Folder Include="Idrac\TaskService\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

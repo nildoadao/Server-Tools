@@ -1,5 +1,5 @@
 ﻿using Microsoft.Win32;
-using Server_Tools.Control;
+using Server_Tools.Idrac;
 using Server_Tools.Model;
 using System;
 using System.Windows;
@@ -49,7 +49,7 @@ namespace Server_Tools.View
         private async void UpdateFirmware(string path, string option)
         {
             Server server = new Server(ServerTextBox.Text, UserTextBox.Text, PasswordBox.Password);
-            IdracRedfishController idrac = new IdracRedfishController(server);
+            UpdateController idrac = new UpdateController(server);
             OutputTextBox.AppendText("Iniciando upload do arquivo " + FirmwareTextBox.Text + " para " + server.Host + "\n");
             try
             {

@@ -1,5 +1,5 @@
 ﻿using Microsoft.Win32;
-using Server_Tools.Control;
+using Server_Tools.Idrac;
 using Server_Tools.Model;
 using Server_Tools.Util;
 using System;
@@ -93,7 +93,7 @@ namespace Server_Tools.View
 
         private async void ImportScp(Server server)
         {
-            IdracRedfishController idrac = new IdracRedfishController(server);
+            ScpController idrac = new ScpController(server);
             OutputTextBox.AppendText("Importando configurações para " + server.Host + "...\n");
             string target = "";
             if (AllCheckBox.IsChecked.Value)

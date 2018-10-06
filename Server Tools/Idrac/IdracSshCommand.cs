@@ -1,8 +1,7 @@
 ﻿using Renci.SshNet;
 using Server_Tools.Model;
-using System.Collections.Generic;
 
-namespace Server_Tools.Control
+namespace Server_Tools.Idrac
 {
     class IdracSshCommand
     {
@@ -19,10 +18,10 @@ namespace Server_Tools.Control
             {
                 client.Connect();
                 SshCommand commandResult = client.RunCommand(command);
+
                 if (commandResult.ExitStatus != 0 | commandResult.Result.Contains("ERROR"))
-                {
                     throw new RacadmException(commandResult.Result);
-                }
+
                 return commandResult.Result;
             }
         }

@@ -1,35 +1,23 @@
 ﻿using Newtonsoft.Json;
-using Server_Tools.Control;
 using Server_Tools.Model;
-using Server_Tools.Util;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Server_Tools.Idrac.UpdateService
+namespace Server_Tools.Idrac
 {
-    class UpdateController
+    class UpdateController : BaseIdrac
     {
-        private Server server;
-        private HttpClient client;
-        private string baseUri;
-        private IdracRedfishController idrac;
 
         public const string FIRMWARE_INVENTORY = @"/redfish/v1/UpdateService/FirmwareInventory";
         public const string FIRMWARE_INSTALL = @"/redfish/v1/UpdateService/Actions/Oem/DellUpdateService.Install";
 
         public UpdateController(Server server)
-        {
-            this.server = server;
-            baseUri = String.Format(@"https://{0}", server.Host);
-            client = HttpUtil.Client;
-            idrac = new IdracRedfishController(server);
-        }
+            :base(server)
+        { }
 
         /// <summary>
         /// Realiza um update de firmware em um servidor que suporta Redfish
@@ -58,6 +46,7 @@ namespace Server_Tools.Idrac.UpdateService
             };
             var jsonContent = JsonConvert.SerializeObject(content);
             var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+            var idrac = new JobController(server);
             string jobId = await idrac.CreateJob(baseUri + FIRMWARE_INSTALL, httpContent);
             return await idrac.GetJob(jobId);
         }
@@ -73,9 +62,9 @@ namespace Server_Tools.Idrac.UpdateService
             using (var content = new MultipartFormDataContent(Guid.NewGuid().ToString()))
             using (var fileContent = new StreamContent(File.Open(path, FileMode.Open)))
             {
-                string etag = await idrac.GetHeaderValue("ETag", baseUri + FIRMWARE_INVENTORY);
+                string etag = await GetHeaderValue("ETag", baseUri + FIRMWARE_INVENTORY);
                 fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse("application/octet-stream");
-                request.Headers.Authorization = HttpUtil.GetCredentialHeader(server.User, server.Password);
+                request.Headers.Authorization = credentials;
                 request.Headers.TryAddWithoutValidation("If-Match", etag);
                 fileContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
                 {
@@ -87,9 +76,8 @@ namespace Server_Tools.Idrac.UpdateService
                 using (HttpResponseMessage response = await client.SendAsync(request))
                 {
                     if (!response.IsSuccessStatusCode)
-                    {
                         throw new HttpRequestException("Falha no upload do arquivo: " + response.ReasonPhrase);
-                    }
+
                     return response.Headers.Location;
                 }
             }

@@ -1,4 +1,4 @@
-﻿using Server_Tools.Control;
+﻿using Server_Tools.Idrac;
 using Server_Tools.Model;
 using System;
 using System.Collections.Generic;
@@ -31,7 +31,7 @@ namespace Server_Tools.View
         {
             ExportButton.IsEnabled = false;
             Server server = new Server(ServerTextBox.Text, UserTextBox.Text, PasswordBox.Password);
-            IdracRedfishController idrac = new IdracRedfishController(server);
+            ScpController idrac = new ScpController(server);
             OutputTextBox.AppendText("Exportando configurações de " + server.Host + "...\n");
             try
             {

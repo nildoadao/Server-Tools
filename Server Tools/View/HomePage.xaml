@@ -25,7 +25,7 @@
                         <TextBlock Text="Update Firmware" VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="White"/>
                     </StackPanel>
                 </Button>
-                <Button Height="Auto" Width="Auto" Background="Transparent " Margin="50" Name="DiskButton" Click="DiskButton_Click" BorderBrush="Transparent" Cursor="Hand">
+                <Button Height="Auto" Width="Auto" Background="Transparent " Margin="50" Name="DiskButton" Click="StorageButton_Click" BorderBrush="Transparent" Cursor="Hand">
                     <StackPanel>
                         <Image Source="/Server Tools;component/Resources/storage.png" Width="50"/>
                         <TextBlock Text="Storage" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="White"/>

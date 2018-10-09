@@ -7,5 +7,6 @@ namespace Server_Tools.Model
         public string Name { get; set; }
         public string JobState { get; set; }
         public string Message { get; set; }
+        public int PercentComplete { get; set; }
     }
 }

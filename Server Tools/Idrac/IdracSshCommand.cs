@@ -12,6 +12,11 @@ namespace Server_Tools.Idrac
             this.server = server;
         }
 
+        /// <summary>
+        /// Executa um comando via SSH em um servidor remoto
+        /// </summary>
+        /// <param name="command">String contendo o comando a ser executado</param>
+        /// <returns>String contendo o resultado do comando</returns>
         public string RunCommand(string command)
         {
             using (SshClient client = new SshClient(server.Host, server.User, server.Password))

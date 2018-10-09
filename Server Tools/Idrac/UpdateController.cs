@@ -60,7 +60,7 @@ namespace Server_Tools.Idrac
         {
             using (var request = new HttpRequestMessage(HttpMethod.Post, baseUri + FIRMWARE_INVENTORY))
             using (var content = new MultipartFormDataContent(Guid.NewGuid().ToString()))
-            using (var fileContent = new StreamContent(File.Open(path, FileMode.Open)))
+            using (var fileContent = new StreamContent(File.Open(path, FileMode.Open, FileAccess.Read)))
             {
                 string etag = await GetHeaderValue("ETag", baseUri + FIRMWARE_INVENTORY);
                 fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse("application/octet-stream");

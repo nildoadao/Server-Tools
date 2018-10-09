@@ -1,14 +1,8 @@
-﻿using Newtonsoft.Json;
-using Server_Tools.Model;
-using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Security;
 using System.Text;
-using System.Threading.Tasks;
 namespace Server_Tools.Util
 {
     class HttpUtil
@@ -26,9 +20,8 @@ namespace Server_Tools.Util
             get
             {
                 if (_client == null)
-                {
                     BuildClient();
-                }
+
                 return _client;
             }
         }

@@ -92,12 +92,14 @@
                     </ScrollViewer>
                 </TabItem>
                 <TabItem Header="Jobs">
-                    <DataGrid Name="JobsDataGrid" Height="200" VerticalScrollBarVisibility="Auto" AutoGenerateColumns="False">
+                    <DataGrid Name="JobsDataGrid" Height="200" VerticalScrollBarVisibility="Auto" AutoGenerateColumns="False" MaxWidth="650" Margin="5">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Servidor" Binding="{Binding Server.Host}"/>
                             <DataGridTextColumn Header="Job ID" Binding="{Binding Job.Id}"/>
                             <DataGridTextColumn Header="Nome" Binding="{Binding Job.Name}"/>
                             <DataGridTextColumn Header="Status do Job" Binding="{Binding Job.JobState}"/>
+                            <DataGridTextColumn Header="% Concluido" Binding="{Binding Job.PercentComplete}"/>
+                            <DataGridTextColumn Header="Mensagem" Binding="{Binding Job.Message}"/>
                         </DataGrid.Columns>
                     </DataGrid>
                 </TabItem>

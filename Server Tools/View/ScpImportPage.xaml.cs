@@ -5,19 +5,8 @@ using Server_Tools.Util;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Threading;
 
 namespace Server_Tools.View
@@ -29,7 +18,8 @@ namespace Server_Tools.View
     {
         OpenFileDialog fileDialog;
         OpenFileDialog csvDialog;
-        ObservableCollection<ServerJob> jobs;
+        ObservableCollection<ServerJob> jobQueue;
+        DispatcherTimer timer;
 
         public ScpImportPage()
         {
@@ -40,8 +30,17 @@ namespace Server_Tools.View
             csvDialog = new OpenFileDialog();
             csvDialog.Filter = "Arquivos CSV|*csv";
             csvDialog.FileOk += CsvDialog_FileOk;
-            jobs = new ObservableCollection<ServerJob>();
-            JobsDataGrid.ItemsSource = jobs;
+            jobQueue = new ObservableCollection<ServerJob>();
+            JobsDataGrid.ItemsSource = jobQueue;
+            timer = new DispatcherTimer();
+            timer.Interval = new TimeSpan(0, 0, 10);
+            timer.Tick += Timer_Tick;
+            timer.Start();
+        }
+
+        private void Timer_Tick(object sender, EventArgs e)
+        {
+            UpdateJobs();
         }
 
         private void FileDialog_FileOk(object sender, System.ComponentModel.CancelEventArgs e)
@@ -94,7 +93,7 @@ namespace Server_Tools.View
         private async void ImportScp(Server server)
         {
             ScpController idrac = new ScpController(server);
-            OutputTextBox.AppendText("Importando configurações para " + server.Host + "...\n");
+            OutputTextBox.AppendText(string.Format("Importando configurações para {0}...\n", server.Host));
             string target = "";
             if (AllCheckBox.IsChecked.Value)
             {
@@ -132,7 +131,7 @@ namespace Server_Tools.View
             {
                 IdracJob job = await idrac.ImportScpFile(FileTextBox.Text, target, shutdown, "On");
                 OutputTextBox.AppendText(string.Format("Job {0} criado para servidor {1} \n", job.Id, server));
-                jobs.Add(new ServerJob { Server = server, Job = job });
+                jobQueue.Add(new ServerJob { Server = server, Job = job });
             }
             catch(Exception ex)
             {
@@ -210,6 +209,19 @@ namespace Server_Tools.View
                     item.IsEnabled = true;
                 }
             }
+        }
+
+        private async void UpdateJobs()
+        {
+            var updatedJobs = new ObservableCollection<ServerJob>();
+            foreach(var job in jobQueue)
+            {
+                var idrac = new JobController(job.Server);
+                var updatedJob = await idrac.GetJob(job.Job.Id);
+                updatedJobs.Add(new ServerJob { Server = job.Server, Job = updatedJob });
+            }
+            jobQueue = updatedJobs;
+            JobsDataGrid.ItemsSource = jobQueue;
         }
     }
 }

@@ -101,14 +101,17 @@
     <Compile Include="Idrac\BaseIdrac.cs" />
     <Compile Include="Idrac\ScpController.cs" />
     <Compile Include="Idrac\JobController.cs" />
+    <Compile Include="Idrac\StorageController.cs" />
     <Compile Include="Idrac\UpdateController.cs" />
     <Compile Include="Model\IdracHostPowerStatus.cs" />
     <Compile Include="Model\IdracInstallOption.cs" />
     <Compile Include="Model\IdracJob.cs" />
+    <Compile Include="Model\IdracRaidController.cs" />
     <Compile Include="Model\IdracScpExportUse.cs" />
     <Compile Include="Model\IdracScpOption.cs" />
     <Compile Include="Model\IdracShutdownType.cs" />
     <Compile Include="Model\IdracPhysicalDisk.cs" />
+    <Compile Include="Model\IdracStorageController.cs" />
     <Compile Include="Model\ServerJob.cs" />
     <Compile Include="Util\FileHelper.cs" />
     <Compile Include="Util\HttpUtil.cs" />
@@ -137,6 +140,12 @@
     </Compile>
     <Compile Include="View\ScpImportPage.xaml.cs">
       <DependentUpon>ScpImportPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\StoragePage.xaml.cs">
+      <DependentUpon>StoragePage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\StorageWindow.xaml.cs">
+      <DependentUpon>StorageWindow.xaml</DependentUpon>
     </Compile>
     <Page Include="View\CustomScriptPage.xaml">
       <SubType>Designer</SubType>
@@ -167,6 +176,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\ScpImportPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\StoragePage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\StorageWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -30,9 +30,9 @@ namespace Server_Tools.View
             NavigationService.Navigate(new FirmwarePage());
         }
 
-        private void DiskButton_Click(object sender, RoutedEventArgs e)
+        private void StorageButton_Click(object sender, RoutedEventArgs e)
         {
-
+            NavigationService.Navigate(new StoragePage());
         }
 
         private void CustomScriptButton_Click(object sender, RoutedEventArgs e)

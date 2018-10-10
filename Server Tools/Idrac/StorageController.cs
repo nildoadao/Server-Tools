@@ -22,7 +22,7 @@ namespace Server_Tools.Idrac
         /// <returns></returns>
         public async Task<List<string>> GetControllersLocation()
         {
-            using(var request = new HttpRequestMessage(HttpMethod.Get, CONTROLLERS))
+            using(var request = new HttpRequestMessage(HttpMethod.Get, baseUri + CONTROLLERS))
             {
                 request.Headers.Authorization = credentials;
                 using(var response = await client.SendAsync(request))
@@ -30,11 +30,15 @@ namespace Server_Tools.Idrac
                     var jsonData = await response.Content.ReadAsStringAsync();
                     var storageEntities = new
                     {
-                        Description = "",
-                        Members = new List<string>()
+                        Members = new List<OdataObject>()
                     };
                     var entities = JsonConvert.DeserializeAnonymousType(jsonData, storageEntities);
-                    return entities.Members;
+                    var locations = new List<string>();
+                    foreach(var location in entities.Members)
+                    {
+                        locations.Add(location.Id);
+                    }
+                    return locations;
                 }
             }
         }
@@ -46,7 +50,7 @@ namespace Server_Tools.Idrac
         /// <returns></returns>
         public async Task<IdracRaidController> GetRaidController(string uri)
         {
-            return await GetResource<IdracRaidController>(uri);
+            return await GetResource<IdracRaidController>(baseUri + uri);
         } 
 
         /// <summary>
@@ -59,7 +63,7 @@ namespace Server_Tools.Idrac
             List<IdracPhysicalDisk> disks = new List<IdracPhysicalDisk>();
             foreach(var item in controller.Drives)
             {
-               disks.Add(await GetResource<IdracPhysicalDisk>(item));
+               disks.Add(await GetResource<IdracPhysicalDisk>(baseUri + item.Id));
             }
             return disks;
         }

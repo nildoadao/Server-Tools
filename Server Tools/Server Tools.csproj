@@ -112,6 +112,8 @@
     <Compile Include="Model\IdracShutdownType.cs" />
     <Compile Include="Model\IdracPhysicalDisk.cs" />
     <Compile Include="Model\IdracStorageController.cs" />
+    <Compile Include="Model\IdracStorageEntities.cs" />
+    <Compile Include="Model\OdataObject.cs" />
     <Compile Include="Model\ServerJob.cs" />
     <Compile Include="Util\FileHelper.cs" />
     <Compile Include="Util\HttpUtil.cs" />

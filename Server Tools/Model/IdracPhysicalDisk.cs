@@ -1,4 +1,5 @@
 ﻿
+using Newtonsoft.Json;
 using System.Collections.Generic;
 
 namespace Server_Tools.Model
@@ -20,9 +21,9 @@ namespace Server_Tools.Model
         public int RotationSpeedRPM { get; set; }
         public DiskLink Links { get; set; }
         
-        public class DiskLink
+        internal class DiskLink
         {
-            public List<string> Volumes { get; set; }
+            public List<OdataObject> Volumes { get; set; }
         }
     }
 }

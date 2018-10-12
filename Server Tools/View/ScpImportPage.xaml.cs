@@ -24,16 +24,22 @@ namespace Server_Tools.View
         public ScpImportPage()
         {
             InitializeComponent();
-            fileDialog = new OpenFileDialog();
-            fileDialog.Filter = "Arquivos SCP (*.xml)|*.xml";
+            fileDialog = new OpenFileDialog()
+            {
+                Filter = "Arquivos SCP (*.xml)|*.xml",
+            };
             fileDialog.FileOk += FileDialog_FileOk;
-            csvDialog = new OpenFileDialog();
-            csvDialog.Filter = "Arquivos CSV|*csv";
+            csvDialog = new OpenFileDialog()
+            {
+                Filter = "Arquivos CSV|*csv"
+            };
             csvDialog.FileOk += CsvDialog_FileOk;
             jobQueue = new ObservableCollection<ServerJob>();
             JobsDataGrid.ItemsSource = jobQueue;
-            timer = new DispatcherTimer();
-            timer.Interval = new TimeSpan(0, 0, 10);
+            timer = new DispatcherTimer()
+            {
+                Interval = new TimeSpan(0, 0, 10)
+            };
             timer.Tick += Timer_Tick;
             timer.Start();
         }

@@ -3,10 +3,10 @@ namespace Server_Tools.Model
 {
     class IdracFirmware
     {
-        string Id { get; set; }
-        string Description { get; set; }
-        string Name { get; set; }
-        bool Updateable { get; set; }
-        string Version { get; set; }
+        public string Id { get; set; }
+        public string Description { get; set; }
+        public string Name { get; set; }
+        public bool Updateable { get; set; }
+        public string Version { get; set; }
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Server_Tools.Model
 {
-    class Server
+    public class Server
     {
         private string host;
         private string user;

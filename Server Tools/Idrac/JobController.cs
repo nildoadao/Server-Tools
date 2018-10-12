@@ -17,21 +17,33 @@ namespace Server_Tools.Idrac
         { }
 
         /// <summary>
-        /// Cria um Job na Idrac
+        /// Cria um Job na Idrac utilizando o metodo POST
         /// </summary>
         /// <param name="uri">String contento o enderço do recurso</param>
         /// <param name="content">Conteudo Http da requisição</param>
         /// <returns>String contendo o Job Id</returns>
         public async Task<string> CreateJob(string uri, HttpContent content)
         {
-            using (var request = new HttpRequestMessage(HttpMethod.Post, uri))
+            return await CreateJob(uri, content, HttpMethod.Post);
+        }
+
+        /// <summary>
+        /// Cria um Job na Idrac
+        /// </summary>
+        /// <param name="uri">String contento o enderço do recurso</param>
+        /// <param name="content">Conteudo Http da requisição</param>
+        /// <param name="method">Metodo Http usado</param>
+        /// <returns>String contendo o Job Id</returns>
+        public async Task<string> CreateJob(string uri, HttpContent content, HttpMethod method)
+        {
+            using (var request = new HttpRequestMessage(method, uri))
             {
                 request.Headers.Authorization = credentials;
                 request.Content = content;
                 using (var response = await client.SendAsync(request))
                 {
                     if (!response.IsSuccessStatusCode)
-                        throw new HttpRequestException("Falha ao criar Job: " + response.Content);
+                        throw new HttpRequestException(string.Format("Falha ao criar Job: {0}", response.ReasonPhrase));
 
                     return Regex.Match(response.Headers.Location.ToString(), "JID_.*").Captures[0].Value.Replace("\r", "");
                 }

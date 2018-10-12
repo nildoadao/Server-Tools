@@ -1,0 +1,106 @@
+﻿<Page x:Class="Server_Tools.View.StorageOverviewPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:Server_Tools.View"
+      mc:Ignorable="d" 
+      d:DesignHeight="600" d:DesignWidth="800"
+      Title="StorageOverviewPage">
+    <ScrollViewer ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto">
+        <Grid HorizontalAlignment="Center">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Name="PageHeader" FontSize="28" FontWeight="DemiBold" Margin="20" HorizontalAlignment="Center" Grid.ColumnSpan="4" Foreground="White"/>
+            <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.ColumnSpan="4" HorizontalAlignment="Center">
+                <Button Height="Auto" Width="Auto" Background="Transparent"  Margin="50" Name="OverviewButton" BorderBrush="Transparent" Cursor="Hand" Click="OverviewButton_Click">
+                    <StackPanel>
+                        <Image Source="/Server Tools;component/Resources/overview.png" VerticalAlignment="Top" HorizontalAlignment="Center" Width="50"/>
+                        <TextBlock Text="Resumo" VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="White"/>
+                    </StackPanel>
+                </Button>
+                <Button Height="Auto" Width="Auto" Background="Transparent"  Margin="50" Name="ControllerButton" BorderBrush="Transparent" Cursor="Hand" Click="ControllerButton_Click"> 
+                    <StackPanel>
+                        <Image Source="/Server Tools;component/Resources/network-card.png" VerticalAlignment="Top" HorizontalAlignment="Center" Width="50"/>
+                        <TextBlock Text="Controladoras" VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="White"/>
+                    </StackPanel>
+                </Button>
+                <Button Height="Auto" Width="Auto" Background="Transparent"  Margin="50" Name="PhysicalDiskButton" BorderBrush="Transparent" Cursor="Hand">
+                    <StackPanel>
+                        <Image Source="/Server Tools;component/Resources/physical-disk.png" VerticalAlignment="Top" HorizontalAlignment="Center" Width="50"/>
+                        <TextBlock Text="Discos Fisicos" VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="White"/>
+                    </StackPanel>
+                </Button>
+                <Button Height="Auto" Width="Auto" Background="Transparent"  Margin="50" Name="VirtualDiskButton" BorderBrush="Transparent" Cursor="Hand">
+                    <StackPanel>
+                        <Image Source="/Server Tools;component/Resources/disk-volume.png" VerticalAlignment="Top" HorizontalAlignment="Center" Width="50"/>
+                        <TextBlock Text="Discos Virtuais" VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="White"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+            <TabControl Name="OverviewPageContent" Grid.Row="2" Grid.ColumnSpan="4" Background="Transparent">
+                <TabItem Header="Resumo">
+                    <GroupBox Header="Resumo" Name="OverviewGroupBox" HorizontalAlignment="Center" Foreground="White">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Servidor" HorizontalAlignment="Right" Margin="5"/>
+                            <TextBlock Name="ServerTextBlock" Grid.Column="1" Margin="5"/>
+                            <TextBlock Text="Discos Fisicos" Grid.Row="1" HorizontalAlignment="Right" Margin="5"/>
+                            <TextBlock Name="PhysicalDiskCountTextBlock" Grid.Row="1" Grid.Column="1" Margin="5"/>
+                            <TextBlock Text="Discos Virtuais" Grid.Row="2" HorizontalAlignment="Right" Margin="5"/>
+                            <TextBlock Name="VirtualDiskCountTextBlock" Grid.Row="2" Grid.Column="1" Margin="5"/>
+                            <TextBlock Text="Discos sem designação" HorizontalAlignment="Right" Grid.Row="3" Margin="5"/>
+                            <TextBlock Name="UnasignedDiskCountTextBlock" Grid.Row="3" Grid.Column="1" Margin="5"/>
+                        </Grid>
+                    </GroupBox>
+                </TabItem>
+                <TabItem Header="Controladoras">
+                    <GroupBox Header="Controladoras" Name="ControllerGroupBox" HorizontalAlignment="Center" Foreground="White">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Controladora" HorizontalAlignment="Right" Margin="5"/>
+                            <ComboBox Name="ControllersComboBox" Grid.Column="1" HorizontalAlignment="Left" Margin="5"/>
+                            <TextBlock Text="Discos Fisicos" Grid.Row="1" HorizontalAlignment="Right" Margin="5"/>
+                            <TreeView Name="PhysicalDisksTreeView" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" Margin="5">
+                                <TreeViewItem Header="Discos Fisicos"/>
+                            </TreeView>
+                            <TextBlock Text="Discos Virtuais" Grid.Row="2" HorizontalAlignment="Right" Margin="5"/>
+                            <TreeView Name="VirtualDisksTreeView" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left" Margin="5">
+                                <TreeViewItem Header="Discos Virtuais"/>
+                            </TreeView>
+                            <TextBlock Text="Status" HorizontalAlignment="Right" Grid.Row="3" Margin="5"/>
+                            <TextBlock Name="ControllerStatusTextBlock" HorizontalAlignment="Right" Grid.Row="3" Grid.Column="1" Margin="5"/>
+                        </Grid>
+                    </GroupBox>
+                </TabItem>
+            </TabControl>
+        </Grid>
+    </ScrollViewer>
+</Page>

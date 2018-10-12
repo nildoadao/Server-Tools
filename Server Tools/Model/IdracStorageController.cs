@@ -8,12 +8,10 @@ namespace Server_Tools.Model
 {
     class IdracStorageController
     {
-        public string FirmwareVersion { get; set; }
-        public string Manufacturer { get; set; }
-        public string Model { get; set; }
+        public string Id { get; set; }
         public string Name { get; set; }
-        public int SpeedGbps { get; set; }
-        public List<string> SupportedControllerProtocols { get; set; }
-        public List<string> SupportedDeviceProtocols { get; set; }
+        public string Description { get; set; }
+        public List<OdataObject> Drives { get; set; }
+        public List<ControllerProperties> StorageControllers { get; set; }
     }
 }

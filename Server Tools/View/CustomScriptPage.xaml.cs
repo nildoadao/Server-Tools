@@ -32,11 +32,15 @@ namespace Server_Tools.View
         public CustomScriptPage()
         {
             InitializeComponent();
-            csvDialog = new OpenFileDialog();
-            csvDialog.Filter = "Arquivos CSV|*csv";
+            csvDialog = new OpenFileDialog()
+            {
+                Filter = "Arquivos CSV|*csv"
+            };
             csvDialog.FileOk += CsvDialog_FileOk;
-            scriptDialog = new OpenFileDialog();
-            scriptDialog.Filter = "Arquivos Txt|*txt";
+            scriptDialog = new OpenFileDialog()
+            {
+                Filter = "Arquivos Txt|*txt"
+            };
             scriptDialog.FileOk += ScriptDialog_FileOk;
         }
 

@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Server_Tools.View"
         mc:Ignorable="d"
-        Title="StorageWindow" Height="300" Width="300">
+        Title="StorageWindow" Height="600" Width="800" Background="#FF3E3E42">
     <Window.Resources>
         <ControlTemplate x:Key="NavigationTemplate" TargetType="Frame">
             <DockPanel Margin="10">

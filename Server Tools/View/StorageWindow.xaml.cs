@@ -20,9 +20,10 @@ namespace Server_Tools.View
     /// </summary>
     public partial class StorageWindow : Window
     {
-        public StorageWindow()
+        public StorageWindow(Server server)
         {
             InitializeComponent();
+            MainFrame.NavigationService.Navigate(new StorageOverviewPage(server));
         }
     }
 }

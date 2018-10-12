@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace Server_Tools.Model
 {
-    class IdracStorageEntities
+    class IdracVirtualDisk
     {
-        [JsonProperty("@odata.id")]
-        public string Id { get; set; }
+        public OdataObject Location { get; set; }
     }
 }

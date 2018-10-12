@@ -17,8 +17,10 @@ namespace Server_Tools.View
         public FileUpdatePage()
         {
             InitializeComponent();
-            firmwareDialog = new OpenFileDialog();
-            firmwareDialog.Filter = "Idrac Firmware (*.exe)(*.d7)(*.pm)| *.exe;*.d7;*.pm";
+            firmwareDialog = new OpenFileDialog()
+            {
+                Filter = "Idrac Firmware (*.exe)(*.d7)(*.pm)| *.exe;*.d7;*.pm"
+            };
             firmwareDialog.FileOk += FirmwareDialog_FileOk;
         }
 
@@ -50,15 +52,15 @@ namespace Server_Tools.View
         {
             Server server = new Server(ServerTextBox.Text, UserTextBox.Text, PasswordBox.Password);
             UpdateController idrac = new UpdateController(server);
-            OutputTextBox.AppendText("Iniciando upload do arquivo " + FirmwareTextBox.Text + " para " + server.Host + "\n");
+            OutputTextBox.AppendText(string.Format("Iniciando upload do arquivo {0} para {1} \n", FirmwareTextBox.Text, server.Host));
             try
             {
                 IdracJob job = await idrac.UpdateFirmware(path, option);
-                OutputTextBox.AppendText("JOb Status: " + job.Message + "\n");
+                OutputTextBox.AppendText(string.Format("Criado Job {0} para update\n",job.Id));
             }
             catch(Exception ex)
             {
-                OutputTextBox.AppendText("Erro: " + ex.Message + "\n");
+                OutputTextBox.AppendText(string.Format("Erro ao atualizar firmware: {0}\n", ex.Message));
             }
             
         }

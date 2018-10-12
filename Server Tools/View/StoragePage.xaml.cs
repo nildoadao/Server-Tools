@@ -1,5 +1,6 @@
 ﻿using Server_Tools.Idrac;
 using Server_Tools.Model;
+using Server_Tools.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,22 +30,47 @@ namespace Server_Tools.View
 
         private void ConnectButton_Click(object sender, RoutedEventArgs e)
         {
-            var storageWindow = new StorageWindow();
-            GetInfo();
+            if (!ValidateForm())
+                return;
+            var server = new Server(ServerTextBox.Text, UserTextBox.Text, PasswordBox.Password);
+            Connect(server);         
+        }
+
+        private bool ValidateForm()
+        {
+            if(String.IsNullOrEmpty(ServerTextBox.Text) | String.IsNullOrEmpty(UserTextBox.Text) | String.IsNullOrEmpty(PasswordBox.Password))
+            {
+                MessageBox.Show("Insira os dados da Idrac", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
+                return false;
+            }
+            return true;
+        }
+
+        private async void Connect(Server server)
+        {
+            if (!NetworkHelper.IsConnected(server.Host))
+            {
+                MessageBox.Show("Servidor inacessivel", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            /*var idrac = new StorageController(server);
+            try
+            {
+                await idrac.GetControllersLocation();
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(string.Format("Falha ao conectar: {0}", ex.Message), "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }*/
+            var storageWindow = new StorageWindow(server);
+            storageWindow.Title = server.Host;
             storageWindow.Show();
         }
 
-        private async void GetInfo()
+        private void BackButton_Click(object sender, RoutedEventArgs e)
         {
-            Server server = new Server(ServerTextBox.Text, UserTextBox.Text, PasswordBox.Password);
-            var idrac = new StorageController(server);
-            var controllers = await idrac.GetControllersLocation();
-            var disks = new List<IdracPhysicalDisk>();
-            foreach(var item in controllers)
-            {
-                var storage = await idrac.GetRaidController(item);
-                disks = await idrac.GetPhysicalDisks(storage);
-            }
+            NavigationService.Navigate(new HomePage());
         }
     }
 }

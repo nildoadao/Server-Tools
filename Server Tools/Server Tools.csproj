@@ -103,16 +103,11 @@
     <Compile Include="Idrac\JobController.cs" />
     <Compile Include="Idrac\StorageController.cs" />
     <Compile Include="Idrac\UpdateController.cs" />
-    <Compile Include="Model\IdracHostPowerStatus.cs" />
-    <Compile Include="Model\IdracInstallOption.cs" />
     <Compile Include="Model\IdracJob.cs" />
-    <Compile Include="Model\IdracRaidController.cs" />
-    <Compile Include="Model\IdracScpExportUse.cs" />
-    <Compile Include="Model\IdracScpOption.cs" />
-    <Compile Include="Model\IdracShutdownType.cs" />
-    <Compile Include="Model\IdracPhysicalDisk.cs" />
     <Compile Include="Model\IdracStorageController.cs" />
-    <Compile Include="Model\IdracStorageEntities.cs" />
+    <Compile Include="Model\IdracPhysicalDisk.cs" />
+    <Compile Include="Model\ControllerProperties.cs" />
+    <Compile Include="Model\IdracVirtualDisk.cs" />
     <Compile Include="Model\OdataObject.cs" />
     <Compile Include="Model\ServerJob.cs" />
     <Compile Include="Util\FileHelper.cs" />
@@ -142,6 +137,9 @@
     </Compile>
     <Compile Include="View\ScpImportPage.xaml.cs">
       <DependentUpon>ScpImportPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\StorageOverviewPage.xaml.cs">
+      <DependentUpon>StorageOverviewPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\StoragePage.xaml.cs">
       <DependentUpon>StoragePage.xaml</DependentUpon>
@@ -178,6 +176,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\ScpImportPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\StorageOverviewPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -257,6 +259,17 @@
   <ItemGroup>
     <Resource Include="Resources\forward.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Resources\disk-volume.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\physical-disk.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\network-card.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\overview.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

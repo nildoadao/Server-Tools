@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Server_Tools.Model
+namespace Server_Tools.Idrac.Models
 {
-    class ControllerProperties
+    class RaidController
     {
         public string FirmwareVersion { get; set; }
         public string Manufacturer { get; set; }
@@ -15,5 +15,10 @@ namespace Server_Tools.Model
         public int SpeedGbps { get; set; }
         public List<string> SupportedControllerProtocols { get; set; }
         public List<string> SupportedDeviceProtocols { get; set; }
+
+        public override string ToString()
+        {
+            return Name;
+        }
     }
 }

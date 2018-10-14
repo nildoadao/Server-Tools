@@ -4,14 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Server_Tools.Model
+namespace Server_Tools.Idrac.Models
 {
-    class IdracStorageController
+    class Enclousure
     {
         public string Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public List<OdataObject> Drives { get; set; }
-        public List<ControllerProperties> StorageControllers { get; set; }
+        public List<RaidController> StorageControllers { get; set; }
+        public List<OdataObject> Volumes { get; set; }
     }
 }

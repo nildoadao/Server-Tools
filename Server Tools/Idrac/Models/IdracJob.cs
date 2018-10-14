@@ -1,5 +1,5 @@
 ﻿
-namespace Server_Tools.Model    
+namespace Server_Tools.Idrac.Models
 {
     class IdracJob
     {

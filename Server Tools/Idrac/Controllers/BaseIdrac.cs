@@ -1,12 +1,12 @@
 ﻿using Newtonsoft.Json;
-using Server_Tools.Model;
+using Server_Tools.Idrac.Models;
 using Server_Tools.Util;
 using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
-namespace Server_Tools.Idrac
+namespace Server_Tools.Idrac.Controllers
 {
     abstract class BaseIdrac
     {
@@ -31,7 +31,7 @@ namespace Server_Tools.Idrac
         public async Task<bool> CheckRedfishSupport(string resource)
         {
             bool support = false;
-            using (var request = new HttpRequestMessage(HttpMethod.Get, resource))
+            using (var request = new HttpRequestMessage(HttpMethod.Get, baseUri + resource))
             {
                 request.Headers.Authorization = credentials;
                 using (var response = await client.SendAsync(request))

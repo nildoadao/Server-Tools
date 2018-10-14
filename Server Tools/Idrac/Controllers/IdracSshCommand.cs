@@ -1,7 +1,7 @@
 ﻿using Renci.SshNet;
-using Server_Tools.Model;
+using Server_Tools.Idrac.Models;
 
-namespace Server_Tools.Idrac
+namespace Server_Tools.Idrac.Controllers
 {
     class IdracSshCommand
     {

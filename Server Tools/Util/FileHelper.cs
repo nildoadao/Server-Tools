@@ -4,7 +4,7 @@ using System.Net;
 using System.Xml;
 using System.Xml.Linq;
 using LumenWorks.Framework.IO.Csv;
-using Server_Tools.Model;
+using Server_Tools.Idrac.Models;
 
 namespace Server_Tools.Util
 {

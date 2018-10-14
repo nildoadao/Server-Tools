@@ -1,6 +1,6 @@
 ﻿using Microsoft.Win32;
-using Server_Tools.Idrac;
-using Server_Tools.Model;
+using Server_Tools.Idrac.Controllers;
+using Server_Tools.Idrac.Models;
 using System;
 using System.Windows;
 using System.Windows.Controls;

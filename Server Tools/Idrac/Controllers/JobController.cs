@@ -1,9 +1,9 @@
-﻿using Server_Tools.Model;
+﻿using Server_Tools.Idrac.Models;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace Server_Tools.Idrac
+namespace Server_Tools.Idrac.Controllers
 {
     class JobController : BaseIdrac
     {

@@ -98,18 +98,18 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Idrac\BaseIdrac.cs" />
-    <Compile Include="Idrac\ScpController.cs" />
-    <Compile Include="Idrac\JobController.cs" />
-    <Compile Include="Idrac\StorageController.cs" />
-    <Compile Include="Idrac\UpdateController.cs" />
-    <Compile Include="Model\IdracJob.cs" />
-    <Compile Include="Model\IdracStorageController.cs" />
-    <Compile Include="Model\IdracPhysicalDisk.cs" />
-    <Compile Include="Model\ControllerProperties.cs" />
-    <Compile Include="Model\IdracVirtualDisk.cs" />
-    <Compile Include="Model\OdataObject.cs" />
-    <Compile Include="Model\ServerJob.cs" />
+    <Compile Include="Idrac\Controllers\BaseIdrac.cs" />
+    <Compile Include="Idrac\Controllers\ScpController.cs" />
+    <Compile Include="Idrac\Controllers\JobController.cs" />
+    <Compile Include="Idrac\Controllers\StorageController.cs" />
+    <Compile Include="Idrac\Controllers\UpdateController.cs" />
+    <Compile Include="Idrac\Models\IdracJob.cs" />
+    <Compile Include="Idrac\Models\Enclousure.cs" />
+    <Compile Include="Idrac\Models\PhysicalDisk.cs" />
+    <Compile Include="Idrac\Models\RaidController.cs" />
+    <Compile Include="Idrac\Models\VirtualDisk.cs" />
+    <Compile Include="Idrac\Models\OdataObject.cs" />
+    <Compile Include="Idrac\Models\ServerJob.cs" />
     <Compile Include="Util\FileHelper.cs" />
     <Compile Include="Util\HttpUtil.cs" />
     <Compile Include="View\CustomScriptPage.xaml.cs">
@@ -127,11 +127,11 @@
     <Compile Include="View\HomeWindow.xaml.cs">
       <DependentUpon>HomeWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Model\IdracFirmware.cs" />
-    <Compile Include="Idrac\IdracSshCommand.cs" />
+    <Compile Include="Idrac\Models\Firmware.cs" />
+    <Compile Include="Idrac\Controllers\IdracSshCommand.cs" />
     <Compile Include="Util\NetworkHelper.cs" />
-    <Compile Include="Model\RacadmException.cs" />
-    <Compile Include="Model\Server.cs" />
+    <Compile Include="Idrac\Models\RacadmException.cs" />
+    <Compile Include="Idrac\Models\Server.cs" />
     <Compile Include="View\ScpExportPage.xaml.cs">
       <DependentUpon>ScpExportPage.xaml</DependentUpon>
     </Compile>

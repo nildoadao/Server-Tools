@@ -6,7 +6,7 @@
       xmlns:local="clr-namespace:Server_Tools.View"
       mc:Ignorable="d" 
       d:DesignHeight="600" d:DesignWidth="800"
-      Title="StorageOverviewPage">
+      Title="StorageOverviewPage" Loaded="Page_Loaded">
     <ScrollViewer ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto">
         <Grid HorizontalAlignment="Center">
             <Grid.RowDefinitions>
@@ -34,13 +34,13 @@
                         <TextBlock Text="Controladoras" VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="White"/>
                     </StackPanel>
                 </Button>
-                <Button Height="Auto" Width="Auto" Background="Transparent"  Margin="50" Name="PhysicalDiskButton" BorderBrush="Transparent" Cursor="Hand">
+                <Button Height="Auto" Width="Auto" Background="Transparent"  Margin="50" Name="PhysicalDiskButton" BorderBrush="Transparent" Cursor="Hand" Click="PhysicalDiskButton_Click">
                     <StackPanel>
                         <Image Source="/Server Tools;component/Resources/physical-disk.png" VerticalAlignment="Top" HorizontalAlignment="Center" Width="50"/>
                         <TextBlock Text="Discos Fisicos" VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="White"/>
                     </StackPanel>
                 </Button>
-                <Button Height="Auto" Width="Auto" Background="Transparent"  Margin="50" Name="VirtualDiskButton" BorderBrush="Transparent" Cursor="Hand">
+                <Button Height="Auto" Width="Auto" Background="Transparent"  Margin="50" Name="VirtualDiskButton" BorderBrush="Transparent" Cursor="Hand" Click="VirtualDiskButton_Click">
                     <StackPanel>
                         <Image Source="/Server Tools;component/Resources/disk-volume.png" VerticalAlignment="Top" HorizontalAlignment="Center" Width="50"/>
                         <TextBlock Text="Discos Virtuais" VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="White"/>
@@ -68,7 +68,7 @@
                             <TextBlock Text="Discos Virtuais" Grid.Row="2" HorizontalAlignment="Right" Margin="5"/>
                             <TextBlock Name="VirtualDiskCountTextBlock" Grid.Row="2" Grid.Column="1" Margin="5"/>
                             <TextBlock Text="Discos sem designação" HorizontalAlignment="Right" Grid.Row="3" Margin="5"/>
-                            <TextBlock Name="UnasignedDiskCountTextBlock" Grid.Row="3" Grid.Column="1" Margin="5"/>
+                            <TextBlock Name="UnassignedDiskCountTextBlock" Grid.Row="3" Grid.Column="1" Margin="5"/>
                         </Grid>
                     </GroupBox>
                 </TabItem>
@@ -86,17 +86,44 @@
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="Controladora" HorizontalAlignment="Right" Margin="5"/>
-                            <ComboBox Name="ControllersComboBox" Grid.Column="1" HorizontalAlignment="Left" Margin="5"/>
+                            <ComboBox Name="ControllersComboBox" Grid.Column="1" HorizontalAlignment="Left" Margin="5" SelectionChanged="ControllersComboBox_SelectionChanged"/>
+                            <TextBlock Text="Versão do Firmware" Grid.Row="1" HorizontalAlignment="Right" Margin="5"/>
+                            <TextBlock Name="FirmwareVersionTextBlock" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" Margin="5"/>
+                            <TextBlock Text="Modelo" HorizontalAlignment="Right" Grid.Row="3" Margin="5"/>
+                            <TextBlock Name="ControllerModelTextBlock" HorizontalAlignment="Left" Grid.Row="3" Grid.Column="1" Margin="5"/>
+                        </Grid>
+                    </GroupBox>
+                </TabItem>
+                <TabItem Header="Discos Fisicos">
+                    <DataGrid Name="PhysicalDiskDatagrid" AutoGenerateColumns="False" IsReadOnly="True">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Nome" Binding="{Binding Name}"/>
+                            <DataGridTextColumn Header="Capacidade" Binding="{Binding CapacityBytes}"/>
+                            <DataGridTextColumn Header="Modelo" Binding="{Binding Model}"/>
+                            <DataGridTextColumn Header="Falha Prevista" Binding="{Binding FailurePredicted}"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </TabItem>
+                <TabItem Header="Discos Virtuais">
+                    <GroupBox Header="Discos Virtuais" Name="VirtualDisksGroupBox" HorizontalAlignment="Center" Foreground="White">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="VD" HorizontalAlignment="Right" Margin="5"/>
+                            <ComboBox Name="VirtualDisksComboBox" Grid.Column="1" HorizontalAlignment="Left" Margin="5" SelectionChanged="VirtualDisksComboBox_SelectionChanged"/>
                             <TextBlock Text="Discos Fisicos" Grid.Row="1" HorizontalAlignment="Right" Margin="5"/>
                             <TreeView Name="PhysicalDisksTreeView" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" Margin="5">
-                                <TreeViewItem Header="Discos Fisicos"/>
-                            </TreeView>
-                            <TextBlock Text="Discos Virtuais" Grid.Row="2" HorizontalAlignment="Right" Margin="5"/>
-                            <TreeView Name="VirtualDisksTreeView" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left" Margin="5">
-                                <TreeViewItem Header="Discos Virtuais"/>
+                                <TreeViewItem Name="PhysicalDisksItems" Header="Discos Fisicos" HorizontalAlignment="Left"/>
                             </TreeView>
                             <TextBlock Text="Status" HorizontalAlignment="Right" Grid.Row="3" Margin="5"/>
-                            <TextBlock Name="ControllerStatusTextBlock" HorizontalAlignment="Right" Grid.Row="3" Grid.Column="1" Margin="5"/>
                         </Grid>
                     </GroupBox>
                 </TabItem>

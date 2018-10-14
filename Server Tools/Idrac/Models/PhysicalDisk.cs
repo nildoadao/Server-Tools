@@ -2,9 +2,9 @@
 using Newtonsoft.Json;
 using System.Collections.Generic;
 
-namespace Server_Tools.Model
+namespace Server_Tools.Idrac.Models
 {
-    class IdracPhysicalDisk
+    class PhysicalDisk
     {
         public string Id { get; set; }
         public long CapacityBytes { get; set; }

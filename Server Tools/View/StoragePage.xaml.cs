@@ -1,5 +1,5 @@
-﻿using Server_Tools.Idrac;
-using Server_Tools.Model;
+﻿using Server_Tools.Idrac.Controllers;
+using Server_Tools.Idrac.Models;
 using Server_Tools.Util;
 using System;
 using System.Collections.Generic;
@@ -53,16 +53,20 @@ namespace Server_Tools.View
                 MessageBox.Show("Servidor inacessivel", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
-            /*var idrac = new StorageController(server);
+            var idrac = new StorageController(server);
             try
             {
-                await idrac.GetControllersLocation();
+                if (await idrac.CheckRedfishSupport(StorageController.CONTROLLERS) == false)
+                {
+                    MessageBox.Show(string.Format("O servidor {0} não suporta a API Redfish", server), "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
+                    return;
+                }                  
             }
             catch(Exception ex)
             {
                 MessageBox.Show(string.Format("Falha ao conectar: {0}", ex.Message), "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
-            }*/
+            }
             var storageWindow = new StorageWindow(server);
             storageWindow.Title = server.Host;
             storageWindow.Show();

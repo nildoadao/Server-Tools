@@ -1,7 +1,7 @@
 ﻿using Microsoft.Win32;
 using Renci.SshNet;
-using Server_Tools.Idrac;
-using Server_Tools.Model;
+using Server_Tools.Idrac.Controllers;
+using Server_Tools.Idrac.Models;
 using Server_Tools.Util;
 using System;
 using System.Collections.Generic;

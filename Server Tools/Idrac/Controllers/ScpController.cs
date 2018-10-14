@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json;
-using Server_Tools.Model;
+using Server_Tools.Idrac.Models;
 using Syroot.Windows.IO;
 using System;
 using System.IO;
@@ -7,7 +7,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Server_Tools.Idrac
+namespace Server_Tools.Idrac.Controllers
 {
     class ScpController : BaseIdrac
     {

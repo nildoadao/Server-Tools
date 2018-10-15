@@ -128,7 +128,7 @@
       <DependentUpon>HomeWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Idrac\Models\Firmware.cs" />
-    <Compile Include="Idrac\Controllers\IdracSshCommand.cs" />
+    <Compile Include="Idrac\Controllers\IdracSshController.cs" />
     <Compile Include="Util\NetworkHelper.cs" />
     <Compile Include="Idrac\Models\RacadmException.cs" />
     <Compile Include="Idrac\Models\Server.cs" />

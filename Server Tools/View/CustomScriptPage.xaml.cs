@@ -5,6 +5,7 @@ using Server_Tools.Idrac.Models;
 using Server_Tools.Util;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -32,6 +33,10 @@ namespace Server_Tools.View
         public CustomScriptPage()
         {
             InitializeComponent();
+        }
+
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
             csvDialog = new OpenFileDialog()
             {
                 Filter = "Arquivos CSV|*csv"
@@ -46,20 +51,16 @@ namespace Server_Tools.View
 
         private void AddButton_Click(object sender, RoutedEventArgs e)
         {
-            if (!ServerTextBox.Text.Trim().Equals(""))
+            if (String.IsNullOrEmpty(UserTextBox.Text) | String.IsNullOrEmpty(PasswordBox.Password) | String.IsNullOrEmpty(ServerTextBox.Text))
+                MessageBox.Show("Preencha os dados da Idrac", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
+
+            else
             {
-                if (UserTextBox.Text.Trim().Equals("") | PasswordBox.Password.Trim().Equals(""))
-                {
-                    MessageBox.Show("Insira usuario e senha da Idrac", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
-                }
-                else
-                {
-                    Server server = new Server(ServerTextBox.Text, UserTextBox.Text, PasswordBox.Password);
-                    ServersListBox.Items.Add(server);
-                    ServerTextBox.Clear();
-                    UserTextBox.Clear();
-                    PasswordBox.Clear();
-                }
+                Server server = new Server(ServerTextBox.Text, UserTextBox.Text, PasswordBox.Password);
+                ServersListBox.Items.Add(server);
+                ServerTextBox.Clear();
+                UserTextBox.Clear();
+                PasswordBox.Clear();
             }
         }
 
@@ -72,78 +73,96 @@ namespace Server_Tools.View
         {
             try
             {
-                IEnumerable<Server> servers = FileHelper.ReadCsvFile(csvDialog.FileName);
-                foreach(Server server in servers)
+                foreach(Server server in FileHelper.ReadCsvFile(csvDialog.FileName))
                 {
                     ServersListBox.Items.Add(server);
                 }
             }
-            catch(Exception ex)
+            catch(Exception)
             {
-                OutputTextBox.AppendText(string.Format("Falha ao carregar CSV: {0}\n", ex.Message));
+                MessageBox.Show("Falha ao ler arquivo CSV, cheque o arquivo e tente novamente", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
         private void ApplyButton_Click(object sender, RoutedEventArgs e)
         {
+            if (!ValidateForm())
+                return;
+
+            ApplyButton.IsEnabled = false;
+            ApplyScript();
+        }
+
+        private bool ValidateForm()
+        {
             if (ServersListBox.Items.Count == 0)
             {
                 MessageBox.Show("Insira ao menos um servidor para aplicar o script", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
-                return;
+                return false;
             }
-            else if (scriptDialog.FileName.Trim().Equals(""))
+            else if (String.IsNullOrEmpty(scriptDialog.FileName))
             {
                 MessageBox.Show("Selecione um script a ser aplicado", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
-                return;
+                return false;
             }
-            ApplyButton.IsEnabled = false;
-            try
-            {
-                ApplyScript();
-            }
-            catch(Exception ex)
-            {
-                OutputTextBox.AppendText(string.Format("Falha ao aplicar o script: {0}\n", ex.Message));
-            }
+            return true;
         }
 
         private async void ApplyScript()
         {
             foreach (Server server in ServersListBox.Items)
             {
-                var script = FileHelper.ReadTxtFile(ScriptTextBox.Text);
-                await Task.Run(() =>
+                try
                 {
-                    try
-                    {
-                        var idrac = new IdracSshCommand(server);
-                        foreach (var command in script)
-                        {
-                            idrac.RunCommand(command);
-                        }
-                        Dispatcher.Invoke(() =>
-                        {
-                            OutputTextBox.AppendText(string.Format("Script com sucesso para {0}\n", server));
-                        });
-                    }
-                    catch(Exception ex)
-                    {
-                        Dispatcher.Invoke(() =>
-                        {
-                            OutputTextBox.AppendText(string.Format("Falha ao aplicar script para {0}: {1}\n", server, ex.Message));
-                        });
-                    }
-                });
+                    var script = File.ReadAllLines(ScriptTextBox.Text);
+                    await RunScriptAsync(server, script);
 
-                if (operationCancelled)
-                {
-                    OutputTextBox.AppendText("Operação cancelada pelo usuário\n");
-                    operationCancelled = false;
-                    ApplyButton.IsEnabled = true;
-                    break;
+                    if (operationCancelled)
+                    {
+                        OutputTextBox.AppendText("Operação cancelada pelo usuário\n");
+                        operationCancelled = false;
+                        break;
+                    }
                 }
+                catch(Exception ex)
+                {
+                    MessageBox.Show(string.Format("Falha ao executar o script : {0}", ex.Message), "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+
             }
             ApplyButton.IsEnabled = true;
+        }
+
+        private async Task<string> RunScriptAsync(Server server, IEnumerable<string> script)
+        {
+            string result = "";
+            await Task.Run(() =>
+            {
+                try
+                {
+                    if (!NetworkHelper.IsConnected(server.Host))
+                    {
+                        Dispatcher.Invoke(() =>
+                        {
+                            OutputTextBox.AppendText(string.Format("Servidor {0} ínacessivel.\n", server));
+                        });
+                        return;
+                    }
+                    var idrac = new IdracSshController(server);
+                    foreach(var command in script)
+                    {
+                        result = idrac.RunCommand(command);
+                    }
+                }
+                catch(Exception ex)
+                {
+                    Dispatcher.Invoke(() =>
+                    {
+                        OutputTextBox.AppendText(string.Format("Falha ao aplicar script para {0}: {1}\n", server, ex.Message));
+                    });
+                }
+            });
+            return result;
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
@@ -168,5 +187,6 @@ namespace Server_Tools.View
         {
             ScriptTextBox.Text = scriptDialog.FileName;
         }
+
     }
 }

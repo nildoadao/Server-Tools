@@ -44,7 +44,7 @@ namespace Server_Tools.Idrac.Controllers
                 SoftwareIdentityURIs = location,
                 InstallUpon = option
             };
-            var jsonContent = JsonConvert.SerializeObject(content);
+            string jsonContent = JsonConvert.SerializeObject(content);
             var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
             var idrac = new JobController(server);
             string jobId = await idrac.CreateJob(baseUri + FIRMWARE_INSTALL, httpContent);

@@ -6,7 +6,7 @@
       xmlns:local="clr-namespace:Server_Tools.View"
       mc:Ignorable="d" 
       d:DesignHeight="600" d:DesignWidth="800"
-      Title="ScpImportPage">
+      Title="ScpImportPage" Loaded="Page_Loaded">
 
     <ScrollViewer HorizontalAlignment="Center" VerticalAlignment="Top" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto">
         <Grid HorizontalAlignment="Center" VerticalAlignment="Top">

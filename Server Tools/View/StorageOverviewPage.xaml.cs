@@ -36,6 +36,11 @@ namespace Server_Tools.View
             PageHeader.Text = string.Format("Storage {0}", server.Host);
         }
 
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            GetStorageData();
+        }
+
         private void OverviewButton_Click(object sender, RoutedEventArgs e)
         {
             OverviewPageContent.SelectedIndex = 0;
@@ -111,7 +116,7 @@ namespace Server_Tools.View
                 return;
 
             ControllersComboBox.Items.Clear();
-            foreach(var controller in controllers)
+            foreach(RaidController controller in controllers)
             {
                 ControllersComboBox.Items.Add(controller);
             }
@@ -123,7 +128,7 @@ namespace Server_Tools.View
                 return;
 
             VirtualDisksComboBox.Items.Clear();
-            foreach(var item in virtualDisks)
+            foreach(VirtualDisk item in virtualDisks)
             {
                 VirtualDisksComboBox.Items.Add(item);
             }
@@ -133,7 +138,7 @@ namespace Server_Tools.View
         {
             var idrac = new StorageController(server);
             PhysicalDisksItems.Items.Clear();
-            foreach (var item in await idrac.GetPhysicalDisks(virtualDisk))
+            foreach (PhysicalDisk item in await idrac.GetPhysicalDisks(virtualDisk))
             {
                 PhysicalDisksItems.Items.Add(item);
             }
@@ -146,7 +151,7 @@ namespace Server_Tools.View
             if (disks == null)
                 return 0;
 
-            foreach(var item in disks)
+            foreach(PhysicalDisk item in disks)
             {
                 if (item.Links == null)
                     count++;
@@ -162,17 +167,12 @@ namespace Server_Tools.View
                 return 0;
 
             int count = 0;
-            foreach(var disk in disks)
+            foreach(PhysicalDisk disk in disks)
             {
                 if (disk.Links != null)
                     count += disk.Links.Volumes.Count;
             }
             return count;
-        }
-
-        private void Page_Loaded(object sender, RoutedEventArgs e)
-        {
-            GetStorageData();
         }
     }
 }

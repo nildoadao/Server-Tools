@@ -7,7 +7,7 @@ namespace Server_Tools.Idrac.Controllers
 {
     class JobController : BaseIdrac
     {
-        # region Uri
+        # region Redfish Uris
         public const string JOB_STATUS = @"/redfish/v1/Managers/iDRAC.Embedded.1/Jobs/";
         public const string JOB_RESULT = @"/redfish/v1/TaskService/Tasks/";
         #endregion
@@ -60,6 +60,11 @@ namespace Server_Tools.Idrac.Controllers
             return await GetResource<IdracJob>(baseUri + JOB_STATUS + jobId);
         }
 
+        /// <summary>
+        /// Retorna os dados de um Job
+        /// </summary>
+        /// <param name="jobId">Identificação do Job</param>
+        /// <returns>Resposta Http do Job</returns>
         public async Task<HttpResponseMessage> GetJobData(string jobId)
         {
             using (var request = new HttpRequestMessage(HttpMethod.Get, baseUri + JOB_RESULT + jobId))

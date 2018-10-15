@@ -1,13 +1,15 @@
 ﻿using Renci.SshNet;
 using Server_Tools.Idrac.Models;
+using System;
+using System.Threading.Tasks;
 
 namespace Server_Tools.Idrac.Controllers
 {
-    class IdracSshCommand
+    class IdracSshController
     {
         private Server server;
 
-        public IdracSshCommand(Server server)
+        public IdracSshController(Server server)
         {
             this.server = server;
         }

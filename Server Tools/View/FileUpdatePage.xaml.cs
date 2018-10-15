@@ -17,6 +17,10 @@ namespace Server_Tools.View
         public FileUpdatePage()
         {
             InitializeComponent();
+        }
+
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
             firmwareDialog = new OpenFileDialog()
             {
                 Filter = "Idrac Firmware (*.exe)(*.d7)(*.pm)| *.exe;*.d7;*.pm"

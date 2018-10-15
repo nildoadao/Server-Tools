@@ -19,10 +19,10 @@ namespace Server_Tools.Idrac.Controllers
             : base(server) { }
 
         /// <summary>
-        /// Retorna uma lista com as localizações de todas as controladoras
+        /// Retorna uma lista com as localizações de todas as enclousures
         /// </summary>
         /// <returns></returns>
-        public async Task<List<string>> GetControllersLocation()
+        public async Task<List<string>> GetEnclousuresLocation()
         {
             using(var request = new HttpRequestMessage(HttpMethod.Get, baseUri + CONTROLLERS))
             {
@@ -64,13 +64,13 @@ namespace Server_Tools.Idrac.Controllers
         /// <returns>Lista com todas enclousures</returns>
         public async Task<List<Enclousure>> GetAllEnclousures()
         {
-            var locations = await GetControllersLocation();
-            var controllers = new List<Enclousure>();
+            var locations = await GetEnclousuresLocation();
+            var enclousures = new List<Enclousure>();
             foreach(var location in locations)
             {
-                controllers.Add(await GetEnclousure(baseUri + location));
+                enclousures.Add(await GetEnclousure(baseUri + location));
             }
-            return controllers;
+            return enclousures;
         }
 
         /// <summary>

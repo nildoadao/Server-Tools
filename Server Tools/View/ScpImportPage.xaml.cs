@@ -24,6 +24,10 @@ namespace Server_Tools.View
         public ScpImportPage()
         {
             InitializeComponent();
+        }
+
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
             fileDialog = new OpenFileDialog()
             {
                 Filter = "Arquivos SCP (*.xml)|*.xml",

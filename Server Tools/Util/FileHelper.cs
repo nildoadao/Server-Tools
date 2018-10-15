@@ -10,69 +10,20 @@ namespace Server_Tools.Util
 {
     class FileHelper
     {
-        public static XmlDocument ReadXmlFile(string path)
-        {
-            XmlDocument file = new XmlDocument();
-            file.Load(path);
-            return file;
-        }
-
-        public static IEnumerable<string> ReadFtpFile(string ftpUri)
-        {
-            string file = "";
-
-            FtpWebRequest request = (FtpWebRequest)WebRequest.Create(ftpUri);
-            request.Method = WebRequestMethods.Ftp.DownloadFile;
-            request.Credentials = new NetworkCredential("anonymous", "anonymous@anonymous.com");
-            FtpWebResponse response = (FtpWebResponse)request.GetResponse();
-
-            using (StreamReader reader = new StreamReader(response.GetResponseStream()))
-            {
-                file = reader.ReadToEnd();
-            }
-
-            List<string> fileLines = new List<string>();
-
-            foreach (string line in file.Split('\n'))
-            {
-                fileLines.Add(line);
-            }
-            return fileLines;
-        }
-
-        public static XDocument ReadXmlFtpFile(string ftpUri)
-        {
-            XDocument file;
-
-            FtpWebRequest request = (FtpWebRequest)WebRequest.Create(ftpUri);
-            request.Method = WebRequestMethods.Ftp.DownloadFile;
-            request.Credentials = new NetworkCredential("anonymous", "anonymous@anonymous.com");
-            FtpWebResponse response = (FtpWebResponse)request.GetResponse();
-
-            using (Stream responseStream = response.GetResponseStream())
-            {
-                file = XDocument.Load(responseStream);
-            }
-
-            return file;
-        }
-
+        /// <summary>
+        /// Retorna os registros Server em um arquivo CSV
+        /// </summary>
+        /// <param name="filePath">Localização completa do arquivo</param>
+        /// <returns></returns>
         public static IEnumerable<Server> ReadCsvFile(string filePath)
         {         
             using (CsvReader csv = new CsvReader(new StreamReader(filePath), false, ';'))
             {
-                List<Server> servers = new List<Server>();
                 while (csv.ReadNextRecord())
                 {
-                    servers.Add(new Server(csv[0], csv[1], csv[2]));
+                    yield return new Server(csv[0], csv[1], csv[2]);
                 }
-                return servers;
             }
-        }
-
-        public static IEnumerable<string> ReadTxtFile(string filePath)
-        {
-            return File.ReadLines(filePath);
         }
     }
 }

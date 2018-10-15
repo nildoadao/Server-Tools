@@ -6,7 +6,7 @@
       xmlns:local="clr-namespace:Server_Tools.View"
       mc:Ignorable="d" 
       d:DesignHeight="600" d:DesignWidth="800"
-      Title="CustomScriptPage">
+      Title="CustomScriptPage" Loaded="Page_Loaded">
 
     <ScrollViewer ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto">
         <Grid Width="Auto" HorizontalAlignment="Center" Height="Auto" VerticalAlignment="Top">

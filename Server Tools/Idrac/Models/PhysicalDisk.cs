@@ -25,5 +25,10 @@ namespace Server_Tools.Idrac.Models
         {
             public List<OdataObject> Volumes { get; set; }
         }
+
+        public override string ToString()
+        {
+            return Name;
+        }
     }
 }

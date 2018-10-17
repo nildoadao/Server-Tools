@@ -13,6 +13,6 @@ namespace Server_Tools.Idrac.Models
         public string Description { get; set; }
         public List<OdataObject> Drives { get; set; }
         public List<RaidController> StorageControllers { get; set; }
-        public List<OdataObject> Volumes { get; set; }
+        public OdataObject Volumes { get; set; }
     }
 }

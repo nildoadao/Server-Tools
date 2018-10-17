@@ -68,7 +68,7 @@ namespace Server_Tools.Idrac.Controllers
             var enclousures = new List<Enclousure>();
             foreach(var location in locations)
             {
-                enclousures.Add(await GetEnclousure(baseUri + location));
+                enclousures.Add(await GetEnclousure(location));
             }
             return enclousures;
         }
@@ -159,12 +159,29 @@ namespace Server_Tools.Idrac.Controllers
         /// <returns>Lista com todos os discos virtuais</returns>
         public async Task<List<VirtualDisk>> GetVirtualDisks(Enclousure enclousure)
         {
-            var virtualDisks = new List<VirtualDisk>();
-            foreach(var item in enclousure.Volumes)
+            string location = enclousure.Volumes.Id;
+            using(var request = new HttpRequestMessage(HttpMethod.Get, baseUri + location))
             {
-                virtualDisks.Add(await GetVirtualDisk(baseUri + item.Id));
+                request.Headers.Authorization = credentials;
+                using(var response = await client.SendAsync(request))
+                {
+                    if (!response.IsSuccessStatusCode)
+                        throw new HttpRequestException(string.Format("Falha ao obter discos virtuais {0}", response.ReasonPhrase));
+
+                    var volumesCollection = new
+                    {
+                        Members = new List<OdataObject>()
+                    };
+                    string jsonData = await response.Content.ReadAsStringAsync();
+                    var collection = JsonConvert.DeserializeAnonymousType(jsonData, volumesCollection);
+                    var virtualDisks = new List<VirtualDisk>();
+                    foreach (var item in collection.Members)
+                    {
+                        virtualDisks.Add(await GetResource<VirtualDisk>(baseUri + item.Id));
+                    }
+                    return virtualDisks;
+                }
             }
-            return virtualDisks;
         }
 
         /// <summary>
@@ -209,8 +226,7 @@ namespace Server_Tools.Idrac.Controllers
             var jsonContent = JsonConvert.SerializeObject(content);
             var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
             var idrac = new JobController(server);
-            var jobId = await idrac.CreateJob(baseUri + VOLUMES, httpContent);
-            return await idrac.GetJob(jobId);
+            return await idrac.CreateJob(baseUri + VOLUMES, httpContent);
         }
 
         /// <summary>
@@ -222,8 +238,7 @@ namespace Server_Tools.Idrac.Controllers
         {
             var httpContent = new StringContent("", Encoding.UTF8, "application/json");
             var idrac = new JobController(server);
-            var jobId = await idrac.CreateJob(baseUri + virtualDisk.Id, httpContent, HttpMethod.Delete);
-            return await idrac.GetJob(jobId);
+            return await idrac.CreateJob(baseUri + virtualDisk.Id, httpContent, HttpMethod.Delete);
         }
     }
 }

@@ -25,7 +25,7 @@ namespace Server_Tools.Idrac.Controllers
         /// </summary>
         /// <param name="target">Parametros que serão incluidos no arquivo</param>
         /// <returns></returns>
-        public async Task<string> ExportScpFile(string target, string exportUse)
+        public async Task<IdracJob> ExportScpFile(string target, string exportUse)
         {
             var content = new
             {
@@ -40,25 +40,12 @@ namespace Server_Tools.Idrac.Controllers
             var jsonContent = JsonConvert.SerializeObject(content);
             var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
             var idrac = new JobController(server);
-            string jobId = await idrac.CreateJob(baseUri + EXPORT_SYSTEM_CONFIGURATION, httpContent);
-            DateTime startTime = DateTime.Now;
+            return await idrac.CreateJob(baseUri + EXPORT_SYSTEM_CONFIGURATION, httpContent);
+        }
 
-            while (true)
-            {
-                var job = await idrac.GetJob(jobId);
-                if (job.JobState.Contains("Completed"))
-                {
-                    break;
-                }
-                else if (job.JobState.Equals("Failed"))
-                {
-                    throw new HttpRequestException("Falha ao executar o Job: " + job.Message);
-                }
-                if (DateTime.Now >= startTime.AddMinutes(JOB_TIMEOUT))
-                {
-                    throw new TimeoutException("Excedido tempo para conclusão do Job " + jobId);
-                }
-            }
+        public async Task<string> SaveScpFile(string jobId)
+        {
+            var idrac = new JobController(server);
             using (var response = await idrac.GetJobData(jobId))
             {
                 if (!response.IsSuccessStatusCode)
@@ -69,7 +56,7 @@ namespace Server_Tools.Idrac.Controllers
                 string dowloadsFolder = KnownFolders.Downloads.Path;
                 string path = Path.Combine(dowloadsFolder, "SCP_" + currentTime + ".xml");
                 File.WriteAllText(path, jobData);
-                return path;               
+                return path;
             }
         }
 
@@ -97,8 +84,7 @@ namespace Server_Tools.Idrac.Controllers
             var jsonContent = JsonConvert.SerializeObject(content);
             var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
             var idrac = new JobController(server);
-            string jobId = await idrac.CreateJob(baseUri + IMPORT_SYSTEM_CONFIGURATION, httpContent);
-            return await idrac.GetJob(jobId);
+            return await idrac.CreateJob(baseUri + IMPORT_SYSTEM_CONFIGURATION, httpContent);
         }
     }
 }

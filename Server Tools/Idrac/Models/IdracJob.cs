@@ -1,7 +1,7 @@
 ﻿
 namespace Server_Tools.Idrac.Models
 {
-    class IdracJob
+    public class IdracJob
     {
         public string Id { get; set; }
         public string Name { get; set; }

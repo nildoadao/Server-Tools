@@ -47,8 +47,7 @@ namespace Server_Tools.Idrac.Controllers
             string jsonContent = JsonConvert.SerializeObject(content);
             var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
             var idrac = new JobController(server);
-            string jobId = await idrac.CreateJob(baseUri + FIRMWARE_INSTALL, httpContent);
-            return await idrac.GetJob(jobId);
+            return await idrac.CreateJob(baseUri + FIRMWARE_INSTALL, httpContent);
         }
 
         /// <summary>
@@ -60,12 +59,12 @@ namespace Server_Tools.Idrac.Controllers
         {
             using (var request = new HttpRequestMessage(HttpMethod.Post, baseUri + FIRMWARE_INVENTORY))
             using (var content = new MultipartFormDataContent(Guid.NewGuid().ToString()))
-            using (var fileContent = new StreamContent(File.Open(path, FileMode.Open, FileAccess.Read)))
+            using (var fileContent = new StreamContent(new FileStream(path, FileMode.Open)))
             {
                 string etag = await GetHeaderValue("ETag", baseUri + FIRMWARE_INVENTORY);
-                fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse("application/octet-stream");
                 request.Headers.Authorization = credentials;
                 request.Headers.TryAddWithoutValidation("If-Match", etag);
+                content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/octet-stream");
                 fileContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
                 {
                     Name = "file",

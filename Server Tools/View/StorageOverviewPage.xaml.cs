@@ -107,7 +107,7 @@ namespace Server_Tools.View
             ServerTextBlock.Text = server.Host;
             PhysicalDiskCountTextBlock.Text = (disks == null) ? "Desconhecido" : disks.Count.ToString();
             UnassignedDiskCountTextBlock.Text = (disks == null) ? "Desconhecido" : UnassignedDisksCount(disks).ToString();
-            VirtualDiskCountTextBlock.Text = (disks == null) ? "Desconhecido" : VolumesCount(disks).ToString();
+            VirtualDiskCountTextBlock.Text = (disks == null) ? "Desconhecido" : virtualDisks.Count.ToString();
         }
 
         private void PopulateControllerGroupBox()
@@ -136,6 +136,9 @@ namespace Server_Tools.View
         
         private async void LoadPhysicalDisks(VirtualDisk virtualDisk)
         {
+            if (virtualDisk == null)
+                return;
+
             var idrac = new StorageController(server);
             PhysicalDisksItems.Items.Clear();
             foreach (PhysicalDisk item in await idrac.GetPhysicalDisks(virtualDisk))

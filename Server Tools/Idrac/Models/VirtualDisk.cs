@@ -8,7 +8,8 @@ namespace Server_Tools.Idrac.Models
 {
     class VirtualDisk
     {
-        public OdataObject Id { get; set; }
+        public string Id { get; set; }
+        public string Description { get; set; }
         public long BlockSizeBytes { get; set; }
         public long CapacityBytes { get; set; }
         public long OptimumIOSizeBytes { get; set; }
@@ -19,5 +20,9 @@ namespace Server_Tools.Idrac.Models
             public List<OdataObject> Drives { get; set; }
         }
 
+        public override string ToString()
+        {
+            return Description;
+        }
     }
 }

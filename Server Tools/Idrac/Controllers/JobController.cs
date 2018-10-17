@@ -12,6 +12,8 @@ namespace Server_Tools.Idrac.Controllers
         public const string JOB_RESULT = @"/redfish/v1/TaskService/Tasks/";
         #endregion
 
+        public const double JOB_TIMEOUT = 10;
+
         public JobController(Server server)
             :base(server)
         { }
@@ -22,7 +24,7 @@ namespace Server_Tools.Idrac.Controllers
         /// <param name="uri">String contento o enderço do recurso</param>
         /// <param name="content">Conteudo Http da requisição</param>
         /// <returns>String contendo o Job Id</returns>
-        public async Task<string> CreateJob(string uri, HttpContent content)
+        public async Task<IdracJob> CreateJob(string uri, HttpContent content)
         {
             return await CreateJob(uri, content, HttpMethod.Post);
         }
@@ -33,8 +35,8 @@ namespace Server_Tools.Idrac.Controllers
         /// <param name="uri">String contento o enderço do recurso</param>
         /// <param name="content">Conteudo Http da requisição</param>
         /// <param name="method">Metodo Http usado</param>
-        /// <returns>String contendo o Job Id</returns>
-        public async Task<string> CreateJob(string uri, HttpContent content, HttpMethod method)
+        /// <returns>Um objeto IdracJob</returns>
+        public async Task<IdracJob> CreateJob(string uri, HttpContent content, HttpMethod method)
         {
             using (var request = new HttpRequestMessage(method, uri))
             {
@@ -45,7 +47,8 @@ namespace Server_Tools.Idrac.Controllers
                     if (!response.IsSuccessStatusCode)
                         throw new HttpRequestException(string.Format("Falha ao criar Job: {0}", response.ReasonPhrase));
 
-                    return Regex.Match(response.Headers.Location.ToString(), "JID_.*").Captures[0].Value.Replace("\r", "");
+                    string location = response.Headers.Location.ToString();
+                    return await GetResource<IdracJob>(baseUri + location);
                 }
             }
         }

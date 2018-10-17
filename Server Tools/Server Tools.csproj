@@ -132,6 +132,9 @@
     <Compile Include="Util\NetworkHelper.cs" />
     <Compile Include="Idrac\Models\RacadmException.cs" />
     <Compile Include="Idrac\Models\Server.cs" />
+    <Compile Include="View\LoadWindow.xaml.cs">
+      <DependentUpon>LoadWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\ScpExportPage.xaml.cs">
       <DependentUpon>ScpExportPage.xaml</DependentUpon>
     </Compile>
@@ -171,6 +174,10 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="View\LoadWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\ScpExportPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

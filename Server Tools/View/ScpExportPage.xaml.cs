@@ -32,17 +32,43 @@ namespace Server_Tools.View
             ExportButton.IsEnabled = false;
             Server server = new Server(ServerTextBox.Text, UserTextBox.Text, PasswordBox.Password);
             ScpController idrac = new ScpController(server);
-            OutputTextBox.AppendText("Exportando configurações de " + server.Host + "...\n");
+            OutputTextBox.AppendText(string.Format("Exportando configurações de {0}...\n", server.Host));
             try
             {
-                string file = await idrac.ExportScpFile(target, exportUse);
-                OutputTextBox.AppendText("Arquivo exportado com sucesso, salvo em: " + file + "\n");
+                IdracJob job = await idrac.ExportScpFile(target, exportUse);
+                var load = new LoadWindow(server, job) { Title = server.Host };
+                load.Closed += (object sender, EventArgs e) =>
+                {
+                    var window = sender as LoadWindow;
+                    job = window.Job;
+                    if (job.JobState.Contains("Completed"))
+                        SaveFile(server, job);
+                };
+                load.Show();
             }
             catch (Exception ex)
             {
                 OutputTextBox.AppendText("Falha ao exportar arquivo: " + ex.Message + "\n");
+                ExportButton.IsEnabled = true;
+            }           
+        }
+
+        private async void SaveFile(Server server, IdracJob job)
+        {
+            try
+            {
+                var idrac = new ScpController(server);
+                string file = await idrac.SaveScpFile(job.Id);
+                OutputTextBox.AppendText(string.Format("Arquivo exportado com sucesso, salvo em {0}\n", file));
             }
-            ExportButton.IsEnabled = true;
+            catch (Exception ex)
+            {
+                OutputTextBox.AppendText(string.Format("Falha ao salvar arquivo {0}\n", ex.Message));
+            }
+            finally
+            {
+                ExportButton.IsEnabled = true;
+            }
         }
 
         private bool ValidateForm()

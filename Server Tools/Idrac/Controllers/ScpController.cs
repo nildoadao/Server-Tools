@@ -14,7 +14,6 @@ namespace Server_Tools.Idrac.Controllers
 
         public const string EXPORT_SYSTEM_CONFIGURATION = @"/redfish/v1/Managers/iDRAC.Embedded.1/Actions/Oem/EID_674_Manager.ExportSystemConfiguration";
         public const string IMPORT_SYSTEM_CONFIGURATION = @"/redfish/v1/Managers/iDRAC.Embedded.1/Actions/Oem/EID_674_Manager.ImportSystemConfiguration";
-        const double JOB_TIMEOUT = 10; // Timeout de 5 minutos para conclusão dos Jobs
 
         public ScpController(Server server)
             :base(server)
@@ -43,7 +42,12 @@ namespace Server_Tools.Idrac.Controllers
             return await idrac.CreateJob(baseUri + EXPORT_SYSTEM_CONFIGURATION, httpContent);
         }
 
-        public async Task<string> SaveScpFile(string jobId)
+        /// <summary>
+        /// Retorna os dados obtidos de um export de arquivo SCP
+        /// </summary>
+        /// <param name="jobId">Identificação do Job em que foi criado o SCP</param>
+        /// <returns>Dados do arquivo</returns>
+        public async Task<string> GetScpFileData(string jobId)
         {
             var idrac = new JobController(server);
             using (var response = await idrac.GetJobData(jobId))
@@ -51,12 +55,7 @@ namespace Server_Tools.Idrac.Controllers
                 if (!response.IsSuccessStatusCode)
                     throw new HttpRequestException("Falha ao receber dados do Export: " + response.RequestMessage);
 
-                string jobData = await response.Content.ReadAsStringAsync();
-                string currentTime = DateTime.Now.ToString().Replace(":", "").Replace("/", "").Replace(" ", "");
-                string dowloadsFolder = KnownFolders.Downloads.Path;
-                string path = Path.Combine(dowloadsFolder, "SCP_" + currentTime + ".xml");
-                File.WriteAllText(path, jobData);
-                return path;
+                return await response.Content.ReadAsStringAsync();
             }
         }
 

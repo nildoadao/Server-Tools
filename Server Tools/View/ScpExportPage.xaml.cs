@@ -1,7 +1,9 @@
 ﻿using Server_Tools.Idrac.Controllers;
 using Server_Tools.Idrac.Models;
+using Syroot.Windows.IO;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -39,7 +41,7 @@ namespace Server_Tools.View
                 var load = new LoadWindow(server, job) { Title = server.Host };
                 load.Closed += (object sender, EventArgs e) =>
                 {
-                    var window = sender as LoadWindow;
+                    var window = (LoadWindow) sender;
                     job = window.Job;
                     if (job.JobState.Contains("Completed"))
                         SaveFile(server, job);
@@ -58,8 +60,12 @@ namespace Server_Tools.View
             try
             {
                 var idrac = new ScpController(server);
-                string file = await idrac.SaveScpFile(job.Id);
-                OutputTextBox.AppendText(string.Format("Arquivo exportado com sucesso, salvo em {0}\n", file));
+                string file = await idrac.GetScpFileData(job.Id);
+                string currentTime = DateTime.Now.ToString().Replace(":", "").Replace("/", "").Replace(" ", "");
+                string dowloadsFolder = KnownFolders.Downloads.Path;
+                string path = System.IO.Path.Combine(dowloadsFolder, "SCP_" + currentTime + ".xml");
+                File.WriteAllText(path, file);
+                OutputTextBox.AppendText(string.Format("Arquivo exportado com sucesso, salvo em {0}\n", path));
             }
             catch (Exception ex)
             {

@@ -37,13 +37,7 @@ namespace Server_Tools.View
         {
             Title = server.Host;
             TaskTextBlock.Text = job.Name;
-            TaskButton.IsEnabled = false;
             LoopJob();
-        }
-
-        private void TaskButton_Click(object sender, RoutedEventArgs e)
-        {
-            Close();
         }
 
         private void UpdateProgressBar(IdracJob job)
@@ -77,7 +71,7 @@ namespace Server_Tools.View
                     MessageBox.Show(ex.Message, "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
-            TaskButton.IsEnabled = true;
+            Close();
         }
     }
 }

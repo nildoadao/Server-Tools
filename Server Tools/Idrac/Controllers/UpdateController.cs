@@ -57,14 +57,16 @@ namespace Server_Tools.Idrac.Controllers
         /// <returns>Uri com a localização do recurso</returns>
         private async Task<Uri> UploadFile(string path)
         {
+            var encoding = Encoding.GetEncoding("ISO-8859-1");
+            string fileEncoding = encoding.GetString(File.ReadAllBytes(path));
             using (var request = new HttpRequestMessage(HttpMethod.Post, baseUri + FIRMWARE_INVENTORY))
-            using (var content = new MultipartFormDataContent(Guid.NewGuid().ToString()))
-            using (var fileContent = new StreamContent(new FileStream(path, FileMode.Open)))
+            using (var content = new MultipartFormDataContent())
+            using (var fileContent = new StringContent(fileEncoding))
             {
                 string etag = await GetHeaderValue("ETag", baseUri + FIRMWARE_INVENTORY);
                 request.Headers.Authorization = credentials;
                 request.Headers.TryAddWithoutValidation("If-Match", etag);
-                content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/octet-stream");
+                fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse("application/octet-stream");
                 fileContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
                 {
                     Name = "file",
@@ -75,8 +77,10 @@ namespace Server_Tools.Idrac.Controllers
                 using (HttpResponseMessage response = await client.SendAsync(request))
                 {
                     if (!response.IsSuccessStatusCode)
-                        throw new HttpRequestException("Falha no upload do arquivo: " + response.ReasonPhrase);
-
+                    {
+                        string message = await response.Content.ReadAsStringAsync();
+                        throw new HttpRequestException("Falha no upload do arquivo: " + message);
+                    }
                     return response.Headers.Location;
                 }
             }

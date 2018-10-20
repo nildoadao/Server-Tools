@@ -74,6 +74,16 @@ namespace Server_Tools.View
             LoadPhysicalDisks(virtualDisk);
         }
 
+        private void CreateVdButton_Click(object sender, RoutedEventArgs e)
+        {
+            NavigationService.Navigate(new CreateRaidPage(disks, controllers));
+        }
+
+        private void DeleteVdButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
         private async void GetStorageData()
         {
             try
@@ -177,5 +187,7 @@ namespace Server_Tools.View
             }
             return count;
         }
+
+
     }
 }

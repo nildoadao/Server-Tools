@@ -86,7 +86,7 @@
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="Controladora" HorizontalAlignment="Right" Margin="5"/>
-                            <ComboBox Name="ControllersComboBox" Grid.Column="1" HorizontalAlignment="Left" Margin="5" SelectionChanged="ControllersComboBox_SelectionChanged"/>
+                            <ComboBox Name="ControllersComboBox" Grid.Column="1" HorizontalAlignment="Left" Margin="5" MinWidth="100" SelectionChanged="ControllersComboBox_SelectionChanged"/>
                             <TextBlock Text="Versão do Firmware" Grid.Row="1" HorizontalAlignment="Right" Margin="5"/>
                             <TextBlock Name="FirmwareVersionTextBlock" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" Margin="5"/>
                             <TextBlock Text="Modelo" HorizontalAlignment="Right" Grid.Row="3" Margin="5"/>
@@ -118,12 +118,14 @@
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="VD" HorizontalAlignment="Right" Margin="5"/>
-                            <ComboBox Name="VirtualDisksComboBox" Grid.Column="1" HorizontalAlignment="Left" Margin="5" SelectionChanged="VirtualDisksComboBox_SelectionChanged"/>
+                            <ComboBox Name="VirtualDisksComboBox" Grid.Column="1" HorizontalAlignment="Left" Margin="5" MinWidth="100" SelectionChanged="VirtualDisksComboBox_SelectionChanged"/>
                             <TextBlock Text="Discos Fisicos" Grid.Row="1" HorizontalAlignment="Right" Margin="5"/>
                             <TreeView Name="PhysicalDisksTreeView" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" Margin="5">
                                 <TreeViewItem Name="PhysicalDisksItems" Header="Discos Fisicos" HorizontalAlignment="Left"/>
                             </TreeView>
-                            <TextBlock Text="Status" HorizontalAlignment="Right" Grid.Row="3" Margin="5"/>
+                            <TextBlock Text="Status" HorizontalAlignment="Right" Grid.Row="2" Margin="5"/>
+                            <Button Content="Criar VD" Name="CreateVdButton" Grid.Row="3" Grid.Column="1" Margin="5" Width="100" Click="CreateVdButton_Click"/>
+                            <Button Content="Deletar VD" Name="DeleteVdButton" Grid.Row="3" Margin="5" Width="100" Click="DeleteVdButton_Click"/>
                         </Grid>
                     </GroupBox>
                 </TabItem>

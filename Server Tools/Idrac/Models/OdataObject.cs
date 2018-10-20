@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Server_Tools.Idrac.Models
 {
-    class OdataObject
+    public class OdataObject
     {
         [JsonProperty("@odata.id")]
         public string Id { get; set; }

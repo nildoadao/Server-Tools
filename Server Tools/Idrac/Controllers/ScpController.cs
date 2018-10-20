@@ -12,8 +12,8 @@ namespace Server_Tools.Idrac.Controllers
     class ScpController : BaseIdrac
     {
 
-        public const string EXPORT_SYSTEM_CONFIGURATION = @"/redfish/v1/Managers/iDRAC.Embedded.1/Actions/Oem/EID_674_Manager.ExportSystemConfiguration";
-        public const string IMPORT_SYSTEM_CONFIGURATION = @"/redfish/v1/Managers/iDRAC.Embedded.1/Actions/Oem/EID_674_Manager.ImportSystemConfiguration";
+        public const string ExportSystemConfiguration = @"/redfish/v1/Managers/iDRAC.Embedded.1/Actions/Oem/EID_674_Manager.ExportSystemConfiguration";
+        public const string ImportSystemConfiguration = @"/redfish/v1/Managers/iDRAC.Embedded.1/Actions/Oem/EID_674_Manager.ImportSystemConfiguration";
 
         public ScpController(Server server)
             :base(server)
@@ -39,7 +39,7 @@ namespace Server_Tools.Idrac.Controllers
             var jsonContent = JsonConvert.SerializeObject(content);
             var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
             var idrac = new JobController(server);
-            return await idrac.CreateJob(baseUri + EXPORT_SYSTEM_CONFIGURATION, httpContent);
+            return await idrac.CreateJob(baseUri + ExportSystemConfiguration, httpContent);
         }
 
         /// <summary>
@@ -83,7 +83,7 @@ namespace Server_Tools.Idrac.Controllers
             var jsonContent = JsonConvert.SerializeObject(content);
             var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
             var idrac = new JobController(server);
-            return await idrac.CreateJob(baseUri + IMPORT_SYSTEM_CONFIGURATION, httpContent);
+            return await idrac.CreateJob(baseUri + ImportSystemConfiguration, httpContent);
         }
     }
 }

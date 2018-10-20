@@ -12,8 +12,8 @@ namespace Server_Tools.Idrac.Controllers
     class UpdateController : BaseIdrac
     {
 
-        public const string FIRMWARE_INVENTORY = @"/redfish/v1/UpdateService/FirmwareInventory";
-        public const string FIRMWARE_INSTALL = @"/redfish/v1/UpdateService/Actions/Oem/DellUpdateService.Install";
+        public const string FirmwareInventory = @"/redfish/v1/UpdateService/FirmwareInventory";
+        public const string FirmwareInstall = @"/redfish/v1/UpdateService/Actions/Oem/DellUpdateService.Install";
 
         public UpdateController(Server server)
             :base(server)
@@ -47,7 +47,7 @@ namespace Server_Tools.Idrac.Controllers
             string jsonContent = JsonConvert.SerializeObject(content);
             var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
             var idrac = new JobController(server);
-            return await idrac.CreateJob(baseUri + FIRMWARE_INSTALL, httpContent);
+            return await idrac.CreateJob(baseUri + FirmwareInstall, httpContent);
         }
 
         /// <summary>
@@ -58,29 +58,27 @@ namespace Server_Tools.Idrac.Controllers
         private async Task<Uri> UploadFile(string path)
         {
             var encoding = Encoding.GetEncoding("ISO-8859-1");
-            string fileEncoding = encoding.GetString(File.ReadAllBytes(path));
-            using (var request = new HttpRequestMessage(HttpMethod.Post, baseUri + FIRMWARE_INVENTORY))
-            using (var content = new MultipartFormDataContent())
-            using (var fileContent = new StringContent(fileEncoding))
+            string decodedFile = encoding.GetString(File.ReadAllBytes(path));
+            using (var request = new HttpRequestMessage(HttpMethod.Post, baseUri + FirmwareInventory))
+            using (var multipartContent = new MultipartFormDataContent())
+            using (var fileContent = new StringContent(decodedFile))
             {
-                string etag = await GetHeaderValue("ETag", baseUri + FIRMWARE_INVENTORY);
+                string etag = await GetHeaderValue("ETag", baseUri + FirmwareInventory);
                 request.Headers.Authorization = credentials;
                 request.Headers.TryAddWithoutValidation("If-Match", etag);
-                fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse("application/octet-stream");
+                fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse("multipart/form-data");
                 fileContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
                 {
                     Name = "file",
                     FileName = Path.GetFileName(path).ToLower()
                 };
-                content.Add(fileContent);
-                request.Content = content;
+                multipartContent.Add(fileContent);
+                request.Content = multipartContent;
                 using (HttpResponseMessage response = await client.SendAsync(request))
                 {
                     if (!response.IsSuccessStatusCode)
-                    {
-                        string message = await response.Content.ReadAsStringAsync();
-                        throw new HttpRequestException("Falha no upload do arquivo: " + message);
-                    }
+                        throw new HttpRequestException("Falha no upload do arquivo: " + response.ReasonPhrase);
+
                     return response.Headers.Location;
                 }
             }

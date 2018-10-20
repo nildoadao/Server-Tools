@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Server_Tools.Idrac.Models
 {
-    class Enclousure
+    public class Enclousure
     {
         public string Id { get; set; }
         public string Name { get; set; }

@@ -8,8 +8,8 @@ namespace Server_Tools.Idrac.Controllers
     class JobController : BaseIdrac
     {
         # region Redfish Uris
-        public const string JOB_STATUS = @"/redfish/v1/Managers/iDRAC.Embedded.1/Jobs/";
-        public const string JOB_RESULT = @"/redfish/v1/TaskService/Tasks/";
+        public const string JobStatus = @"/redfish/v1/Managers/iDRAC.Embedded.1/Jobs/";
+        public const string JobResult = @"/redfish/v1/TaskService/Tasks/";
         #endregion
 
         public const double JOB_TIMEOUT = 10;
@@ -60,7 +60,7 @@ namespace Server_Tools.Idrac.Controllers
         /// <returns>O Job corresponde ao ID</returns>
         public async Task<IdracJob> GetJob(string jobId)
         {
-            return await GetResource<IdracJob>(baseUri + JOB_STATUS + jobId);
+            return await GetResource<IdracJob>(baseUri + JobStatus + jobId);
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace Server_Tools.Idrac.Controllers
         /// <returns>Resposta Http do Job</returns>
         public async Task<HttpResponseMessage> GetJobData(string jobId)
         {
-            using (var request = new HttpRequestMessage(HttpMethod.Get, baseUri + JOB_RESULT + jobId))
+            using (var request = new HttpRequestMessage(HttpMethod.Get, baseUri + JobResult + jobId))
             {
                 request.Headers.Authorization = credentials;
                 return await client.SendAsync(request);

@@ -11,9 +11,7 @@ namespace Server_Tools.Idrac.Controllers
 {
     class StorageController : BaseIdrac
     {
-        public const string CONTROLLERS = @"/redfish/v1/Systems/System.Embedded.1/Storage";
-        public const string DRIVES = @"/redfish/v1/Systems/System.Embedded.1/Storage/Drives/";
-        public const string VOLUMES = @"/redfish/v1/Systems/System.Embedded.1/Storage/Volumes/";
+        public const string Controllers = @"/redfish/v1/Systems/System.Embedded.1/Storage";
 
         public StorageController(Server server)
             : base(server) { }
@@ -24,7 +22,7 @@ namespace Server_Tools.Idrac.Controllers
         /// <returns></returns>
         public async Task<List<string>> GetEnclousuresLocation()
         {
-            using(var request = new HttpRequestMessage(HttpMethod.Get, baseUri + CONTROLLERS))
+            using(var request = new HttpRequestMessage(HttpMethod.Get, baseUri + Controllers))
             {
                 request.Headers.Authorization = credentials;
                 using(var response = await client.SendAsync(request))
@@ -226,7 +224,45 @@ namespace Server_Tools.Idrac.Controllers
             var jsonContent = JsonConvert.SerializeObject(content);
             var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
             var idrac = new JobController(server);
-            return await idrac.CreateJob(baseUri + VOLUMES, httpContent);
+            return await idrac.CreateJob(string.Format("{0}{1}/{2}", baseUri, Controllers, controller.Name), httpContent);
+        }
+
+        public async Task<IdracJob> CreateVirtualDisk(List<PhysicalDisk> disks, Enclousure controller, int level)
+        {
+            List<OdataObject> drives = new List<OdataObject>();
+            foreach (var disk in disks)
+            {
+                drives.Add(new OdataObject { Id = disk.Id });
+            }
+            var content = new
+            {
+                VolumeType = level,
+                Drives = drives,
+            };
+            var jsonContent = JsonConvert.SerializeObject(content);
+            var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+            var idrac = new JobController(server);
+            return await idrac.CreateJob(string.Format("{0}{1}/{2}", baseUri, Controllers, controller.Name), httpContent);
+        }
+
+
+        public async Task<IdracJob> CreateVirtualDisk(List<PhysicalDisk> disks, Enclousure controller, int level, string name)
+        {
+            List<OdataObject> drives = new List<OdataObject>();
+            foreach (var disk in disks)
+            {
+                drives.Add(new OdataObject { Id = disk.Id });
+            }
+            var content = new
+            {
+                VolumeType = level,
+                Drives = drives,
+                Name = name,
+            };
+            var jsonContent = JsonConvert.SerializeObject(content);
+            var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+            var idrac = new JobController(server);
+            return await idrac.CreateJob(string.Format("{0}{1}/{2}", baseUri, Controllers, controller.Name), httpContent);
         }
 
         /// <summary>

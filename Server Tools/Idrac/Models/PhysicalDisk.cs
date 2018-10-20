@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Server_Tools.Idrac.Models
 {
-    class PhysicalDisk
+    public class PhysicalDisk
     {
         public string Id { get; set; }
         public long CapacityBytes { get; set; }
@@ -21,7 +21,7 @@ namespace Server_Tools.Idrac.Models
         public int RotationSpeedRPM { get; set; }
         public DiskLink Links { get; set; }
         
-        internal class DiskLink
+        public class DiskLink
         {
             public List<OdataObject> Volumes { get; set; }
         }

@@ -48,7 +48,7 @@ namespace Server_Tools.View
 
         private async void Connect(Server server)
         {
-            if (!NetworkHelper.IsConnected(server.Host))
+            /*if (!NetworkHelper.IsConnected(server.Host))
             {
                 MessageBox.Show("Servidor inacessivel", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
@@ -56,7 +56,7 @@ namespace Server_Tools.View
             var idrac = new StorageController(server);
             try
             {
-                if (await idrac.CheckRedfishSupport(StorageController.CONTROLLERS) == false)
+                if (await idrac.CheckRedfishSupport(StorageController.Controllers) == false)
                 {
                     MessageBox.Show(string.Format("O servidor {0} não suporta a API Redfish", server), "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
                     return;
@@ -66,7 +66,7 @@ namespace Server_Tools.View
             {
                 MessageBox.Show(string.Format("Falha ao conectar: {0}", ex.Message), "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
-            }
+            }*/
             var storageWindow = new StorageWindow(server);
             storageWindow.Title = server.Host;
             storageWindow.Show();

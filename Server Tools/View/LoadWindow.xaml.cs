@@ -35,7 +35,7 @@ namespace Server_Tools.View
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            Title = server.Host;
+            Title = "Server Tools";
             TaskTextBlock.Text = job.Name;
             LoopJob();
         }

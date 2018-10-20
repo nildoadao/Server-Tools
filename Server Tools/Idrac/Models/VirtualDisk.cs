@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Server_Tools.Idrac.Models
 {
-    class VirtualDisk
+    public class VirtualDisk
     {
         public string Id { get; set; }
         public string Description { get; set; }
@@ -15,7 +15,7 @@ namespace Server_Tools.Idrac.Models
         public long OptimumIOSizeBytes { get; set; }
         public VolumeLink Links { get; set; }
 
-        internal class VolumeLink
+        public class VolumeLink
         {
             public List<OdataObject> Drives { get; set; }
         }

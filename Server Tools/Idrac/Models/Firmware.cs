@@ -1,7 +1,7 @@
 ﻿
 namespace Server_Tools.Idrac.Models
 {
-    class Firmware
+    public class Firmware
     {
         public string Id { get; set; }
         public string Description { get; set; }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Server_Tools.Idrac.Models
 {
-    class RaidController
+    public class RaidController
     {
         public string FirmwareVersion { get; set; }
         public string Manufacturer { get; set; }

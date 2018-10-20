@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Server_Tools.Idrac.Models
 {
-    class ServerJob
+    public class ServerJob
     {
         public Server Server { get; set; }
         public IdracJob Job { get; set; }

@@ -63,7 +63,7 @@ namespace Server_Tools.View
                     else if (job.JobState.Contains("Failed"))
                         throw new Exception(string.Format("Falha ao executar o Job: {0}", job.Message));
 
-                    else if (DateTime.Now >= time.AddMinutes(JobController.JOB_TIMEOUT))
+                    else if (DateTime.Now >= time.AddMinutes(JobController.JobTimeout))
                         throw new TimeoutException("Excedido tempo limite do Job");
                 }
                 catch(Exception ex)

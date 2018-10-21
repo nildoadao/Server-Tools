@@ -5,6 +5,7 @@ using Server_Tools.Util;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
@@ -102,6 +103,9 @@ namespace Server_Tools.View
 
         private async void ImportScp(Server server)
         {
+            if (!await CheckSupport(server))
+                return;
+
             ScpController idrac = new ScpController(server);
             OutputTextBox.AppendText(string.Format("Importando configurações para {0}...\n", server.Host));
             string target = "";
@@ -232,6 +236,33 @@ namespace Server_Tools.View
             }
             jobQueue = updatedJobs;
             JobsDataGrid.ItemsSource = jobQueue;
+        }
+
+        private async Task<bool> CheckSupport(Server server)
+        {
+            var idrac = new ScpController(server);
+
+            if (!NetworkHelper.IsConnected(server.Host))
+            {
+                MessageBox.Show(string.Format("O servidor {0} não está acessivel, verifique a conexão e tente novamente", server.Host), "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
+                return false;
+            }
+
+            try
+            {
+                if (!await idrac.CheckRedfishSupport(ScpController.ImportSystemConfiguration))
+                {
+                    MessageBox.Show("A versão da Idrac desse servidor não possui suporte a função de import de arquivos SCP", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
+                    return false;
+                }
+            }
+            catch 
+            {
+                MessageBox.Show("A versão da Idrac desse servidor não possui suporte a função de import de arquivos SCP", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
+                return false;
+            }
+
+            return true;
         }
     }
 }

@@ -48,7 +48,7 @@ namespace Server_Tools.View
 
         private async void Connect(Server server)
         {
-            /*if (!NetworkHelper.IsConnected(server.Host))
+            if (!NetworkHelper.IsConnected(server.Host))
             {
                 MessageBox.Show("Servidor inacessivel", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
@@ -66,9 +66,8 @@ namespace Server_Tools.View
             {
                 MessageBox.Show(string.Format("Falha ao conectar: {0}", ex.Message), "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
-            }*/
-            var storageWindow = new StorageWindow(server);
-            storageWindow.Title = server.Host;
+            }
+            var storageWindow = new StorageWindow(server) { Title = server.Host };
             storageWindow.Show();
         }
 

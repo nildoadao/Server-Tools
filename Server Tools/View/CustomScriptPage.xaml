@@ -44,13 +44,13 @@
                 </Grid>
             </GroupBox>
             <StackPanel Grid.Row="1" Grid.Column="1" Width="Auto" VerticalAlignment="Center" HorizontalAlignment="Center">
-                <Button Name="AddButton" Content="Adicionar" Margin="5" Width="75" Click="AddButton_Click"/>
-                <Button Name="RemoveButton" Content="Remover" Margin="5" Width="75" Click="RemoveButton_Click"/>
+                <Button Name="AddButton" Content="Adicionar" Margin="5" Width="100" Height="30" Click="AddButton_Click"/>
+                <Button Name="RemoveButton" Content="Remover" Margin="5" Width="100" Height="30" Click="RemoveButton_Click"/>
             </StackPanel>
             <StackPanel Grid.Row="1" Grid.Column="2" Grid.RowSpan="4">
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Margin="5" Text="Servidores" Foreground="White"/>
-                    <Button Name="AddCsvButton" Content="Adicionar CSV" Margin="5" Width="100" HorizontalAlignment="Left" Click="AddCsvButton_Click"/>
+                    <TextBlock Margin="5" Text="Servidores" Foreground="White" VerticalAlignment="Center"/>
+                    <Button Name="AddCsvButton" Content="Adicionar CSV" Margin="5" Width="100" Height="30" HorizontalAlignment="Left" Click="AddCsvButton_Click"/>
                 </StackPanel>
                 <ListBox Name="ServersListBox" HorizontalAlignment="Left" Height="250" Margin="5" Width="250"/>
             </StackPanel>
@@ -60,8 +60,8 @@
                 <Button Name="ScriptDialogButton" Content="..."  Margin="5" Width="30" Click="ScriptDialogButton_Click"/>
             </StackPanel>
             <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
-                <Button Name="ApplyButton" Content="Aplicar a todos" Margin="5" Click="ApplyButton_Click" Height="20" Width="150"/>
-                <Button Name="CancelButton" Content="Cancelar" Margin="5" Click="CancelButton_Click" Height="20" Width="100"/>
+                <Button Name="ApplyButton" Content="Aplicar a todos" Margin="5" Click="ApplyButton_Click" Width="100" Height="30"/>
+                <Button Name="CancelButton" Content="Cancelar" Margin="5" Click="CancelButton_Click" Width="100" Height="30"/>
             </StackPanel>
             <StackPanel Grid.Row="5" Grid.ColumnSpan="3" HorizontalAlignment="Left" VerticalAlignment="Center">
                 <TextBlock Margin="5" Text="Saida" Foreground="White"/>

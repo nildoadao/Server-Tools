@@ -1,7 +1,9 @@
 ﻿using Microsoft.Win32;
 using Server_Tools.Idrac.Controllers;
 using Server_Tools.Idrac.Models;
+using Server_Tools.Util;
 using System;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -55,6 +57,10 @@ namespace Server_Tools.View
         private async void UpdateFirmware(string path, string option)
         {
             Server server = new Server(ServerTextBox.Text, UserTextBox.Text, PasswordBox.Password);
+
+            if (!await CheckSupport(server))
+                return;
+
             UpdateController idrac = new UpdateController(server);
             OutputTextBox.AppendText(string.Format("Iniciando upload do arquivo {0} para {1} \n", FirmwareTextBox.Text, server.Host));
             try
@@ -65,8 +71,7 @@ namespace Server_Tools.View
             catch(Exception ex)
             {
                 OutputTextBox.AppendText(string.Format("Erro ao atualizar firmware: {0}\n", ex.Message));
-            }
-            
+            }           
         }
 
         private void OpenFirmwareButton_Click(object sender, RoutedEventArgs e)
@@ -96,6 +101,33 @@ namespace Server_Tools.View
                 MessageBox.Show("Selecione um firmware", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
                 return false;
             }
+            return true;
+        }
+
+        private async Task<bool> CheckSupport(Server server)
+        {
+            var idrac = new UpdateController(server);
+
+            if (!NetworkHelper.IsConnected(server.Host))
+            {
+                MessageBox.Show(string.Format("O servidor {0} não está acessivel, verifique a conexão e tente novamente", server.Host), "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
+                return false;
+            }
+
+            try
+            {
+                if (!await idrac.CheckRedfishSupport(UpdateController.FirmwareInventory))
+                {
+                    MessageBox.Show("A versão da Idrac desse servidor não possui suporte a função de update de firmware", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
+                    return false;
+                }
+            }
+            catch
+            {
+                MessageBox.Show("A versão da Idrac desse servidor não possui suporte a função de update de firmware", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
+                return false;
+            }
+
             return true;
         }
     }

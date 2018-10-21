@@ -76,7 +76,7 @@ namespace Server_Tools.View
 
         private void CreateVdButton_Click(object sender, RoutedEventArgs e)
         {
-            NavigationService.Navigate(new CreateRaidPage(disks, controllers));
+            NavigationService.Navigate(new CreateRaidPage(disks, enclousures, server));
         }
 
         private void DeleteVdButton_Click(object sender, RoutedEventArgs e)

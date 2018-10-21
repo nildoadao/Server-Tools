@@ -14,5 +14,10 @@ namespace Server_Tools.Idrac.Models
         public List<OdataObject> Drives { get; set; }
         public List<RaidController> StorageControllers { get; set; }
         public OdataObject Volumes { get; set; }
+
+        public override string ToString()
+        {
+            return Name;
+        }
     }
 }

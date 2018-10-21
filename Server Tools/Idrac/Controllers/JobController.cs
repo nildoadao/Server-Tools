@@ -12,7 +12,7 @@ namespace Server_Tools.Idrac.Controllers
         public const string JobResult = @"/redfish/v1/TaskService/Tasks/";
         #endregion
 
-        public const double JOB_TIMEOUT = 10;
+        public const double JobTimeout = 10;
 
         public JobController(Server server)
             :base(server)

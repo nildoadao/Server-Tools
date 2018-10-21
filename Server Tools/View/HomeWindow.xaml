@@ -4,20 +4,21 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Server_Tools.View"
+        xmlns:wpf="http://schemas.microsoft.com/netfx/2009/xaml/presentation"
         mc:Ignorable="d"
         Title="Server Tools" Height="700" Width="800" WindowStartupLocation="CenterScreen" Background="#FF3E3E42">
     <Window.Resources>
         <ControlTemplate x:Key="NavigationTemplate" TargetType="Frame">
             <DockPanel Margin="10">
                 <StackPanel Margin="5" Orientation="Horizontal" DockPanel.Dock="Top">
-                    <Button Command="{x:Static NavigationCommands.BrowseBack}" IsEnabled="{TemplateBinding CanGoBack}" Height="Auto" Width="Auto" Background="Transparent" BorderBrush="Transparent">
+                    <Button Name="BackButton" Command="{x:Static NavigationCommands.BrowseBack}" IsEnabled="{TemplateBinding CanGoBack}" Height="Auto" Width="Auto" Background="Transparent" BorderBrush="Transparent" Foreground="Transparent">
                         <Image  Width="30" Source="/Server Tools;component/Resources/back.png"/>
                     </Button>
-                    <Button Command="{x:Static NavigationCommands.BrowseForward}" IsEnabled="{TemplateBinding CanGoForward}" Height="Auto" Width="Auto" Background="Transparent" BorderBrush="Transparent">
+                    <Button Name="FowardButton"  Command="{x:Static NavigationCommands.BrowseForward}" IsEnabled="{TemplateBinding CanGoForward}" Height="Auto" Width="Auto" Background="#00000000" BorderBrush="Transparent" Foreground="Transparent">
                         <Image  Width="30" Source="/Server Tools;component/Resources/forward.png"/>
                     </Button>
                 </StackPanel>
-                    <Border BorderBrush="CadetBlue" Margin="7" BorderThickness="5" Padding="5" CornerRadius="5">
+                <Border BorderBrush="CadetBlue" Margin="7" BorderThickness="5" Padding="5" CornerRadius="5">
                     <ContentPresenter />
                 </Border>
             </DockPanel>

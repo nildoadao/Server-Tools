@@ -1,5 +1,6 @@
 ﻿using Server_Tools.Idrac.Controllers;
 using Server_Tools.Idrac.Models;
+using Server_Tools.Util;
 using Syroot.Windows.IO;
 using System;
 using System.Collections.Generic;
@@ -29,74 +30,26 @@ namespace Server_Tools.View
             InitializeComponent();
         }
 
-        private async void ExportScpFile(string target, string exportUse)
+        private void AllCheckBox_Checked(object sender, RoutedEventArgs e)
         {
-            ExportButton.IsEnabled = false;
-            Server server = new Server(ServerTextBox.Text, UserTextBox.Text, PasswordBox.Password);
-            ScpController idrac = new ScpController(server);
-            OutputTextBox.AppendText(string.Format("Exportando configurações de {0}...\n", server.Host));
-            try
+            foreach (CheckBox item in TargetGroup.Children)
             {
-                IdracJob job = await idrac.ExportScpFile(target, exportUse);
-                var load = new LoadWindow(server, job) { Title = server.Host };
-                load.Closed += (object sender, EventArgs e) =>
+                if (item.Content.ToString() != "ALL")
                 {
-                    var window = (LoadWindow) sender;
-                    job = window.Job;
-                    if (job.JobState.Contains("Completed"))
-                        SaveFile(server, job);
-                };
-                load.Show();
-            }
-            catch (Exception ex)
-            {
-                OutputTextBox.AppendText("Falha ao exportar arquivo: " + ex.Message + "\n");
-                ExportButton.IsEnabled = true;
-            }           
-        }
-
-        private async void SaveFile(Server server, IdracJob job)
-        {
-            try
-            {
-                var idrac = new ScpController(server);
-                string file = await idrac.GetScpFileData(job.Id);
-                string currentTime = DateTime.Now.ToString().Replace(":", "").Replace("/", "").Replace(" ", "");
-                string dowloadsFolder = KnownFolders.Downloads.Path;
-                string path = System.IO.Path.Combine(dowloadsFolder, "SCP_" + currentTime + ".xml");
-                File.WriteAllText(path, file);
-                OutputTextBox.AppendText(string.Format("Arquivo exportado com sucesso, salvo em {0}\n", path));
-            }
-            catch (Exception ex)
-            {
-                OutputTextBox.AppendText(string.Format("Falha ao salvar arquivo {0}\n", ex.Message));
-            }
-            finally
-            {
-                ExportButton.IsEnabled = true;
+                    item.IsChecked = false;
+                    item.IsEnabled = false;
+                }
             }
         }
 
-        private bool ValidateForm()
+        private void AllCheckBox_Unchecked(object sender, RoutedEventArgs e)
         {
-            if (ServerTextBox.Text.Trim().Equals(""))
+            foreach (CheckBox item in TargetGroup.Children)
             {
-                MessageBox.Show("Informe o endereço do host", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
-                return false;
-            }
-            else if (UserTextBox.Text.Trim().Equals(""))
-            {
-                MessageBox.Show("Informe o usuario", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
-                return false;
-            }
-            else if (PasswordBox.Password.Trim().Equals(""))
-            {
-                MessageBox.Show("Informe a senha", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
-                return false;
-            }
-            else
-            {
-                return true;
+                if (item.Content.ToString() != "ALL")
+                {
+                    item.IsEnabled = true;
+                }
             }
         }
 
@@ -137,7 +90,7 @@ namespace Server_Tools.View
                 }
             }
             string exportUse = "";
-            foreach(RadioButton item in ExportUseGroup.Children)
+            foreach (RadioButton item in ExportUseGroup.Children)
             {
                 if (item.IsChecked.Value)
                 {
@@ -148,27 +101,107 @@ namespace Server_Tools.View
             ExportScpFile(target, exportUse);
         }
 
-        private void AllCheckBox_Checked(object sender, RoutedEventArgs e)
+        private async void ExportScpFile(string target, string exportUse)
         {
-            foreach (CheckBox item in TargetGroup.Children)
+            Server server = new Server(ServerTextBox.Text, UserTextBox.Text, PasswordBox.Password);
+
+            if (!await CheckSupport(server))
+                return;
+
+            ExportButton.IsEnabled = false;
+            ScpController idrac = new ScpController(server);
+            OutputTextBox.AppendText(string.Format("Exportando configurações de {0}...\n", server.Host));
+            try
             {
-                if (item.Content.ToString() != "ALL")
+                IdracJob job = await idrac.ExportScpFile(target, exportUse);
+                var load = new LoadWindow(server, job) { Title = server.Host };
+                load.Closed += (object sender, EventArgs e) =>
                 {
-                    item.IsChecked = false;
-                    item.IsEnabled = false;
-                }
+                    var window = (LoadWindow) sender;
+                    job = window.Job;
+                    if (job.JobState.Contains("Completed"))
+                        SaveFile(server, job);
+                };
+                load.Show();
+            }
+            catch (Exception ex)
+            {
+                OutputTextBox.AppendText("Falha ao exportar arquivo: " + ex.Message + "\n");
+                ExportButton.IsEnabled = true;
+            }           
+        }
+
+        private async void SaveFile(Server server, IdracJob job)
+        {
+            try
+            {
+                var idrac = new ScpController(server);
+                string file = await idrac.GetScpFileData(job.Id);
+                string currentTime = DateTime.Now.ToString().Replace(":", "").Replace("/", "").Replace(" ", "");
+                string downloadsFolder = KnownFolders.Downloads.Path;
+                string path = System.IO.Path.Combine(downloadsFolder, "SCP_" + currentTime + ".xml");
+                File.WriteAllText(path, file);
+                OutputTextBox.AppendText(string.Format("Arquivo exportado com sucesso, salvo em {0}\n", path));
+            }
+            catch (Exception ex)
+            {
+                OutputTextBox.AppendText(string.Format("Falha ao salvar arquivo {0}\n", ex.Message));
+            }
+            finally
+            {
+                ExportButton.IsEnabled = true;
             }
         }
 
-        private void AllCheckBox_Unchecked(object sender, RoutedEventArgs e)
+        private bool ValidateForm()
         {
-            foreach (CheckBox item in TargetGroup.Children)
+            if (ServerTextBox.Text.Trim().Equals(""))
             {
-                if (item.Content.ToString() != "ALL")
-                {
-                    item.IsEnabled = true;
-                }
+                MessageBox.Show("Informe o endereço do host", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
+                return false;
+            }
+            else if (UserTextBox.Text.Trim().Equals(""))
+            {
+                MessageBox.Show("Informe o usuario", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
+                return false;
+            }
+            else if (PasswordBox.Password.Trim().Equals(""))
+            {
+                MessageBox.Show("Informe a senha", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
+                return false;
+            }
+            else
+            {
+                return true;
             }
         }
+
+        private async Task<bool> CheckSupport(Server server)
+        {
+            var idrac = new ScpController(server);
+
+            if (!NetworkHelper.IsConnected(server.Host))
+            {
+                MessageBox.Show(string.Format("O servidor {0} não está acessivel, verifique a conexão e tente novamente", server.Host), "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
+                return false;
+            }
+
+            try
+            {
+                if (!await idrac.CheckRedfishSupport(ScpController.ExportSystemConfiguration))
+                {
+                    MessageBox.Show("A versão da Idrac desse servidor não possui suporte a função de export de arquivos SCP", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
+                    return false;
+                }
+            }
+            catch
+            {
+                MessageBox.Show("A versão da Idrac desse servidor não possui suporte a função de export de arquivos SCP", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
+                return false;
+            }
+
+            return true;                
+        }
+
     }
 }

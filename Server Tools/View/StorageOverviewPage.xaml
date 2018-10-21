@@ -124,8 +124,8 @@
                                 <TreeViewItem Name="PhysicalDisksItems" Header="Discos Fisicos" HorizontalAlignment="Left"/>
                             </TreeView>
                             <TextBlock Text="Status" HorizontalAlignment="Right" Grid.Row="2" Margin="5"/>
-                            <Button Content="Criar VD" Name="CreateVdButton" Grid.Row="3" Grid.Column="1" Margin="5" Width="100" Click="CreateVdButton_Click"/>
-                            <Button Content="Deletar VD" Name="DeleteVdButton" Grid.Row="3" Margin="5" Width="100" Click="DeleteVdButton_Click"/>
+                            <Button Content="Criar VD" Name="CreateVdButton" Grid.Row="3" Grid.Column="1" Margin="5"  Width="100" Height="30" Click="CreateVdButton_Click"/>
+                            <Button Content="Deletar VD" Name="DeleteVdButton" Grid.Row="3" Margin="5"  Width="100" Height="30" Click="DeleteVdButton_Click"/>
                         </Grid>
                     </GroupBox>
                 </TabItem>

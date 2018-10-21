@@ -62,7 +62,7 @@
                     </StackPanel>
                 </GroupBox>
             </StackPanel>
-            <Button Name="ExportButton" Content="Exportar Arquivo" Grid.Row="2" Grid.Column="2" Height="20" Width="150" HorizontalAlignment="Left" Click="ExportButton_Click" Margin="5" Background="#FF686868" Foreground="White" BorderBrush="#FFB8A9A9"/>
+            <Button Name="ExportButton" Content="Exportar Arquivo" Grid.Row="2" Grid.Column="2"  Width="100" Height="30" HorizontalAlignment="Left" Click="ExportButton_Click" Margin="5" Background="#FF686868" Foreground="White" BorderBrush="#FFB8A9A9"/>
             <TextBlock Text="Saida" Grid.Row="2" Margin="5" Width="Auto" HorizontalAlignment="Left" Foreground="White"/>
             <ScrollViewer Margin="5" HorizontalContentAlignment="Left"  HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" CanContentScroll="True" MaxWidth="650" BorderBrush="Transparent" Grid.Row="3" Grid.ColumnSpan="2">
                 <TextBox Name="OutputTextBox"  Height="200" TextWrapping="Wrap" IsReadOnly="True" BorderBrush="Black"  HorizontalScrollBarVisibility="Auto" Width="650" />

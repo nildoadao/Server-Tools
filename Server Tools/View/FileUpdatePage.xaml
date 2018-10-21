@@ -49,7 +49,7 @@
                     <RadioButton Content="NextReboot" GroupName="InstallOption" Background="White" Foreground="White"/>
                 </StackPanel>
             </GroupBox>
-            <Button Name="UpdateButton" Grid.Row="4" Content="Atualizar" Margin="5" Height="20" Width="150" HorizontalAlignment="Left" Click="UpdateButton_Click"/>
+            <Button Name="UpdateButton" Grid.Row="4" Content="Atualizar" Margin="5"  Width="100" Height="30" HorizontalAlignment="Left" Click="UpdateButton_Click"/>
             <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom">
                 <TextBlock Text="Arquivo: " Margin="5" Foreground="White"/>
                 <TextBox Name="FirmwareTextBox" Width="200" Margin="5"/>

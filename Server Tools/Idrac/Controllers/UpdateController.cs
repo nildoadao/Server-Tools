@@ -74,6 +74,7 @@ namespace Server_Tools.Idrac.Controllers
                 };
                 multipartContent.Add(fileContent);
                 request.Content = multipartContent;
+                
                 using (HttpResponseMessage response = await client.SendAsync(request))
                 {
                     if (!response.IsSuccessStatusCode)

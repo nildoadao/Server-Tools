@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +9,8 @@ namespace Server_Tools.Idrac.Models
 {
     public class Enclousure
     {
+        [JsonProperty("@odata.id")]
+        public string OdataId { get; set; }
         public string Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }

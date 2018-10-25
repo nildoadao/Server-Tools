@@ -76,7 +76,19 @@ namespace Server_Tools.View
 
         private void CreateVdButton_Click(object sender, RoutedEventArgs e)
         {
-            NavigationService.Navigate(new CreateRaidPage(disks, enclousures, server));
+            if (UnassignedDisksCount(disks) == 0)
+            {
+                MessageBox.Show("Não há discos sem designação para criar um Raid", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            var unassignedDisk = new List<PhysicalDisk>();
+            foreach(var item in disks)
+            {
+                if(item.Links.Volumes.Count == 0)
+                    unassignedDisk.Add(item);
+            }
+            NavigationService.Navigate(new CreateRaidPage(unassignedDisk, enclousures, server));
         }
 
         private void DeleteVdButton_Click(object sender, RoutedEventArgs e)
@@ -159,35 +171,11 @@ namespace Server_Tools.View
 
         private int UnassignedDisksCount(IEnumerable<PhysicalDisk> disks)
         {
-            int count = 0;
+            var unassigned = from item in disks
+                             where item.Links.Volumes.Count == 0
+                             select item;
 
-            if (disks == null)
-                return 0;
-
-            foreach(PhysicalDisk item in disks)
-            {
-                if (item.Links == null)
-                    count++;
-                else if (item.Links.Volumes.Count == 0)
-                    count++;
-            }
-            return count;
+            return unassigned.Count();
         }
-
-        private int VolumesCount(IEnumerable<PhysicalDisk> disks)
-        {
-            if (disks == null)
-                return 0;
-
-            int count = 0;
-            foreach(PhysicalDisk disk in disks)
-            {
-                if (disk.Links != null)
-                    count += disk.Links.Volumes.Count;
-            }
-            return count;
-        }
-
-
     }
 }

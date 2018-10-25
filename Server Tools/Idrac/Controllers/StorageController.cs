@@ -206,12 +206,12 @@ namespace Server_Tools.Idrac.Controllers
         /// <param name="stripeSize">Representa o OptimumIOSizeBytes</param>
         /// <param name="name">Nome do VD a ser criado</param>
         /// <returns>Job da operação</returns>
-        public async Task<IdracJob> CreateVirtualDisk(List<PhysicalDisk> disks, Enclousure enclousure, int level, int size, int stripeSize, string name)
+        public async Task<IdracJob> CreateVirtualDisk(List<PhysicalDisk> disks, Enclousure enclousure, string level, int size, int stripeSize, string name)
         {
             List<OdataObject> drives = new List<OdataObject>();
-            foreach(var disk in disks)
+            foreach (var disk in disks)
             {
-                drives.Add(new OdataObject { Id = disk.Id });
+                drives.Add(new OdataObject() { Id = disk.OdataId });
             }
             var content = new
             {
@@ -224,15 +224,15 @@ namespace Server_Tools.Idrac.Controllers
             var jsonContent = JsonConvert.SerializeObject(content);
             var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
             var idrac = new JobController(server);
-            return await idrac.CreateJob(string.Format("{0}{1}/{2}", baseUri, Controllers, enclousure.Name), httpContent);
+            return await idrac.CreateJob(string.Format("{0}{1}/Volumes", baseUri, enclousure.OdataId), httpContent);
         }
 
-        public async Task<IdracJob> CreateVirtualDisk(List<PhysicalDisk> disks, Enclousure enclousure, int level)
+        public async Task<IdracJob> CreateVirtualDisk(List<PhysicalDisk> disks, Enclousure enclousure, string level)
         {
             List<OdataObject> drives = new List<OdataObject>();
             foreach (var disk in disks)
             {
-                drives.Add(new OdataObject { Id = disk.Id });
+                drives.Add(new OdataObject() { Id = disk.OdataId });
             }
             var content = new
             {
@@ -242,16 +242,16 @@ namespace Server_Tools.Idrac.Controllers
             var jsonContent = JsonConvert.SerializeObject(content);
             var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
             var idrac = new JobController(server);
-            return await idrac.CreateJob(string.Format("{0}{1}/{2}", baseUri, Controllers, enclousure.Name), httpContent);
+            return await idrac.CreateJob(string.Format("{0}{1}/Volumes", baseUri, enclousure.OdataId), httpContent);
         }
 
 
-        public async Task<IdracJob> CreateVirtualDisk(List<PhysicalDisk> disks, Enclousure enclousure, int level, string name)
+        public async Task<IdracJob> CreateVirtualDisk(List<PhysicalDisk> disks, Enclousure enclousure, string level, string name)
         {
             List<OdataObject> drives = new List<OdataObject>();
             foreach (var disk in disks)
             {
-                drives.Add(new OdataObject { Id = disk.Id });
+                drives.Add(new OdataObject() { Id = disk.OdataId });
             }
             var content = new
             {
@@ -262,7 +262,7 @@ namespace Server_Tools.Idrac.Controllers
             var jsonContent = JsonConvert.SerializeObject(content);
             var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
             var idrac = new JobController(server);
-            return await idrac.CreateJob(string.Format("{0}{1}/{2}", baseUri, Controllers, enclousure.Name), httpContent);
+            return await idrac.CreateJob(string.Format("{0}{1}/Volumes", baseUri, enclousure.OdataId), httpContent);
         }
 
         /// <summary>
@@ -274,7 +274,7 @@ namespace Server_Tools.Idrac.Controllers
         {
             var httpContent = new StringContent("", Encoding.UTF8, "application/json");
             var idrac = new JobController(server);
-            return await idrac.CreateJob(baseUri + virtualDisk.Id, httpContent, HttpMethod.Delete);
+            return await idrac.CreateJob(baseUri + virtualDisk.OdataId.Id, HttpMethod.Delete);
         }
     }
 }

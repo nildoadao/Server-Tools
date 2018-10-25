@@ -90,46 +90,23 @@ namespace Server_Tools.View
 
         private void ImportButton_Click(object sender, RoutedEventArgs e)
         {
-            if(ServersListBox.Items.Count == 0)
-            {
-                MessageBox.Show("Selecione ao menos um servidor para aplicar o template", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
-                return;
-            }
-            foreach(Server server in ServersListBox.Items)
-            {
-                ImportScp(server);
-            }
-        }
-
-        private async void ImportScp(Server server)
-        {
-            if (!await CheckSupport(server))
-                return;
-
-            ScpController idrac = new ScpController(server);
-            OutputTextBox.AppendText(string.Format("Importando configurações para {0}...\n", server.Host));
             string target = "";
+
             if (AllCheckBox.IsChecked.Value)
-            {
                 target = "ALL";
-            }
+
             else
             {
                 bool first = true;
                 foreach (CheckBox item in TargetGroup.Children)
                 {
-                    if (item.IsChecked.Value)
+                    if (item.IsChecked.Value && first)
                     {
-                        if (first)
-                        {
-                            target += item.Content.ToString();
-                            first = false;
-                        }
-                        else
-                        {
-                            target += string.Format(", {0}", item.Content.ToString());
-                        }
+                        target += item.Content.ToString();
+                        first = false;
                     }
+                    else if (item.IsChecked.Value)
+                        target += string.Format(", {0}", item.Content.ToString());
                 }
             }
             string shutdown = "";
@@ -141,8 +118,23 @@ namespace Server_Tools.View
                     break;
                 }
             }
+            foreach (Server server in ServersListBox.Items)
+            {
+                ImportScp(server, target, shutdown);
+            }
+        }
+
+        private async void ImportScp(Server server, string target, string shutdown)
+        {
+            if (!NetworkHelper.IsConnected(server.Host))
+            {
+                MessageBox.Show("Servidor inacessivel", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            ScpController idrac = new ScpController(server);           
             try
             {
+                OutputTextBox.AppendText(string.Format("Importando configurações para {0}...\n", server.Host));
                 IdracJob job = await idrac.ImportScpFile(FileTextBox.Text, target, shutdown, "On");
                 OutputTextBox.AppendText(string.Format("Job {0} criado para servidor {1} \n", job.Id, server));
                 jobQueue.Add(new ServerJob { Server = server, Job = job });
@@ -196,6 +188,11 @@ namespace Server_Tools.View
                 MessageBox.Show("Selecione um arquivo", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
                 return false;
             }
+            else if (ServersListBox.Items.Count == 0)
+            {
+                MessageBox.Show("Selecione ao menos um servidor para aplicar o template", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
+                return false;
+            }
             else
             {
                 return true;
@@ -219,9 +216,7 @@ namespace Server_Tools.View
             foreach (CheckBox item in TargetGroup.Children)
             {
                 if (item.Content.ToString() != "ALL")
-                {
                     item.IsEnabled = true;
-                }
             }
         }
 
@@ -236,33 +231,6 @@ namespace Server_Tools.View
             }
             jobQueue = updatedJobs;
             JobsDataGrid.ItemsSource = jobQueue;
-        }
-
-        private async Task<bool> CheckSupport(Server server)
-        {
-            var idrac = new ScpController(server);
-
-            if (!NetworkHelper.IsConnected(server.Host))
-            {
-                MessageBox.Show(string.Format("O servidor {0} não está acessivel, verifique a conexão e tente novamente", server.Host), "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
-                return false;
-            }
-
-            try
-            {
-                if (!await idrac.CheckRedfishSupport(ScpController.ImportSystemConfiguration))
-                {
-                    MessageBox.Show("A versão da Idrac desse servidor não possui suporte a função de import de arquivos SCP", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
-                    return false;
-                }
-            }
-            catch 
-            {
-                MessageBox.Show("A versão da Idrac desse servidor não possui suporte a função de import de arquivos SCP", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
-                return false;
-            }
-
-            return true;
         }
     }
 }

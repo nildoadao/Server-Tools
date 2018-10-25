@@ -47,48 +47,40 @@ namespace Server_Tools.View
             foreach (CheckBox item in TargetGroup.Children)
             {
                 if (item.Content.ToString() != "ALL")
-                {
                     item.IsEnabled = true;
-                }
             }
         }
 
         private void ExportButton_Click(object sender, RoutedEventArgs e)
         {
             if (!ValidateForm())
-            {
                 return;
-            }
+
             string target = "";
 
             if (AllCheckBox.IsChecked.Value)
-            {
                 target = "ALL";
-            }
             else
             {
                 bool first = true;
                 foreach (CheckBox item in TargetGroup.Children)
                 {
-                    if (item.IsChecked.Value)
+                    if (item.IsChecked.Value && first)
                     {
-                        if (first)
-                        {
-                            target += item.Content.ToString();
-                            first = false;
-                        }
-                        else
-                        {
-                            target += string.Format(", {0}", item.Content.ToString());
-                        }
+                        target += item.Content.ToString();
+                        first = false;
                     }
-                }
-                if (target.Equals(""))
-                {
-                    MessageBox.Show("Selecione uma opção de Export", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
-                    return;
+                    else if(item.IsChecked.Value)
+                        target += string.Format(", {0}", item.Content.ToString());                   
                 }
             }
+
+            if (String.IsNullOrEmpty(target))
+            {
+                MessageBox.Show("Selecione uma opção de Export", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
             string exportUse = "";
             foreach (RadioButton item in ExportUseGroup.Children)
             {
@@ -98,21 +90,22 @@ namespace Server_Tools.View
                     break;
                 }
             }
-            ExportScpFile(target, exportUse);
+            Server server = new Server(ServerTextBox.Text, UserTextBox.Text, PasswordBox.Password);
+            ExportScpFile(server, target, exportUse);
         }
 
-        private async void ExportScpFile(string target, string exportUse)
+        private async void ExportScpFile(Server server, string target, string exportUse)
         {
-            Server server = new Server(ServerTextBox.Text, UserTextBox.Text, PasswordBox.Password);
-
-            if (!await CheckSupport(server))
+            if (!NetworkHelper.IsConnected(server.Host))
+            {
+                MessageBox.Show("Servidor inacessivel", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
-
-            ExportButton.IsEnabled = false;
+            }
             ScpController idrac = new ScpController(server);
-            OutputTextBox.AppendText(string.Format("Exportando configurações de {0}...\n", server.Host));
             try
             {
+                ExportButton.IsEnabled = false;
+                OutputTextBox.AppendText(string.Format("Exportando configurações de {0}...\n", server.Host));
                 IdracJob job = await idrac.ExportScpFile(target, exportUse);
                 var load = new LoadWindow(server, job) { Title = server.Host };
                 load.Closed += (object sender, EventArgs e) =>
@@ -126,7 +119,7 @@ namespace Server_Tools.View
             }
             catch (Exception ex)
             {
-                OutputTextBox.AppendText("Falha ao exportar arquivo: " + ex.Message + "\n");
+                OutputTextBox.AppendText(string.Format("Falha ao exportar arquivo: {0}\n", ex.Message));
                 ExportButton.IsEnabled = true;
             }           
         }
@@ -175,33 +168,5 @@ namespace Server_Tools.View
                 return true;
             }
         }
-
-        private async Task<bool> CheckSupport(Server server)
-        {
-            var idrac = new ScpController(server);
-
-            if (!NetworkHelper.IsConnected(server.Host))
-            {
-                MessageBox.Show(string.Format("O servidor {0} não está acessivel, verifique a conexão e tente novamente", server.Host), "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
-                return false;
-            }
-
-            try
-            {
-                if (!await idrac.CheckRedfishSupport(ScpController.ExportSystemConfiguration))
-                {
-                    MessageBox.Show("A versão da Idrac desse servidor não possui suporte a função de export de arquivos SCP", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
-                    return false;
-                }
-            }
-            catch
-            {
-                MessageBox.Show("A versão da Idrac desse servidor não possui suporte a função de export de arquivos SCP", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
-                return false;
-            }
-
-            return true;                
-        }
-
     }
 }

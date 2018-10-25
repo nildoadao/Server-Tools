@@ -55,8 +55,8 @@ namespace Server_Tools.View
                 return;
 
             var selectedDisks = from item in datagridItems
-                            where item.IsSelected
-                            select item.Disk;
+                                where item.IsSelected
+                                select item.Disk;
 
             var raidDisks = new List<PhysicalDisk>();
 
@@ -65,9 +65,9 @@ namespace Server_Tools.View
                 raidDisks.Add(disk);
             }
 
-            int level = (int) RaidCombobox.SelectedItem;
+            var level = (RaidLevel) RaidCombobox.SelectedItem;
             Enclousure enclousure = (Enclousure) ControllersCombobox.SelectedItem;
-            CreateRaid(raidDisks, enclousure, level);
+            CreateRaid(raidDisks, enclousure, level.ToString());
         }
 
         private void PopulateRaidCombobox()
@@ -103,9 +103,9 @@ namespace Server_Tools.View
                                 where disk.IsSelected
                                 select disk;
 
-            if(selectedDisks.Count() <= 1)
+            if(selectedDisks.Count() <= 0)
             {
-                MessageBox.Show("É preciso selecionar ao menos dois discos para criar um Raid", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("É preciso selecionar ao menos um disco para criar um Raid", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
                 return false;
             }
             else if (ControllersCombobox.SelectedIndex == -1)
@@ -121,7 +121,7 @@ namespace Server_Tools.View
             return true;
         }
 
-        public async void CreateRaid(List<PhysicalDisk> disks, Enclousure enclousure, int level)
+        public async void CreateRaid(List<PhysicalDisk> disks, Enclousure enclousure, string level)
         {
             var idrac = new StorageController(server);
             try

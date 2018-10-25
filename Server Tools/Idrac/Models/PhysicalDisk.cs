@@ -6,6 +6,8 @@ namespace Server_Tools.Idrac.Models
 {
     public class PhysicalDisk
     {
+        [JsonProperty("@odata.id")]
+        public string OdataId { get; set; }
         public string Id { get; set; }
         public long CapacityBytes { get; set; }
         public string Manufacturer { get; set; }

@@ -11,7 +11,7 @@ namespace Server_Tools.Util
 
         #region Parametros default
 
-        private const string USER_AGENT = "Server Tools";
+        private const string USER_AGENT = "Server_Tools";
 
         #endregion
 
@@ -31,8 +31,10 @@ namespace Server_Tools.Util
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Ssl3;
             ServicePointManager.ServerCertificateValidationCallback += (sender, certificate, chain, sslPolicyErrors) => true;
             _client = new HttpClient();
-            //_client.DefaultRequestHeaders.ExpectContinue = false;
+            //_client.DefaultRequestHeaders.ExpectContinue = true;
             _client.DefaultRequestHeaders.Add("User-Agent", USER_AGENT);
+            _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("*/*"));
+            _client.DefaultRequestHeaders.Connection.Add("keep-alive");
         }
 
         public static AuthenticationHeaderValue GetCredentialHeader(string user, string password)

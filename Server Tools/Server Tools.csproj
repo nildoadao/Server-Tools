@@ -110,6 +110,7 @@
     <Compile Include="Idrac\Models\Enclousure.cs" />
     <Compile Include="Idrac\Models\PhysicalDisk.cs" />
     <Compile Include="Idrac\Models\RaidController.cs" />
+    <Compile Include="Idrac\Models\RaidLevel.cs" />
     <Compile Include="Idrac\Models\VirtualDisk.cs" />
     <Compile Include="Idrac\Models\OdataObject.cs" />
     <Compile Include="Idrac\Models\ServerJob.cs" />

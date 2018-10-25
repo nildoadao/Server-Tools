@@ -53,9 +53,9 @@ namespace Server_Tools.View
                 MessageBox.Show("Servidor inacessivel", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
-            var idrac = new StorageController(server);
             try
             {
+                var idrac = new StorageController(server);
                 if (await idrac.CheckRedfishSupport(StorageController.Controllers) == false)
                 {
                     MessageBox.Show(string.Format("O servidor {0} não suporta a API Redfish", server), "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);

@@ -26,22 +26,32 @@ namespace Server_Tools.Idrac.Controllers
         /// <returns>String contendo o Job Id</returns>
         public async Task<IdracJob> CreateJob(string uri, HttpContent content)
         {
-            return await CreateJob(uri, content, HttpMethod.Post);
-        }
-
-        /// <summary>
-        /// Cria um Job na Idrac
-        /// </summary>
-        /// <param name="uri">String contento o enderço do recurso</param>
-        /// <param name="content">Conteudo Http da requisição</param>
-        /// <param name="method">Metodo Http usado</param>
-        /// <returns>Um objeto IdracJob</returns>
-        public async Task<IdracJob> CreateJob(string uri, HttpContent content, HttpMethod method)
-        {
-            using (var request = new HttpRequestMessage(method, uri))
+            using (var request = new HttpRequestMessage(HttpMethod.Post, uri))
             {
                 request.Headers.Authorization = credentials;
                 request.Content = content;
+                using (var response = await client.SendAsync(request))
+                {
+                    if (!response.IsSuccessStatusCode)
+                        throw new HttpRequestException(string.Format("Falha ao criar Job: {0}", response.ReasonPhrase));
+
+                    string location = response.Headers.Location.ToString();
+                    return await GetResource<IdracJob>(baseUri + location);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Cria um Job para requisições que não precisam de conteudo.
+        /// </summary>
+        /// <param name="uri">Uri do recurso</param>
+        /// <param name="method">Método HTTP da requisição</param>
+        /// <returns></returns>
+        public async Task<IdracJob> CreateJob(string uri, HttpMethod method)
+        {
+            using (var request = new HttpRequestMessage(method, uri))
+            {
+                request.Headers.Authorization = credentials;;
                 using (var response = await client.SendAsync(request))
                 {
                     if (!response.IsSuccessStatusCode)

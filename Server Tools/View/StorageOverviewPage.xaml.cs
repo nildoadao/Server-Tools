@@ -93,7 +93,12 @@ namespace Server_Tools.View
 
         private void DeleteVdButton_Click(object sender, RoutedEventArgs e)
         {
-
+            if(virtualDisks == null || virtualDisks.Count() == 0)
+            {
+                MessageBox.Show("Não há volumes a serem removidos", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+            NavigationService.Navigate(new DeleteRaidPage(server));
         }
 
         private async void GetStorageData()
@@ -171,6 +176,9 @@ namespace Server_Tools.View
 
         private int UnassignedDisksCount(IEnumerable<PhysicalDisk> disks)
         {
+            if (disks == null)
+                return 0;
+
             var unassigned = from item in disks
                              where item.Links.Volumes.Count == 0
                              select item;

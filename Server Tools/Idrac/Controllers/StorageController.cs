@@ -227,6 +227,13 @@ namespace Server_Tools.Idrac.Controllers
             return await idrac.CreateJob(string.Format("{0}{1}/Volumes", baseUri, enclousure.OdataId), httpContent);
         }
 
+        /// <summary>
+        /// Cria um disco virtual
+        /// </summary>
+        /// <param name="disks">Lista de discos fisicos</param>
+        /// <param name="enclousure">Enclousure responsável pelos discos</param>
+        /// <param name="level">Nivel de Raid</param>
+        /// <returns></returns>
         public async Task<IdracJob> CreateVirtualDisk(List<PhysicalDisk> disks, Enclousure enclousure, string level)
         {
             List<OdataObject> drives = new List<OdataObject>();
@@ -245,7 +252,14 @@ namespace Server_Tools.Idrac.Controllers
             return await idrac.CreateJob(string.Format("{0}{1}/Volumes", baseUri, enclousure.OdataId), httpContent);
         }
 
-
+        /// <summary>
+        /// Cria um disco virtual
+        /// </summary>
+        /// <param name="disks">Lsta de discos fisicos</param>
+        /// <param name="enclousure">Enclousure resposavel pelos discos</param>
+        /// <param name="level">Nivel de Raid</param>
+        /// <param name="name">Nome do disco virtual</param>
+        /// <returns></returns>
         public async Task<IdracJob> CreateVirtualDisk(List<PhysicalDisk> disks, Enclousure enclousure, string level, string name)
         {
             List<OdataObject> drives = new List<OdataObject>();
@@ -272,7 +286,6 @@ namespace Server_Tools.Idrac.Controllers
         /// <returns>Job de exclusão do VD</returns>
         public async Task<IdracJob> DeleteVirtualDisk(VirtualDisk virtualDisk)
         {
-            var httpContent = new StringContent("", Encoding.UTF8, "application/json");
             var idrac = new JobController(server);
             return await idrac.CreateJob(baseUri + virtualDisk.OdataId.Id, HttpMethod.Delete);
         }

@@ -16,6 +16,7 @@ namespace Server_Tools.Idrac.Models
         public long BlockSizeBytes { get; set; }
         public long CapacityBytes { get; set; }
         public long OptimumIOSizeBytes { get; set; }
+        public string VolumeType { get; set; }
         public VolumeLink Links { get; set; }
 
         public class VolumeLink

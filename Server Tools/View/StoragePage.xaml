@@ -6,7 +6,7 @@
       xmlns:local="clr-namespace:Server_Tools.View"
       mc:Ignorable="d" 
       d:DesignHeight="600" d:DesignWidth="800"
-      Title="StoragePage">
+      Title="StoragePage" KeyDown="Page_KeyDown">
 
     <Grid HorizontalAlignment="Center" VerticalAlignment="Top">
         <Grid.ColumnDefinitions>

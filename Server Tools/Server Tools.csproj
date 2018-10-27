@@ -122,6 +122,9 @@
     <Compile Include="View\CustomScriptPage.xaml.cs">
       <DependentUpon>CustomScriptPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\DeleteRaidPage.xaml.cs">
+      <DependentUpon>DeleteRaidPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\FileUpdatePage.xaml.cs">
       <DependentUpon>FileUpdatePage.xaml</DependentUpon>
     </Compile>
@@ -162,6 +165,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\CustomScriptPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\DeleteRaidPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

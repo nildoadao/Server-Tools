@@ -20,6 +20,7 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
@@ -29,14 +30,19 @@
             <TextBlock Text="Controladora" Foreground="White" Grid.Row="1" Margin="5" HorizontalAlignment="Right"/>
             <ComboBox Name="ControllersCombobox" Grid.Row="1" Grid.Column="1" Margin="5" HorizontalAlignment="Left" MinWidth="150"/>
             <TextBlock Text="Nome" Foreground="White" Grid.Row="2" Margin="5" HorizontalAlignment="Right"/>
-            <TextBox Name="VdNameTextBox" Grid.Row="2" Grid.Column="1" Margin="5" HorizontalAlignment="Left" Width="150"/>
+            <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal">
+                <TextBox Name="VdNameTextBox" Margin="5" HorizontalAlignment="Left" Width="150"/>
+                <CheckBox Name="VdNameCheckBox" Margin="5" Click="VdNameCheckBox_Click"/>
+            </StackPanel>
             <TextBlock Text="Raid" Foreground="White" Grid.Row="3" Margin="5" HorizontalAlignment="Right"/>
             <ComboBox Name="RaidCombobox" Grid.Row="3" Grid.Column="1" Margin="5" HorizontalAlignment="Left" MinWidth="100"/>
-            <TextBlock Text="CapacityBytes" Foreground="White" Grid.Row="4" Margin="5" HorizontalAlignment="Right"/>
-            <TextBox Name="CapacityBytesTextBox" Grid.Row="4" Grid.Column="1" Margin="5" HorizontalAlignment="Left" Width="150"/>
-            <TextBlock Text="OptimumIOSizeBytes" Foreground="White" Grid.Row="5" Margin="5" HorizontalAlignment="Right"/>
-            <TextBox Name="OptimumIOSizeTextBox" Grid.Row="5" Grid.Column="1" Margin="5" HorizontalAlignment="Left" Width="150"/>
-            <DataGrid Name="DiskDataGrid" Grid.Row="6" Grid.ColumnSpan="2" Margin="5" MinWidth="400" MaxWidth="400" MaxHeight="400" AutoGenerateColumns="False" CanUserAddRows="False">
+            <TextBlock Text="Parâmetros Opcionais" Grid.Row="5" Margin="5" Foreground="White" HorizontalAlignment="Right"/>
+            <CheckBox Name="OptionalCheckBox" Grid.Row="5" Grid.Column="1" Margin="5" HorizontalAlignment="Left" Click="OptionalCheckBox_Click"/>
+            <TextBlock Text="CapacityBytes" Foreground="White" Grid.Row="6" Margin="5" HorizontalAlignment="Right"/>
+            <TextBox Name="CapacityBytesTextBox" Grid.Row="6" Grid.Column="1" Margin="5" HorizontalAlignment="Left" Width="150"/>
+            <TextBlock Text="OptimumIOSizeBytes" Foreground="White" Grid.Row="7" Margin="5" HorizontalAlignment="Right"/>
+            <TextBox Name="OptimumIOSizeTextBox" Grid.Row="7" Grid.Column="1" Margin="5" HorizontalAlignment="Left" Width="150"/>
+            <DataGrid Name="DiskDataGrid" Grid.Row="8" Grid.ColumnSpan="2" Margin="5" MinWidth="400" MaxWidth="400" MaxHeight="400" AutoGenerateColumns="False" CanUserAddRows="False">
                 <DataGrid.Columns>
                     <DataGridCheckBoxColumn Header="Selecionar" Binding="{Binding IsSelected}"/>
                     <DataGridTextColumn Header="Disco" Binding="{Binding Disk.Name}"/>
@@ -44,7 +50,7 @@
                     <DataGridTextColumn Header="Modelo" Binding="{Binding Disk.Model}"/>
                 </DataGrid.Columns>
             </DataGrid>
-            <Button Name="CreateButton" Content="Criar Raid" Grid.Row="7" Grid.Column="1" Margin="5" Width="100" Height="30" HorizontalAlignment="Right" Click="CreateButton_Click"/>
+            <Button Name="CreateButton" Content="Criar Raid" Grid.Row="9" Grid.Column="1" Margin="5" Width="100" Height="30" HorizontalAlignment="Right" Click="CreateButton_Click"/>
         </Grid>
     </ScrollViewer>
 </Page>

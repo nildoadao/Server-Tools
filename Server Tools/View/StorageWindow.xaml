@@ -7,17 +7,18 @@
         mc:Ignorable="d"
         Title="StorageWindow" Height="600" Width="800" Background="#FF3E3E42">
     <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
         <ControlTemplate x:Key="NavigationTemplate" TargetType="Frame">
             <DockPanel Margin="10">
                 <StackPanel Margin="5" Orientation="Horizontal" DockPanel.Dock="Top">
-                    <Button Command="{x:Static NavigationCommands.BrowseBack}" IsEnabled="{TemplateBinding CanGoBack}" Height="Auto" Width="Auto" Background="Transparent" BorderBrush="Transparent">
+                    <Button Name="BackButton" Command="{x:Static NavigationCommands.BrowseBack}" Visibility="{TemplateBinding CanGoBack, Converter={StaticResource BoolToVis}}" Height="Auto" Width="Auto" Background="#00808080" BorderBrush="Transparent" Foreground="#00808080">
                         <Image  Width="30" Source="/Server Tools;component/Resources/back.png"/>
                     </Button>
-                    <Button Command="{x:Static NavigationCommands.BrowseForward}" IsEnabled="{TemplateBinding CanGoForward}" Height="Auto" Width="Auto" Background="Transparent" BorderBrush="Transparent">
+                    <Button Name="FowardButton"  Command="{x:Static NavigationCommands.BrowseForward}" Visibility="{TemplateBinding CanGoForward, Converter={StaticResource BoolToVis}}" Height="Auto" Width="Auto" Background="#00000000" BorderBrush="Transparent" Foreground="Transparent">
                         <Image  Width="30" Source="/Server Tools;component/Resources/forward.png"/>
                     </Button>
                 </StackPanel>
-                <Border BorderBrush="CadetBlue" Margin="7" BorderThickness="5" Padding="5" CornerRadius="5">
+                <Border BorderBrush="CadetBlue" Margin="7" BorderThickness="1" Padding="5" CornerRadius="5">
                     <ContentPresenter />
                 </Border>
             </DockPanel>

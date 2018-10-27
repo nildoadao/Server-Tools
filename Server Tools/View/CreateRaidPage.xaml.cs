@@ -44,6 +44,9 @@ namespace Server_Tools.View
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
+            CapacityBytesTextBox.IsEnabled = false;
+            OptimumIOSizeTextBox.IsEnabled = false;
+            VdNameTextBox.IsEnabled = false;
             PopulateControllersCombobox();
             PopulateRaidCombobox();
             PopulateDataGrid();
@@ -67,7 +70,40 @@ namespace Server_Tools.View
 
             var level = (RaidLevel) RaidCombobox.SelectedItem;
             Enclousure enclousure = (Enclousure) ControllersCombobox.SelectedItem;
-            CreateRaid(raidDisks, enclousure, level.ToString());
+            string name = VdNameTextBox.Text;
+            int capacity = 0;
+            int optimal = 0;
+            try
+            {
+                capacity = int.Parse(CapacityBytesTextBox.Text);
+                optimal = int.Parse(OptimumIOSizeTextBox.Text);
+            }
+            catch
+            {
+                MessageBox.Show("Valores invalidos para Capacity Bytes e Optimal IO.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                return;
+            }
+
+            if (VdNameCheckBox.IsChecked.Value)
+            {
+                if (OptionalCheckBox.IsChecked.Value)
+                    CreateRaid(raidDisks, enclousure, level.ToString(), name, capacity, optimal);
+                else
+                    CreateRaid(raidDisks, enclousure, level.ToString(), name);
+            }
+            else
+                CreateRaid(raidDisks, enclousure, level.ToString());
+        }
+
+        private void OptionalCheckBox_Click(object sender, RoutedEventArgs e)
+        {
+            CapacityBytesTextBox.IsEnabled = OptionalCheckBox.IsChecked.Value;
+            OptimumIOSizeTextBox.IsEnabled = OptionalCheckBox.IsChecked.Value;
+        }
+
+        private void VdNameCheckBox_Click(object sender, RoutedEventArgs e)
+        {
+            VdNameTextBox.IsEnabled = VdNameCheckBox.IsChecked.Value;
         }
 
         private void PopulateRaidCombobox()
@@ -118,6 +154,16 @@ namespace Server_Tools.View
                 MessageBox.Show("Selecione um nivel de Raid", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
                 return false;
             }
+            else if(VdNameCheckBox.IsChecked.Value && String.IsNullOrEmpty(VdNameTextBox.Text))
+            {
+                MessageBox.Show("Informe o nome do VD", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
+                return false;
+            }
+            else if (OptionalCheckBox.IsChecked.Value && (String.IsNullOrEmpty(OptimumIOSizeTextBox.Text) || (String.IsNullOrEmpty(CapacityBytesTextBox.Text))))
+            {
+                MessageBox.Show("Informe os parametros opcionais", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
+                return false;
+            }
             return true;
         }
 
@@ -138,6 +184,50 @@ namespace Server_Tools.View
                 load.Show();
             }
             catch(Exception ex)
+            {
+                MessageBox.Show(string.Format("Falha ao criar o Job {0}", ex.Message), "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        public async void CreateRaid(List<PhysicalDisk> disks, Enclousure enclousure, string level, string name)
+        {
+            var idrac = new StorageController(server);
+            try
+            {
+                IdracJob job = await idrac.CreateVirtualDisk(disks, enclousure, level, name);
+                var load = new LoadWindow(server, job) { Title = server.Host };
+                load.Closed += (object sender, EventArgs e) =>
+                {
+                    var window = (LoadWindow)sender;
+                    job = window.Job;
+                    if (job.JobState.Contains("Completed"))
+                        MessageBox.Show("Raid criado com sucesso !", "Sucesso", MessageBoxButton.OK, MessageBoxImage.Information);
+                };
+                load.Show();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(string.Format("Falha ao criar o Job {0}", ex.Message), "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        public async void CreateRaid(List<PhysicalDisk> disks, Enclousure enclousure, string level, string name, int capacity, int optimal)
+        {
+            var idrac = new StorageController(server);
+            try
+            {
+                IdracJob job = await idrac.CreateVirtualDisk(disks, enclousure, level);
+                var load = new LoadWindow(server, job) { Title = server.Host };
+                load.Closed += (object sender, EventArgs e) =>
+                {
+                    var window = (LoadWindow)sender;
+                    job = window.Job;
+                    if (job.JobState.Contains("Completed"))
+                        MessageBox.Show("Raid criado com sucesso !", "Sucesso", MessageBoxButton.OK, MessageBoxImage.Information);
+                };
+                load.Show();
+            }
+            catch (Exception ex)
             {
                 MessageBox.Show(string.Format("Falha ao criar o Job {0}", ex.Message), "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
             }

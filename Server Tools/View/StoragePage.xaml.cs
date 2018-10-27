@@ -36,6 +36,17 @@ namespace Server_Tools.View
             Connect(server);         
         }
 
+        private void Page_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                if (!ValidateForm())
+                    return;
+                var server = new Server(ServerTextBox.Text, UserTextBox.Text, PasswordBox.Password);
+                Connect(server);
+            }
+        }
+
         private bool ValidateForm()
         {
             if(String.IsNullOrEmpty(ServerTextBox.Text) | String.IsNullOrEmpty(UserTextBox.Text) | String.IsNullOrEmpty(PasswordBox.Password))
@@ -75,5 +86,7 @@ namespace Server_Tools.View
         {
             NavigationService.Navigate(new HomePage());
         }
+
+
     }
 }

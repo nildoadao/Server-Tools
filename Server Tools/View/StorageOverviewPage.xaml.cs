@@ -24,10 +24,6 @@ namespace Server_Tools.View
     public partial class StorageOverviewPage : Page
     {
         private Server server;
-        private List<PhysicalDisk> disks;
-        private List<Enclousure> enclousures;
-        private List<RaidController> controllers;
-        private List<VirtualDisk> virtualDisks;
 
         public StorageOverviewPage(Server server)
         {
@@ -38,7 +34,7 @@ namespace Server_Tools.View
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            GetStorageData();
+            UpdateForm();
         }
 
         private void OverviewButton_Click(object sender, RoutedEventArgs e)
@@ -76,101 +72,89 @@ namespace Server_Tools.View
 
         private void CreateVdButton_Click(object sender, RoutedEventArgs e)
         {
-            if (UnassignedDisksCount(disks) == 0)
-            {
-                MessageBox.Show("Não há discos sem designação para criar um Raid", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
-                return;
-            }
-
-            var unassignedDisk = new List<PhysicalDisk>();
-            foreach(var item in disks)
-            {
-                if(item.Links.Volumes.Count == 0)
-                    unassignedDisk.Add(item);
-            }
-            NavigationService.Navigate(new CreateRaidPage(unassignedDisk, enclousures, server));
+            NavigationService.Navigate(new CreateRaidPage(server));
         }
 
         private void DeleteVdButton_Click(object sender, RoutedEventArgs e)
         {
-            if(virtualDisks == null || virtualDisks.Count() == 0)
-            {
-                MessageBox.Show("Não há volumes a serem removidos", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
-                return;
-            }
             NavigationService.Navigate(new DeleteRaidPage(server));
-        }
-
-        private async void GetStorageData()
-        {
-            try
-            {
-                var idrac = new StorageController(server);
-                disks = await idrac.GetAllPhysicalDisks();
-                enclousures = await idrac.GetAllEnclousures();
-                controllers = await idrac.GetAllRaidControllers();
-                virtualDisks = await idrac.GetAllVirtualDisks();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(string.Format("Falha ao ler dados de Storage: {0}", ex.Message), "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-            finally
-            {
-                UpdateForm();
-            }
         }
       
         private void UpdateForm()
         {
-            PhysicalDiskDatagrid.ItemsSource = disks;
-            PopulateDiskGroupBox();
-            PopulateControllerGroupBox();
-            PopulateVirtualDiskGroupBox();
+            UpdateDisks();
+            UpdateControllers();
+            UpdateVirtualDisks();
         }
 
-        private void PopulateDiskGroupBox()
+        private async void UpdateDisks()
         {
-            ServerTextBlock.Text = server.Host;
-            PhysicalDiskCountTextBlock.Text = (disks == null) ? "Desconhecido" : disks.Count.ToString();
-            UnassignedDiskCountTextBlock.Text = (disks == null) ? "Desconhecido" : UnassignedDisksCount(disks).ToString();
-            VirtualDiskCountTextBlock.Text = (disks == null) ? "Desconhecido" : virtualDisks.Count.ToString();
-        }
-
-        private void PopulateControllerGroupBox()
-        {
-            if (controllers == null)
-                return;
-
-            ControllersComboBox.Items.Clear();
-            foreach(RaidController controller in controllers)
+            try
             {
-                ControllersComboBox.Items.Add(controller);
+                var idrac = new StorageController(server);
+                List<PhysicalDisk> disks = await idrac.GetAllPhysicalDisks();
+                PhysicalDiskDatagrid.ItemsSource = disks;
+                ServerTextBlock.Text = server.Host;
+                PhysicalDiskCountTextBlock.Text = disks.Count.ToString();
+                UnassignedDiskCountTextBlock.Text = UnassignedDisksCount(disks).ToString();               
+            }
+            catch
+            {
+                MessageBox.Show("Falha ao receber os dados de disco do servidor", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-        private void PopulateVirtualDiskGroupBox()
+        private async void UpdateControllers()
         {
-            if (virtualDisks == null)
-                return;
-
-            VirtualDisksComboBox.Items.Clear();
-            foreach(VirtualDisk item in virtualDisks)
+            try
             {
-                VirtualDisksComboBox.Items.Add(item);
+                var idrac = new StorageController(server);
+                ControllersComboBox.Items.Clear();
+                foreach (RaidController controller in await idrac.GetAllRaidControllers())
+                {
+                    ControllersComboBox.Items.Add(controller);
+                }
+            }
+            catch
+            {
+                MessageBox.Show("Falha ao receber os dados de controladoras do servidor", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private async void UpdateVirtualDisks()
+        {
+            try
+            {
+                var idrac = new StorageController(server);
+                VirtualDisksComboBox.Items.Clear();
+                List<VirtualDisk> volumes = await idrac.GetAllVirtualDisks();
+                foreach (VirtualDisk item in volumes)
+                {
+                    VirtualDisksComboBox.Items.Add(item);
+                }
+                VirtualDiskCountTextBlock.Text = volumes.Count.ToString();
+            }
+            catch
+            {
+                MessageBox.Show("Falha ao receber os dados de volumes do servidor", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
         
-        private async void LoadPhysicalDisks(VirtualDisk virtualDisk)
+        private async void LoadPhysicalDisks(VirtualDisk volume)
         {
-            if (virtualDisk == null)
-                return;
-
-            var idrac = new StorageController(server);
-            PhysicalDisksItems.Items.Clear();
-            foreach (PhysicalDisk item in await idrac.GetPhysicalDisks(virtualDisk))
+            try
             {
-                PhysicalDisksItems.Items.Add(item);
+                var idrac = new StorageController(server);
+                PhysicalDisksItems.Items.Clear();
+                List<PhysicalDisk> disks = await idrac.GetPhysicalDisks(volume);
+                foreach (PhysicalDisk item in disks)
+                {
+                    PhysicalDisksItems.Items.Add(item);
+                }
+            }
+            catch
+            {
+                MessageBox.Show("Falha ao receber os dados dos discos do servidor", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

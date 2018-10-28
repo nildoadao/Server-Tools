@@ -15,18 +15,18 @@ namespace Server_Tools.Util
         /// </summary>
         /// <param name="IpAddres">String contendo o IP</param>
         /// <returns></returns>
-        public static bool IsConnected(string IpAddres)
+        public static bool IsConnected(string IpAddress)
         {
             try
             {
                 Ping ping = new Ping();
-                PingReply reply = ping.Send(IpAddres);
+                PingReply reply = ping.Send(IpAddress);
                 if (reply.Status == IPStatus.Success)
                     return true;
                 else
                     return false;
             }
-            catch (Exception) // Caso o endereço seja fornecido de maneira errada/ mal formatado
+            catch (Exception) // Caso o endereço seja fornecido de maneira errada / mal formatado
             {
                 return false;
             }

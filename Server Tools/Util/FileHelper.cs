@@ -11,7 +11,7 @@ namespace Server_Tools.Util
     class FileHelper
     {
         /// <summary>
-        /// Retorna os registros Server em um arquivo CSV
+        /// Retorna os registros Server de um arquivo CSV
         /// </summary>
         /// <param name="filePath">Localização completa do arquivo</param>
         /// <returns></returns>

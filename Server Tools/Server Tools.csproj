@@ -113,7 +113,6 @@
     <Compile Include="Idrac\Models\RaidLevel.cs" />
     <Compile Include="Idrac\Models\VirtualDisk.cs" />
     <Compile Include="Idrac\Models\OdataObject.cs" />
-    <Compile Include="Idrac\Models\ServerJob.cs" />
     <Compile Include="Util\FileHelper.cs" />
     <Compile Include="Util\HttpUtil.cs" />
     <Compile Include="View\CreateRaidPage.xaml.cs">

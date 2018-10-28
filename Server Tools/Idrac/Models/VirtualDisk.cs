@@ -19,10 +19,7 @@ namespace Server_Tools.Idrac.Models
         public string VolumeType { get; set; }
         public VolumeLink Links { get; set; }
 
-        public class VolumeLink
-        {
-            public List<OdataObject> Drives { get; set; }
-        }
+        public class VolumeLink { public List<OdataObject> Drives { get; set; } }
 
         public override string ToString()
         {

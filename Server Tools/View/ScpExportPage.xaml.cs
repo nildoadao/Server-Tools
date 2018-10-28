@@ -53,7 +53,7 @@ namespace Server_Tools.View
 
         private void ExportButton_Click(object sender, RoutedEventArgs e)
         {
-            if (!ValidateForm())
+            if (!CheckForm())
                 return;
 
             string target = "";
@@ -146,7 +146,7 @@ namespace Server_Tools.View
             }
         }
 
-        private bool ValidateForm()
+        private bool CheckForm()
         {
             if (ServerTextBox.Text.Trim().Equals(""))
             {

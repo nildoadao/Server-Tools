@@ -99,12 +99,15 @@ namespace Server_Tools.Idrac.Controllers
         /// <summary>
         /// Retorna todos os discos associados a uma determinada Controladora
         /// </summary>
-        /// <param name="controller">Controladora que abriga os discos</param>
+        /// <param name="enclousure">Controladora que abriga os discos</param>
         /// <returns>Lista com todos os discos da controladora</returns>
-        public async Task<List<PhysicalDisk>> GetPhysicalDisks(Enclousure controller)
+        public async Task<List<PhysicalDisk>> GetPhysicalDisks(Enclousure enclousure)
         {
+            if (enclousure == null)
+                throw new ArgumentNullException("enclousure", "O argumento não pode ser nulo");
+
             List<PhysicalDisk> disks = new List<PhysicalDisk>();
-            foreach(var item in controller.Drives)
+            foreach(var item in enclousure.Drives)
             {
                disks.Add(await GetResource<PhysicalDisk>(baseUri + item.Id));
             }
@@ -114,12 +117,15 @@ namespace Server_Tools.Idrac.Controllers
         /// <summary>
         /// Retorna os discos fisicos pertencentes a um disco virtual
         /// </summary>
-        /// <param name="virtualDisk">Disco virtual</param>
+        /// <param name="volume">Disco virtual</param>
         /// <returns>Lista com todos os discos fisicos</returns>
-        public async Task<List<PhysicalDisk>> GetPhysicalDisks(VirtualDisk virtualDisk)
+        public async Task<List<PhysicalDisk>> GetPhysicalDisks(VirtualDisk volume)
         {
+            if (volume == null)
+                throw new ArgumentNullException("volume", "O argumento não pode ser nulo");
+
             List<PhysicalDisk> disks = new List<PhysicalDisk>();
-            foreach(var item in virtualDisk.Links.Drives)
+            foreach(var item in volume.Links.Drives)
             {
                 disks.Add(await GetResource<PhysicalDisk>(baseUri + item.Id));
             }
@@ -157,6 +163,9 @@ namespace Server_Tools.Idrac.Controllers
         /// <returns>Lista com todos os discos virtuais</returns>
         public async Task<List<VirtualDisk>> GetVirtualDisks(Enclousure enclousure)
         {
+            if (enclousure == null)
+                throw new ArgumentNullException("enclousure", "O argumento não pode ser nulo");
+
             string location = enclousure.Volumes.Id;
             using(var request = new HttpRequestMessage(HttpMethod.Get, baseUri + location))
             {
@@ -282,12 +291,15 @@ namespace Server_Tools.Idrac.Controllers
         /// <summary>
         /// Deleta um disco virtual
         /// </summary>
-        /// <param name="virtualDisk">Objeto contendo o disco virtual</param>
+        /// <param name="volume">Objeto contendo o disco virtual</param>
         /// <returns>Job de exclusão do VD</returns>
-        public async Task<IdracJob> DeleteVirtualDisk(VirtualDisk virtualDisk)
+        public async Task<IdracJob> DeleteVirtualDisk(VirtualDisk volume)
         {
+            if (volume == null)
+                throw new ArgumentNullException("volume", "O argumento não pode ser nulo");
+
             var idrac = new JobController(server);
-            return await idrac.CreateJob(baseUri + virtualDisk.OdataId.Id, HttpMethod.Delete);
+            return await idrac.CreateJob(baseUri + volume.OdataId.Id, HttpMethod.Delete);
         }
     }
 }

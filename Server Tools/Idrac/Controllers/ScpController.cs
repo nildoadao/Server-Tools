@@ -11,9 +11,10 @@ namespace Server_Tools.Idrac.Controllers
 {
     class ScpController : BaseIdrac
     {
-
+        #region Redfish Uris
         public const string ExportSystemConfiguration = @"/redfish/v1/Managers/iDRAC.Embedded.1/Actions/Oem/EID_674_Manager.ExportSystemConfiguration";
         public const string ImportSystemConfiguration = @"/redfish/v1/Managers/iDRAC.Embedded.1/Actions/Oem/EID_674_Manager.ImportSystemConfiguration";
+        #endregion
 
         public ScpController(Server server)
             :base(server)

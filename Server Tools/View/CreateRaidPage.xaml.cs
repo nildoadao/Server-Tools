@@ -23,21 +23,16 @@ namespace Server_Tools.View
     /// </summary>
     public partial class CreateRaidPage : Page
     {
-        private List<PhysicalDisk> disks;
-        private List<Enclousure> enclousures;
         private Server server;
-        private ObservableCollection<DiskItem> datagridItems;
 
-        internal class DiskItem
+        private class DiskItem
         {
             public bool IsSelected { get; set; }
             public PhysicalDisk Disk { get; set; }
         }
 
-        public CreateRaidPage(List<PhysicalDisk> disks, List<Enclousure> enclousures, Server server)
+        public CreateRaidPage(Server server)
         {
-            this.disks = disks;
-            this.enclousures = enclousures;
             this.server = server;
             InitializeComponent();
         }
@@ -47,17 +42,15 @@ namespace Server_Tools.View
             CapacityBytesTextBox.IsEnabled = false;
             OptimumIOSizeTextBox.IsEnabled = false;
             VdNameTextBox.IsEnabled = false;
-            PopulateControllersCombobox();
-            PopulateRaidCombobox();
-            PopulateDataGrid();
+            UpdateForm();
         }
 
         private void CreateButton_Click(object sender, RoutedEventArgs e)
         {
-            if (!ValidateForm())
+            if (!CheckForm())
                 return;
 
-            var selectedDisks = from item in datagridItems
+            var selectedDisks = from DiskItem item in DiskDataGrid.Items
                                 where item.IsSelected
                                 select item.Disk;
 
@@ -106,7 +99,14 @@ namespace Server_Tools.View
             VdNameTextBox.IsEnabled = VdNameCheckBox.IsChecked.Value;
         }
 
-        private void PopulateRaidCombobox()
+        private void UpdateForm()
+        {
+            UpdateControllers();
+            UpdateRaid();
+            UpdateDataGrid();
+        }
+
+        private void UpdateRaid()
         {
             var raidLevels = new List<int>() { 0, 1, 5, 10, 50 };
             foreach(var item in raidLevels)
@@ -115,31 +115,56 @@ namespace Server_Tools.View
             }
         }
 
-        private void PopulateDataGrid()
+        private async void UpdateDataGrid()
         {
-            datagridItems = new ObservableCollection<DiskItem>();
-            foreach (var disk in disks)
+            try
             {
-                datagridItems.Add(new DiskItem { IsSelected = false, Disk = disk });
+                var idrac = new StorageController(server);
+                List<PhysicalDisk> disks = await idrac.GetAllPhysicalDisks();
+                ObservableCollection<DiskItem> datagridItems = new ObservableCollection<DiskItem>();
+                foreach (var disk in disks)
+                {
+                    datagridItems.Add(new DiskItem { IsSelected = false, Disk = disk });
+                }
+                DiskDataGrid.ItemsSource = datagridItems;
             }
-            DiskDataGrid.ItemsSource = datagridItems;
+            catch
+            {
+                MessageBox.Show("Falha ao receber dados dos discos do servidor", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
         }
 
-        private void PopulateControllersCombobox()
+        private async void UpdateControllers()
         {
-            foreach (var controller in enclousures)
+            try
             {
-                ControllersCombobox.Items.Add(controller);
+                var idrac = new StorageController(server);
+                List<Enclousure> enclousures = await idrac.GetAllEnclousures();
+                foreach (var enclousure in enclousures)
+                {
+                    ControllersCombobox.Items.Add(enclousure);
+                }
+            }
+            catch
+            {
+                MessageBox.Show("Falha ao receber dados das controladoras", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-        private bool ValidateForm()
+        private bool CheckForm()
         {
-            var selectedDisks = from disk in datagridItems
+            if (DiskDataGrid.Items == null)
+            {
+                MessageBox.Show("Não há discos para se criar um Raid", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+                return false;
+            }
+ 
+            var selectedDisks = from DiskItem disk in DiskDataGrid.Items
                                 where disk.IsSelected
                                 select disk;
 
-            if(selectedDisks.Count() <= 0)
+            if(selectedDisks.Count() == 0)
             {
                 MessageBox.Show("É preciso selecionar ao menos um disco para criar um Raid", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
                 return false;
@@ -169,9 +194,9 @@ namespace Server_Tools.View
 
         public async void CreateRaid(List<PhysicalDisk> disks, Enclousure enclousure, string level)
         {
-            var idrac = new StorageController(server);
             try
             {
+                var idrac = new StorageController(server);
                 IdracJob job = await idrac.CreateVirtualDisk(disks, enclousure, level);
                 var load = new LoadWindow(server, job) { Title = server.Host };
                 load.Closed += (object sender, EventArgs e) =>
@@ -191,9 +216,9 @@ namespace Server_Tools.View
 
         public async void CreateRaid(List<PhysicalDisk> disks, Enclousure enclousure, string level, string name)
         {
-            var idrac = new StorageController(server);
             try
             {
+                var idrac = new StorageController(server);
                 IdracJob job = await idrac.CreateVirtualDisk(disks, enclousure, level, name);
                 var load = new LoadWindow(server, job) { Title = server.Host };
                 load.Closed += (object sender, EventArgs e) =>
@@ -213,9 +238,9 @@ namespace Server_Tools.View
 
         public async void CreateRaid(List<PhysicalDisk> disks, Enclousure enclousure, string level, string name, int capacity, int optimal)
         {
-            var idrac = new StorageController(server);
             try
             {
+                var idrac = new StorageController(server);
                 IdracJob job = await idrac.CreateVirtualDisk(disks, enclousure, level);
                 var load = new LoadWindow(server, job) { Title = server.Host };
                 load.Closed += (object sender, EventArgs e) =>
@@ -232,6 +257,5 @@ namespace Server_Tools.View
                 MessageBox.Show(string.Format("Falha ao criar o Job {0}", ex.Message), "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-
     }
 }

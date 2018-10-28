@@ -1,5 +1,4 @@
-﻿
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System.Collections.Generic;
 
 namespace Server_Tools.Idrac.Models
@@ -23,10 +22,7 @@ namespace Server_Tools.Idrac.Models
         public int RotationSpeedRPM { get; set; }
         public DiskLink Links { get; set; }
         
-        public class DiskLink
-        {
-            public List<OdataObject> Volumes { get; set; }
-        }
+        public class DiskLink { public List<OdataObject> Volumes { get; set; } }
 
         public override string ToString()
         {

@@ -86,14 +86,14 @@ namespace Server_Tools.View
 
         private void ApplyButton_Click(object sender, RoutedEventArgs e)
         {
-            if (!ValidateForm())
+            if (!CheckForm())
                 return;
 
             ApplyButton.IsEnabled = false;
             ApplyScript();
         }
 
-        private bool ValidateForm()
+        private bool CheckForm()
         {
             if (ServersListBox.Items.Count == 0)
             {
@@ -168,9 +168,7 @@ namespace Server_Tools.View
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
             if (!operationCancelled)
-            {
                 operationCancelled = true;
-            }
         }
 
         private void ScriptDialogButton_Click(object sender, RoutedEventArgs e)

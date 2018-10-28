@@ -11,9 +11,10 @@ namespace Server_Tools.Idrac.Controllers
 {
     class UpdateController : BaseIdrac
     {
-
+        #region Redfish Uris
         public const string FirmwareInventory = @"/redfish/v1/UpdateService/FirmwareInventory";
         public const string FirmwareInstall = @"/redfish/v1/UpdateService/Actions/Oem/DellUpdateService.Install";
+        #endregion
 
         public UpdateController(Server server)
             :base(server)

@@ -23,7 +23,6 @@ namespace Server_Tools.View
     /// </summary>
     public partial class DeleteRaidPage : Page
     {
-        private List<VirtualDisk> volumes;
         private Server server;
 
         public DeleteRaidPage(Server server)
@@ -45,17 +44,14 @@ namespace Server_Tools.View
 
         private void DeleteButton_Click(object sender, RoutedEventArgs e)
         {
-            var selectedVolumes = from VolumeItem item in VdDataGrid.ItemsSource
-                                where item.IsSelected
-                                select item.Volume;
-
-            if(selectedVolumes.Count() == 0)
-            {
-                MessageBox.Show("Selecione ao menos um VD", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
+            if (!CheckForm())
                 return;
-            }
 
-            if(MessageBox.Show("Deseja mesmo excluir o(s) volume(s) selecionado(s) ?", "Aviso", MessageBoxButton.OKCancel, MessageBoxImage.Question) == MessageBoxResult.OK)
+            var selectedVolumes = from VolumeItem item in VdDataGrid.ItemsSource
+                                  where item.IsSelected
+                                  select item.Volume;
+
+            if (MessageBox.Show("Deseja mesmo excluir o(s) volume(s) selecionado(s) ?", "Aviso", MessageBoxButton.OKCancel, MessageBoxImage.Question) == MessageBoxResult.OK)
             {
                 foreach(var item in selectedVolumes)
                 {
@@ -64,28 +60,24 @@ namespace Server_Tools.View
             }
         }
 
-        private void LoadDataGrid()
-        {
-            ObservableCollection<VolumeItem> datagridItems = new ObservableCollection<VolumeItem>();
-            LoadVolumes();
-            foreach (var item in volumes)
-            {
-                datagridItems.Add(new VolumeItem { IsSelected = false, Volume = item });
-            }
-            VdDataGrid.ItemsSource = datagridItems;
-        }
-
-        private async void LoadVolumes()
+        private async void LoadDataGrid()
         {
             try
             {
                 var idrac = new StorageController(server);
-                volumes = await idrac.GetAllVirtualDisks();
+                List<VirtualDisk> volumes = await idrac.GetAllVirtualDisks();
+                ObservableCollection<VolumeItem> datagridItems = new ObservableCollection<VolumeItem>();
+                foreach (var item in volumes)
+                {
+                    datagridItems.Add(new VolumeItem { IsSelected = false, Volume = item });
+                }
+                VdDataGrid.ItemsSource = datagridItems;
             }
-            catch(Exception ex)
+            catch
             {
-                MessageBox.Show(string.Format("Falha ao criar obter dados do servidor {0}", ex.Message), "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Falha ao receber os Volumes do servidor", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+
         }
 
         private async void DeleteVd(VirtualDisk volume)
@@ -109,6 +101,26 @@ namespace Server_Tools.View
                 MessageBox.Show(string.Format("Falha ao criar o Job {0}", ex.Message), "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             LoadDataGrid();
+        }
+
+        private bool CheckForm()
+        {
+            if(VdDataGrid.Items == null || VdDataGrid.Items.Count == 0)
+            {
+                MessageBox.Show("Não há volumes para serem excluidos", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
+                return false;
+            }
+            var selectedVolumes = from VolumeItem item in VdDataGrid.ItemsSource
+                                  where item.IsSelected
+                                  select item.Volume;
+
+            if (selectedVolumes.Count() == 0)
+            {
+                MessageBox.Show("Selecione ao menos um VD", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
+                return false;
+            }
+
+            return true;
         }
     }
 }

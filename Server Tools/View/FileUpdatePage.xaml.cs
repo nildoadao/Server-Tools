@@ -37,7 +37,7 @@ namespace Server_Tools.View
 
         private void UpdateButton_Click(object sender, RoutedEventArgs e)
         {
-            if (!ValidateForm())
+            if (!CheckForm())
             {
                 return;
             }
@@ -79,7 +79,7 @@ namespace Server_Tools.View
             firmwareDialog.ShowDialog();
         }
 
-        private bool ValidateForm()
+        private bool CheckForm()
         {
             if (ServerTextBox.Text.Trim().Equals(""))
             {

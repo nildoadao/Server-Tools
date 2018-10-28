@@ -22,6 +22,12 @@ namespace Server_Tools.View
         ObservableCollection<ServerJob> jobQueue;
         DispatcherTimer timer;
 
+        private class ServerJob
+        {
+            public Server Server {get; set;}
+            public IdracJob Job { get; set; }
+        }
+
         public ScpImportPage()
         {
             InitializeComponent();
@@ -166,7 +172,7 @@ namespace Server_Tools.View
             }
         }
 
-        private bool ValidateForm()
+        private bool CheckForm()
         {
             if (String.IsNullOrEmpty(ServerTextBox.Text))
             {

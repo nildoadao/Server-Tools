@@ -23,6 +23,14 @@ namespace Server_Tools.View
     /// </summary>
     public partial class StorageOverviewPage : Page
     {
+        // Classe interna para os dados do datagrid
+
+        private class VolumeItem
+        {
+            public bool IsSelected { get; set; }
+            public VirtualDisk Volume { get; set; }
+        }
+
         private Server server;
 
         public StorageOverviewPage(Server server)
@@ -64,12 +72,6 @@ namespace Server_Tools.View
             ControllerModelTextBlock.Text = controller.Model;
         }
 
-        private void VirtualDisksComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            var virtualDisk = VirtualDisksComboBox.SelectedItem as VirtualDisk;
-            LoadPhysicalDisks(virtualDisk);
-        }
-
         private void CreateVdButton_Click(object sender, RoutedEventArgs e)
         {
             NavigationService.Navigate(new CreateRaidPage(server));
@@ -77,7 +79,20 @@ namespace Server_Tools.View
 
         private void DeleteVdButton_Click(object sender, RoutedEventArgs e)
         {
-            NavigationService.Navigate(new DeleteRaidPage(server));
+            if (!CheckForm())
+                return;
+
+            var selectedVolumes = from VolumeItem item in VdDataGrid.ItemsSource
+                                  where item.IsSelected
+                                  select item.Volume;
+
+            if (MessageBox.Show("Deseja mesmo excluir o(s) volume(s) selecionado(s) ?", "Aviso", MessageBoxButton.OKCancel, MessageBoxImage.Question) == MessageBoxResult.OK)
+            {
+                foreach (var item in selectedVolumes)
+                {
+                    DeleteVd(item);
+                }
+            }
         }
       
         private void UpdateForm()
@@ -126,35 +141,17 @@ namespace Server_Tools.View
             try
             {
                 var idrac = new StorageController(server);
-                VirtualDisksComboBox.Items.Clear();
                 List<VirtualDisk> volumes = await idrac.GetAllVirtualDisks();
-                foreach (VirtualDisk item in volumes)
+                var datagridItems = new ObservableCollection<VolumeItem>();
+                foreach (var item in volumes)
                 {
-                    VirtualDisksComboBox.Items.Add(item);
+                    datagridItems.Add(new VolumeItem { IsSelected = false, Volume = item });
                 }
-                VirtualDiskCountTextBlock.Text = volumes.Count.ToString();
+                VdDataGrid.ItemsSource = datagridItems;
             }
             catch
             {
-                MessageBox.Show("Falha ao receber os dados de volumes do servidor", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-        
-        private async void LoadPhysicalDisks(VirtualDisk volume)
-        {
-            try
-            {
-                var idrac = new StorageController(server);
-                PhysicalDisksItems.Items.Clear();
-                List<PhysicalDisk> disks = await idrac.GetPhysicalDisks(volume);
-                foreach (PhysicalDisk item in disks)
-                {
-                    PhysicalDisksItems.Items.Add(item);
-                }
-            }
-            catch
-            {
-                MessageBox.Show("Falha ao receber os dados dos discos do servidor", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Falha ao receber os Volumes do servidor", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -168,6 +165,48 @@ namespace Server_Tools.View
                              select item;
 
             return unassigned.Count();
+        }
+
+        private async void DeleteVd(VirtualDisk volume)
+        {
+            try
+            {
+                var idrac = new StorageController(server);
+                IdracJob job = await idrac.DeleteVirtualDisk(volume);
+                var load = new LoadWindow(server, job) { Title = server.Host };
+                load.Closed += (object sender, EventArgs e) =>
+                {
+                    var window = (LoadWindow)sender;
+                    job = window.Job;
+                    if (job.JobState.Contains("Completed"))
+                        MessageBox.Show("Volume excluido com sucesso !", "Sucesso", MessageBoxButton.OK, MessageBoxImage.Information);
+                };
+                load.Show();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(string.Format("Falha ao criar o Job {0}", ex.Message), "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            UpdateForm();
+        }
+
+        private bool CheckForm()
+        {
+            if (VdDataGrid.Items == null || VdDataGrid.Items.Count == 0)
+            {
+                MessageBox.Show("Não há volumes para serem excluidos", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
+                return false;
+            }
+            var selectedVolumes = from VolumeItem item in VdDataGrid.ItemsSource
+                                  where item.IsSelected
+                                  select item.Volume;
+
+            if (selectedVolumes.Count() == 0)
+            {
+                MessageBox.Show("Selecione ao menos um VD", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
+                return false;
+            }
+            return true;
         }
     }
 }

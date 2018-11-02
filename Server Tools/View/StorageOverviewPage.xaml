@@ -28,7 +28,7 @@
                         <TextBlock Text="Resumo" VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="White"/>
                     </StackPanel>
                 </Button>
-                <Button Height="Auto" Width="Auto" Background="Transparent"  Margin="50" Name="ControllerButton" BorderBrush="Transparent" Cursor="Hand" Click="ControllerButton_Click"> 
+                <Button Height="Auto" Width="Auto" Background="Transparent"  Margin="50" Name="ControllerButton" BorderBrush="Transparent" Cursor="Hand" Click="ControllerButton_Click">
                     <StackPanel>
                         <Image Source="/Server Tools;component/Resources/network-card.png" VerticalAlignment="Top" HorizontalAlignment="Center" Width="50"/>
                         <TextBlock Text="Controladoras" VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="White"/>
@@ -95,7 +95,7 @@
                     </GroupBox>
                 </TabItem>
                 <TabItem Header="Discos Fisicos">
-                    <DataGrid Name="PhysicalDiskDatagrid" AutoGenerateColumns="False" IsReadOnly="True">
+                    <DataGrid Name="PhysicalDiskDatagrid" AutoGenerateColumns="False" IsReadOnly="True" Margin="5">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Nome" Binding="{Binding Name}"/>
                             <DataGridTextColumn Header="Capacidade" Binding="{Binding CapacityBytes}"/>
@@ -105,29 +105,26 @@
                     </DataGrid>
                 </TabItem>
                 <TabItem Header="Discos Virtuais">
-                    <GroupBox Header="Discos Virtuais" Name="VirtualDisksGroupBox" HorizontalAlignment="Center" Foreground="White">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                            </Grid.RowDefinitions>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="VD" HorizontalAlignment="Right" Margin="5"/>
-                            <ComboBox Name="VirtualDisksComboBox" Grid.Column="1" HorizontalAlignment="Left" Margin="5" MinWidth="100" SelectionChanged="VirtualDisksComboBox_SelectionChanged"/>
-                            <TextBlock Text="Discos Fisicos" Grid.Row="1" HorizontalAlignment="Right" Margin="5"/>
-                            <TreeView Name="PhysicalDisksTreeView" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" Margin="5">
-                                <TreeViewItem Name="PhysicalDisksItems" Header="Discos Fisicos" HorizontalAlignment="Left"/>
-                            </TreeView>
-                            <TextBlock Text="Status" HorizontalAlignment="Right" Grid.Row="2" Margin="5"/>
-                            <Button Content="Criar VD" Name="CreateVdButton" Grid.Row="3" Grid.Column="1" Margin="5"  Width="100" Height="30" Click="CreateVdButton_Click"/>
-                            <Button Content="Deletar VD" Name="DeleteVdButton" Grid.Row="3" Margin="5"  Width="100" Height="30" Click="DeleteVdButton_Click"/>
-                        </Grid>
-                    </GroupBox>
+                    <Grid Width="Auto" HorizontalAlignment="Center" Height="Auto" VerticalAlignment="Top">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <DataGrid Name="VdDataGrid" Grid.ColumnSpan="2" Margin="5" MinWidth="400" MaxHeight="400" AutoGenerateColumns="False" CanUserAddRows="False">
+                            <DataGrid.Columns>
+                                <DataGridCheckBoxColumn Header="Selecionar" Binding="{Binding IsSelected}"/>
+                                <DataGridTextColumn Header="VD" Binding="{Binding Volume.Description}"/>
+                                <DataGridTextColumn Header="Capacidade" Binding="{Binding Volume.CapacityBytes}"/>
+                                <DataGridTextColumn Header="Tipo" Binding="{Binding Volume.VolumeType}"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                        <Button Name="DeleteVdButton" Content="Excluir Volume" Grid.Row="1" Margin="5" Width="100" Height="30" HorizontalAlignment="Right" Grid.Column="1" Click="DeleteVdButton_Click"/>
+                        <Button Name="CreateVdButton" Content="Criar Volume" Grid.Row="1" Grid.Column="2" Margin="5" Width="100" Height="30" HorizontalAlignment="Left" Click="CreateVdButton_Click"/>
+                    </Grid>
                 </TabItem>
             </TabControl>
         </Grid>

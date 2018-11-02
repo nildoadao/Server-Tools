@@ -38,9 +38,8 @@ namespace Server_Tools.View
         private void UpdateButton_Click(object sender, RoutedEventArgs e)
         {
             if (!CheckForm())
-            {
                 return;
-            }
+            
             string firmware = FirmwareTextBox.Text;
             string option = "";
             foreach(RadioButton item in InstallOptionGroup.Children)
@@ -58,13 +57,12 @@ namespace Server_Tools.View
         {
             Server server = new Server(ServerTextBox.Text, UserTextBox.Text, PasswordBox.Password);
 
-            if (!await CheckSupport(server))
-                return;
-
-            UpdateController idrac = new UpdateController(server);
-            OutputTextBox.AppendText(string.Format("Iniciando upload do arquivo {0} para {1} \n", FirmwareTextBox.Text, server.Host));
+            /*if (!await CheckSupport(server))
+                return;*/
             try
             {
+                UpdateController idrac = new UpdateController(server);
+                OutputTextBox.AppendText(string.Format("Iniciando upload do arquivo {0} para {1} \n", FirmwareTextBox.Text, server.Host));
                 IdracJob job = await idrac.UpdateFirmware(path, option);
                 OutputTextBox.AppendText(string.Format("Criado Job {0} para update\n",job.Id));
             }

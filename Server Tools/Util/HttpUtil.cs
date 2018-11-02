@@ -31,7 +31,7 @@ namespace Server_Tools.Util
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Ssl3;
             ServicePointManager.ServerCertificateValidationCallback += (sender, certificate, chain, sslPolicyErrors) => true;
             _client = new HttpClient();
-            //_client.DefaultRequestHeaders.ExpectContinue = true;
+            _client.DefaultRequestHeaders.ExpectContinue = true;
             _client.DefaultRequestHeaders.Add("User-Agent", USER_AGENT);
             _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("*/*"));
             _client.DefaultRequestHeaders.Connection.Add("keep-alive");

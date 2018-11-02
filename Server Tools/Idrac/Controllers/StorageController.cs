@@ -299,7 +299,7 @@ namespace Server_Tools.Idrac.Controllers
                 throw new ArgumentNullException("volume", "O argumento não pode ser nulo");
 
             var idrac = new JobController(server);
-            return await idrac.CreateJob(baseUri + volume.OdataId.Id, HttpMethod.Delete);
+            return await idrac.CreateJob(baseUri + volume.OdataId, HttpMethod.Delete);
         }
     }
 }

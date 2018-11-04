@@ -22,10 +22,10 @@ namespace Server_Tools.Idrac.Controllers
         /// <returns></returns>
         public async Task<List<string>> GetEnclousuresLocation()
         {
-            using(var request = new HttpRequestMessage(HttpMethod.Get, baseUri + Controllers))
+            using(var request = new HttpRequestMessage(HttpMethod.Get, BaseUri + Controllers))
             {
-                request.Headers.Authorization = credentials;
-                using(var response = await client.SendAsync(request))
+                request.Headers.Authorization = Credentials;
+                using(var response = await Client.SendAsync(request))
                 {
                     if (!response.IsSuccessStatusCode)
                         throw new HttpRequestException(string.Format("Falha ao listar controladoras: {0}", response.ReasonPhrase));
@@ -53,7 +53,7 @@ namespace Server_Tools.Idrac.Controllers
         /// <returns></returns>
         public async Task<Enclousure> GetEnclousure(string uri)
         {
-            return await GetResource<Enclousure>(baseUri + uri);
+            return await GetResource<Enclousure>(BaseUri + uri);
         } 
 
         /// <summary>
@@ -78,7 +78,7 @@ namespace Server_Tools.Idrac.Controllers
         /// <returns>Objeto contendo a controladora</returns>
         public async Task<RaidController> GetRaidController(string uri)
         {
-            return await GetResource<RaidController>(baseUri + uri);
+            return await GetResource<RaidController>(BaseUri + uri);
         }
 
         /// <summary>
@@ -109,7 +109,7 @@ namespace Server_Tools.Idrac.Controllers
             List<PhysicalDisk> disks = new List<PhysicalDisk>();
             foreach(var item in enclousure.Drives)
             {
-               disks.Add(await GetResource<PhysicalDisk>(baseUri + item.Id));
+               disks.Add(await GetResource<PhysicalDisk>(BaseUri + item.Id));
             }
             return disks;
         }
@@ -127,7 +127,7 @@ namespace Server_Tools.Idrac.Controllers
             List<PhysicalDisk> disks = new List<PhysicalDisk>();
             foreach(var item in volume.Links.Drives)
             {
-                disks.Add(await GetResource<PhysicalDisk>(baseUri + item.Id));
+                disks.Add(await GetResource<PhysicalDisk>(BaseUri + item.Id));
             }
             return disks;
         }
@@ -153,7 +153,7 @@ namespace Server_Tools.Idrac.Controllers
         /// <returns>Obejto contendo o disco virtual</returns>
         public async Task<VirtualDisk> GetVirtualDisk(string uri)
         {
-            return await GetResource<VirtualDisk>(baseUri + uri);
+            return await GetResource<VirtualDisk>(BaseUri + uri);
         }
 
         /// <summary>
@@ -167,10 +167,10 @@ namespace Server_Tools.Idrac.Controllers
                 throw new ArgumentNullException("enclousure", "O argumento não pode ser nulo");
 
             string location = enclousure.Volumes.Id;
-            using(var request = new HttpRequestMessage(HttpMethod.Get, baseUri + location))
+            using(var request = new HttpRequestMessage(HttpMethod.Get, BaseUri + location))
             {
-                request.Headers.Authorization = credentials;
-                using(var response = await client.SendAsync(request))
+                request.Headers.Authorization = Credentials;
+                using(var response = await Client.SendAsync(request))
                 {
                     if (!response.IsSuccessStatusCode)
                         throw new HttpRequestException(string.Format("Falha ao obter discos virtuais {0}", response.ReasonPhrase));
@@ -184,7 +184,7 @@ namespace Server_Tools.Idrac.Controllers
                     var virtualDisks = new List<VirtualDisk>();
                     foreach (var item in collection.Members)
                     {
-                        virtualDisks.Add(await GetResource<VirtualDisk>(baseUri + item.Id));
+                        virtualDisks.Add(await GetResource<VirtualDisk>(BaseUri + item.Id));
                     }
                     return virtualDisks;
                 }
@@ -232,8 +232,8 @@ namespace Server_Tools.Idrac.Controllers
             };
             var jsonContent = JsonConvert.SerializeObject(content);
             var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-            var idrac = new JobController(server);
-            return await idrac.CreateJob(string.Format("{0}{1}/Volumes", baseUri, enclousure.OdataId), httpContent);
+            var idrac = new JobController(Server);
+            return await idrac.CreateJob(string.Format("{0}{1}/Volumes", BaseUri, enclousure.OdataId), httpContent);
         }
 
         /// <summary>
@@ -257,8 +257,8 @@ namespace Server_Tools.Idrac.Controllers
             };
             var jsonContent = JsonConvert.SerializeObject(content);
             var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-            var idrac = new JobController(server);
-            return await idrac.CreateJob(string.Format("{0}{1}/Volumes", baseUri, enclousure.OdataId), httpContent);
+            var idrac = new JobController(Server);
+            return await idrac.CreateJob(string.Format("{0}{1}/Volumes", BaseUri, enclousure.OdataId), httpContent);
         }
 
         /// <summary>
@@ -284,8 +284,8 @@ namespace Server_Tools.Idrac.Controllers
             };
             var jsonContent = JsonConvert.SerializeObject(content);
             var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-            var idrac = new JobController(server);
-            return await idrac.CreateJob(string.Format("{0}{1}/Volumes", baseUri, enclousure.OdataId), httpContent);
+            var idrac = new JobController(Server);
+            return await idrac.CreateJob(string.Format("{0}{1}/Volumes", BaseUri, enclousure.OdataId), httpContent);
         }
 
         /// <summary>
@@ -298,8 +298,8 @@ namespace Server_Tools.Idrac.Controllers
             if (volume == null)
                 throw new ArgumentNullException("volume", "O argumento não pode ser nulo");
 
-            var idrac = new JobController(server);
-            return await idrac.CreateJob(baseUri + volume.OdataId, HttpMethod.Delete);
+            var idrac = new JobController(Server);
+            return await idrac.CreateJob(BaseUri + volume.OdataId, HttpMethod.Delete);
         }
     }
 }

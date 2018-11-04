@@ -86,12 +86,15 @@ namespace Server_Tools.View
                                   where item.IsSelected
                                   select item.Volume;
 
-            if (MessageBox.Show("Deseja mesmo excluir o(s) volume(s) selecionado(s) ?", "Aviso", MessageBoxButton.OKCancel, MessageBoxImage.Question) == MessageBoxResult.OK)
+            if(selectedVolumes.Count() > 1)
             {
-                foreach (var item in selectedVolumes)
-                {
-                    DeleteVd(item);
-                }
+                MessageBox.Show("Selecione apenas um Volume para ser excluido", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            if (MessageBox.Show("Deseja mesmo excluir o volume selecionado ?", "Aviso", MessageBoxButton.OKCancel, MessageBoxImage.Question) == MessageBoxResult.OK)
+            {
+                DeleteVd(selectedVolumes.FirstOrDefault());
             }
         }
       
@@ -147,6 +150,7 @@ namespace Server_Tools.View
                 {
                     datagridItems.Add(new VolumeItem { IsSelected = false, Volume = item });
                 }
+                VirtualDiskCountTextBlock.Text = volumes.Count().ToString();
                 VdDataGrid.ItemsSource = datagridItems;
             }
             catch

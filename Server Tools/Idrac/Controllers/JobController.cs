@@ -28,15 +28,15 @@ namespace Server_Tools.Idrac.Controllers
         {
             using (var request = new HttpRequestMessage(HttpMethod.Post, uri))
             {
-                request.Headers.Authorization = credentials;
+                request.Headers.Authorization = Credentials;
                 request.Content = content;
-                using (var response = await client.SendAsync(request))
+                using (var response = await Client.SendAsync(request))
                 {
                     if (!response.IsSuccessStatusCode)
                         throw new HttpRequestException(string.Format("Falha ao criar Job: {0}", response.ReasonPhrase));
 
                     string location = response.Headers.Location.ToString();
-                    return await GetResource<IdracJob>(baseUri + location);
+                    return await GetResource<IdracJob>(BaseUri + location);
                 }
             }
         }
@@ -51,14 +51,14 @@ namespace Server_Tools.Idrac.Controllers
         {
             using (var request = new HttpRequestMessage(method, uri))
             {
-                request.Headers.Authorization = credentials;;
-                using (var response = await client.SendAsync(request))
+                request.Headers.Authorization = Credentials;;
+                using (var response = await Client.SendAsync(request))
                 {
                     if (!response.IsSuccessStatusCode)
                         throw new HttpRequestException(string.Format("Falha ao criar Job: {0}", response.ReasonPhrase));
 
                     string location = response.Headers.Location.ToString();
-                    return await GetResource<IdracJob>(baseUri + location);
+                    return await GetResource<IdracJob>(BaseUri + location);
                 }
             }
         }
@@ -70,7 +70,7 @@ namespace Server_Tools.Idrac.Controllers
         /// <returns>O Job corresponde ao ID</returns>
         public async Task<IdracJob> GetJob(string jobId)
         {
-            return await GetResource<IdracJob>(baseUri + JobStatus + jobId);
+            return await GetResource<IdracJob>(BaseUri + JobStatus + jobId);
         }
 
         /// <summary>
@@ -80,10 +80,10 @@ namespace Server_Tools.Idrac.Controllers
         /// <returns>Resposta Http do Job</returns>
         public async Task<HttpResponseMessage> GetJobData(string jobId)
         {
-            using (var request = new HttpRequestMessage(HttpMethod.Get, baseUri + JobResult + jobId))
+            using (var request = new HttpRequestMessage(HttpMethod.Get, BaseUri + JobResult + jobId))
             {
-                request.Headers.Authorization = credentials;
-                return await client.SendAsync(request);
+                request.Headers.Authorization = Credentials;
+                return await Client.SendAsync(request);
             }
         }
     }

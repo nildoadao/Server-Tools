@@ -35,6 +35,22 @@ namespace Server_Tools.Idrac.Controllers
         }
 
         /// <summary>
+        /// Realiza um update de varios firmwares em um servidor
+        /// </summary>
+        /// <param name="paths">Lista com o caminho dos recursos</param>
+        /// <param name="option">Modo de instalação</param>
+        /// <returns></returns>
+        public async Task<IdracJob> UpdateFirmware(IEnumerable<string> paths, string option)
+        {
+            var locations = new List<Uri>();
+            foreach(var item in paths)
+            {
+                locations.Add(await UploadFile(item));
+            }
+            return await InstallFirmware(locations, option);
+        }
+
+        /// <summary>
         /// Realiza a instalação do Firmware na Idrac
         /// </summary>
         /// <param name="location">Uri do recurso</param>
@@ -50,8 +66,32 @@ namespace Server_Tools.Idrac.Controllers
             };
             string jsonContent = JsonConvert.SerializeObject(content);
             var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-            var idrac = new JobController(server);
-            return await idrac.CreateJob(baseUri + FirmwareInstall, httpContent);
+            var idrac = new JobController(Server);
+            return await idrac.CreateJob(BaseUri + FirmwareInstall, httpContent);
+        }
+
+        /// <summary>
+        /// Realiza a instalação do Firmware na Idrac
+        /// </summary>
+        /// <param name="locations">Lista com a localização dos recursos</param>
+        /// <param name="option">Modo de Instalação</param>
+        /// <returns>Job de Instação fo Firmware</returns>
+        private async Task<IdracJob> InstallFirmware(IEnumerable<Uri> locations, string option)
+        {
+            var uris = new List<string>(); 
+            foreach(var item in locations)
+            {
+                uris.Add(item.ToString());
+            }
+            var content = new
+            {
+                SoftwareIdentityURIs = uris,
+                InstallUpon = option
+            };
+            string jsonContent = JsonConvert.SerializeObject(content);
+            var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+            var idrac = new JobController(Server);
+            return await idrac.CreateJob(BaseUri + FirmwareInstall, httpContent);
         }
 
         /// <summary>
@@ -61,12 +101,12 @@ namespace Server_Tools.Idrac.Controllers
         /// <returns>Uri com a localização do recurso</returns>
         private async Task<Uri> UploadFile(string path)
         {
-            using (var request = new HttpRequestMessage(HttpMethod.Post, baseUri + FirmwareInventory))
+            using (var request = new HttpRequestMessage(HttpMethod.Post, BaseUri + FirmwareInventory))
             using (var multipartContent = new MultipartFormDataContent())
             using (var fileContent = new StreamContent(File.Open(path, FileMode.Open)))
             {
-                request.Headers.Authorization = credentials;
-                string etag = await GetHeaderValue("ETag", baseUri + FirmwareInventory);
+                request.Headers.Authorization = Credentials;
+                string etag = await GetHeaderValue("ETag", BaseUri + FirmwareInventory);
                 request.Headers.TryAddWithoutValidation("If-Match", etag);
                 request.Headers.CacheControl = CacheControlHeaderValue.Parse("no-cache");
                 fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse("multipart/form-data");
@@ -77,7 +117,7 @@ namespace Server_Tools.Idrac.Controllers
                 };
                 multipartContent.Add(fileContent);
                 request.Content = multipartContent;
-                using (HttpResponseMessage response = await client.SendAsync(request))
+                using (HttpResponseMessage response = await Client.SendAsync(request))
                 {
                     if (!response.IsSuccessStatusCode)
                         throw new HttpRequestException("Falha no upload do arquivo: " + response.ReasonPhrase);

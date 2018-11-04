@@ -52,7 +52,7 @@
                     <TextBlock Margin="5" Text="Servidores" Foreground="White" VerticalAlignment="Center"/>
                     <Button Name="AddCsvButton" Content="Adicionar CSV" Margin="5" Width="100" Height="30" HorizontalAlignment="Left" Click="AddCsvButton_Click"/>
                 </StackPanel>
-                <ListBox Name="ServersListBox" HorizontalAlignment="Left" Height="250" Margin="5" Width="250"/>
+                <ListBox Name="ServersListBox" HorizontalAlignment="Right" Height="250" Margin="5" Width="250"/>
             </StackPanel>
             <StackPanel Grid.Row="2" Orientation="Horizontal" Height="Auto" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <TextBlock  Margin="5" Text="Script:" Foreground="White" />
@@ -65,7 +65,7 @@
             </StackPanel>
             <StackPanel Grid.Row="5" Grid.ColumnSpan="3" HorizontalAlignment="Left" VerticalAlignment="Center">
                 <TextBlock Margin="5" Text="Saida" Foreground="White"/>
-                <TextBox Name="OutputTextBox" Height="200" Margin="5" Text="" Width="640" ScrollViewer.CanContentScroll="True" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Visible" MaxWidth="650" MaxHeight="200" IsReadOnly="True"/>
+                <TextBox Name="OutputTextBox" Height="150" Margin="5" Width="750" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" MaxWidth="750" MaxHeight="150" IsReadOnly="True"/>
             </StackPanel>
         </Grid>
     </ScrollViewer>

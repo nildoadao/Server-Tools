@@ -97,22 +97,12 @@ namespace Server_Tools.View
         private void ImportButton_Click(object sender, RoutedEventArgs e)
         {
             string target = "";
-
-            if (AllCheckBox.IsChecked.Value)
-                target = "ALL";
-
-            else
+            foreach(RadioButton item in TargetGroup.Children)
             {
-                bool first = true;
-                foreach (CheckBox item in TargetGroup.Children)
+                if (item.IsChecked.Value)
                 {
-                    if (item.IsChecked.Value && first)
-                    {
-                        target += item.Content.ToString();
-                        first = false;
-                    }
-                    else if (item.IsChecked.Value)
-                        target += string.Format(", {0}", item.Content.ToString());
+                    target = item.Content.ToString();
+                    break;
                 }
             }
             string shutdown = "";
@@ -124,13 +114,14 @@ namespace Server_Tools.View
                     break;
                 }
             }
+            string path = FileTextBox.Text;
             foreach (Server server in ServersListBox.Items)
             {
-                ImportScp(server, target, shutdown);
+                ImportScp(server, path, target, shutdown);
             }
         }
 
-        private async void ImportScp(Server server, string target, string shutdown)
+        private async void ImportScp(Server server, string path, string target, string shutdown)
         {
             if (!NetworkHelper.IsConnected(server.Host))
             {
@@ -141,7 +132,7 @@ namespace Server_Tools.View
             try
             {
                 OutputTextBox.AppendText(string.Format("Importando configurações para {0}...\n", server.Host));
-                IdracJob job = await idrac.ImportScpFile(FileTextBox.Text, target, shutdown, "On");
+                IdracJob job = await idrac.ImportScpFile(path, target, shutdown, "On");
                 OutputTextBox.AppendText(string.Format("Job {0} criado para servidor {1} \n", job.Id, server));
                 jobQueue.Add(new ServerJob { Server = server, Job = job });
             }
@@ -202,27 +193,6 @@ namespace Server_Tools.View
             else
             {
                 return true;
-            }
-        }
-
-        private void AllCheckBox_Checked(object sender, RoutedEventArgs e)
-        {
-            foreach (CheckBox item in TargetGroup.Children)
-            {
-                if (item.Content.ToString() != "ALL")
-                {
-                    item.IsChecked = false;
-                    item.IsEnabled = false;
-                }
-            }
-        }
-
-        private void AllCheckBox_Unchecked(object sender, RoutedEventArgs e)
-        {
-            foreach (CheckBox item in TargetGroup.Children)
-            {
-                if (item.Content.ToString() != "ALL")
-                    item.IsEnabled = true;
             }
         }
 

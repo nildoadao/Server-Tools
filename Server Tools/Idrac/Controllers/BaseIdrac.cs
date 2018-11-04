@@ -10,10 +10,30 @@ namespace Server_Tools.Idrac.Controllers
 {
     abstract class BaseIdrac
     {
-        protected Server server;
-        protected string baseUri;
-        protected HttpClient client;
-        protected AuthenticationHeaderValue credentials;
+        private Server server;
+        private string baseUri;
+        private HttpClient client;
+        private AuthenticationHeaderValue credentials;
+
+        protected Server Server
+        {
+            get { return server; }
+        }
+
+        protected string BaseUri
+        {
+            get { return baseUri; }
+        }
+
+        protected HttpClient Client
+        {
+            get { return client; }
+        }
+
+        protected AuthenticationHeaderValue Credentials
+        {
+            get { return credentials; }
+        }
 
         public BaseIdrac(Server server)
         {

@@ -57,7 +57,7 @@
             </StackPanel>
             <TextBlock Text="Saida" Grid.Row="5" Margin="5" Foreground="White"/>
             <ScrollViewer Margin="5" HorizontalContentAlignment="Left"  HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" CanContentScroll="True" MaxWidth="750" BorderBrush="Transparent" Grid.Row="6" Grid.ColumnSpan="3">
-                <TextBox Name="OutputTextBox"  Height="200" IsReadOnly="True" BorderBrush="Transparent"  HorizontalScrollBarVisibility="Auto" Width="750"/>
+                <TextBox Name="OutputTextBox"  Height="150" IsReadOnly="True" BorderBrush="Transparent"  HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" Width="750" MaxHeight="150" MaxWidth="750"/>
             </ScrollViewer>
         </Grid>
     </ScrollViewer>

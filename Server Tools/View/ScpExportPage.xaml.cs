@@ -30,57 +30,21 @@ namespace Server_Tools.View
             InitializeComponent();
         }
 
-        private void AllCheckBox_Checked(object sender, RoutedEventArgs e)
-        {
-            foreach (CheckBox item in TargetGroup.Children)
-            {
-                if (item.Content.ToString() != "ALL")
-                {
-                    item.IsChecked = false;
-                    item.IsEnabled = false;
-                }
-            }
-        }
-
-        private void AllCheckBox_Unchecked(object sender, RoutedEventArgs e)
-        {
-            foreach (CheckBox item in TargetGroup.Children)
-            {
-                if (item.Content.ToString() != "ALL")
-                    item.IsEnabled = true;
-            }
-        }
-
         private void ExportButton_Click(object sender, RoutedEventArgs e)
         {
             if (!CheckForm())
                 return;
 
             string target = "";
-
-            if (AllCheckBox.IsChecked.Value)
-                target = "ALL";
-            else
+            foreach(RadioButton item in TargetGroup.Children)
             {
-                bool first = true;
-                foreach (CheckBox item in TargetGroup.Children)
+                if (item.IsChecked.Value)
                 {
-                    if (item.IsChecked.Value && first)
-                    {
-                        target += item.Content.ToString();
-                        first = false;
-                    }
-                    else if(item.IsChecked.Value)
-                        target += string.Format(", {0}", item.Content.ToString());                   
+                    target = item.Content.ToString();
+                    break;
                 }
             }
-
-            if (String.IsNullOrEmpty(target))
-            {
-                MessageBox.Show("Selecione uma opção de Export", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
-                return;
-            }
-
+            
             string exportUse = "";
             foreach (RadioButton item in ExportUseGroup.Children)
             {

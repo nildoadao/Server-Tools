@@ -39,8 +39,8 @@ namespace Server_Tools.Idrac.Controllers
 
             var jsonContent = JsonConvert.SerializeObject(content);
             var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-            var idrac = new JobController(server);
-            return await idrac.CreateJob(baseUri + ExportSystemConfiguration, httpContent);
+            var idrac = new JobController(Server);
+            return await idrac.CreateJob(BaseUri + ExportSystemConfiguration, httpContent);
         }
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace Server_Tools.Idrac.Controllers
         /// <returns>Dados do arquivo</returns>
         public async Task<string> GetScpFileData(string jobId)
         {
-            var idrac = new JobController(server);
+            var idrac = new JobController(Server);
             using (var response = await idrac.GetJobData(jobId))
             {
                 if (!response.IsSuccessStatusCode)
@@ -83,8 +83,8 @@ namespace Server_Tools.Idrac.Controllers
             };
             var jsonContent = JsonConvert.SerializeObject(content);
             var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-            var idrac = new JobController(server);
-            return await idrac.CreateJob(baseUri + ImportSystemConfiguration, httpContent);
+            var idrac = new JobController(Server);
+            return await idrac.CreateJob(BaseUri + ImportSystemConfiguration, httpContent);
         }
     }
 }

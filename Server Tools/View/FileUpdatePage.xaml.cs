@@ -57,8 +57,8 @@ namespace Server_Tools.View
         {
             Server server = new Server(ServerTextBox.Text, UserTextBox.Text, PasswordBox.Password);
 
-            /*if (!await CheckSupport(server))
-                return;*/
+            if (!await CheckSupport(server))
+                return;
             try
             {
                 UpdateController idrac = new UpdateController(server);

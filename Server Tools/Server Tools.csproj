@@ -102,10 +102,12 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Idrac\Controllers\BaseIdrac.cs" />
+    <Compile Include="Idrac\Controllers\ChassisController.cs" />
     <Compile Include="Idrac\Controllers\ScpController.cs" />
     <Compile Include="Idrac\Controllers\JobController.cs" />
     <Compile Include="Idrac\Controllers\StorageController.cs" />
     <Compile Include="Idrac\Controllers\UpdateController.cs" />
+    <Compile Include="Idrac\Models\Chassis.cs" />
     <Compile Include="Idrac\Models\IdracJob.cs" />
     <Compile Include="Idrac\Models\Enclousure.cs" />
     <Compile Include="Idrac\Models\PhysicalDisk.cs" />
@@ -140,6 +142,9 @@
     <Compile Include="Idrac\Models\Server.cs" />
     <Compile Include="View\LoadWindow.xaml.cs">
       <DependentUpon>LoadWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\RepositoryUpdatePage.xaml.cs">
+      <DependentUpon>RepositoryUpdatePage.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\ScpExportPage.xaml.cs">
       <DependentUpon>ScpExportPage.xaml</DependentUpon>
@@ -185,6 +190,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="View\LoadWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\RepositoryUpdatePage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

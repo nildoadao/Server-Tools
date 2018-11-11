@@ -35,6 +35,7 @@ namespace Server_Tools.Util
             _client.DefaultRequestHeaders.Add("User-Agent", USER_AGENT);
             _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("*/*"));
             _client.DefaultRequestHeaders.Connection.Add("keep-alive");
+            _client.Timeout = new TimeSpan(0, 3, 0); 
         }
 
         public static AuthenticationHeaderValue GetCredentialHeader(string user, string password)

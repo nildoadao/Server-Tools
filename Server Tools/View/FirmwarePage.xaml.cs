@@ -27,7 +27,7 @@ namespace Server_Tools.View
 
         private void RepositoryButton_Click(object sender, RoutedEventArgs e)
         {
-
+            NavigationService.Navigate(new RepositoryUpdatePage());
         }
 
         private void FileButton_Click(object sender, RoutedEventArgs e)

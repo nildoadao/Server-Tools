@@ -26,6 +26,7 @@ namespace Server_Tools.View
         {
             public Server Server {get; set;}
             public IdracJob Job { get; set; }
+            public string SerialNumber { get; set; }
         }
 
         public ScpImportPage()
@@ -201,9 +202,18 @@ namespace Server_Tools.View
             var updatedJobs = new ObservableCollection<ServerJob>();
             foreach(var job in jobQueue)
             {
-                var idrac = new JobController(job.Server);
-                var updatedJob = await idrac.GetJob(job.Job.Id);
-                updatedJobs.Add(new ServerJob { Server = job.Server, Job = updatedJob });
+                try
+                {
+                    var idrac = new JobController(job.Server);
+                    var updatedJob = await idrac.GetJob(job.Job.Id);
+                    var chassis = new ChassisController(job.Server);
+                    var serial = await chassis.GetChassisInformation();
+                    updatedJobs.Add(new ServerJob { Server = job.Server, Job = updatedJob, SerialNumber = serial.SKU });
+                }
+                catch
+                {
+                    OutputTextBox.AppendText("Falha ao atualizar status dos Jobs");
+                }
             }
             jobQueue = updatedJobs;
             JobsDataGrid.ItemsSource = jobQueue;

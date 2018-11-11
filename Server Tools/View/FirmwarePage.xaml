@@ -21,7 +21,7 @@
                 <Button Height="Auto" Width="Auto" Background="Transparent"  Margin="50" Name="RepositoryButton" Click="RepositoryButton_Click" BorderBrush="Transparent" Cursor="Hand">
                     <StackPanel>
                         <Image Source="/Server Tools;component/Resources/repository.png" Width="50"/>
-                        <TextBlock Text="Atualizar via repositorio" VerticalAlignment="Center" Margin="5" Foreground="White"/>
+                        <TextBlock Text="Atualizar via FTP Dell" VerticalAlignment="Center" Margin="5" Foreground="White"/>
                     </StackPanel>
                 </Button>
                 <Button Height="Auto" Width="Auto" Background="Transparent " Margin="50" Name="FileButton" Click="FileButton_Click" BorderBrush="Transparent" Cursor="Hand">

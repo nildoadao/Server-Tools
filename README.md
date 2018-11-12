@@ -6,6 +6,7 @@ Basic tool to deploy Dell servers with Redfish API.
 Support to:
 
 * Local firmware update
+* Firmware Update via Dell FTP repository
 * Local Import / Export SCP Files
   * Import files to multiple servers at once
 * Storage configuration

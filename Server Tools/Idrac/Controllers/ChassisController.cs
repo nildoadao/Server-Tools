@@ -9,7 +9,7 @@ namespace Server_Tools.Idrac.Controllers
 {
     class ChassisController : BaseIdrac
     {
-        public const string ChassisRoot = @"/redfish/v1/Chassis";
+        public const string ChassisRoot = @"/redfish/v1/Chassis/System.Embedded.1";
 
         public ChassisController(Server server)
             : base(server) { }

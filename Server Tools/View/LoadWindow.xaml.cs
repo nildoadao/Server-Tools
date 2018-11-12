@@ -69,6 +69,7 @@ namespace Server_Tools.View
                 catch(Exception ex)
                 {
                     MessageBox.Show(ex.Message, "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+                    Close();
                 }
             }
             Close();

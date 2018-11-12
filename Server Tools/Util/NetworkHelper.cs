@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.NetworkInformation;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace Server_Tools.Util
@@ -30,6 +31,28 @@ namespace Server_Tools.Util
             {
                 return false;
             }
+        }
+
+        public static async Task<bool> CheckConnectionAsync(string host)
+        {
+            bool connection = false;
+            await Task.Run(() =>
+            {               
+                try
+                {
+                    Ping ping = new Ping();
+                    PingReply reply = ping.Send(host);
+                    if (reply.Status == IPStatus.Success)
+                        connection = true;
+                    else
+                        connection = false;
+                }
+                catch (Exception) // Caso o endereço seja fornecido de maneira errada / mal formatado
+                {
+                    connection = false;
+                }
+            });
+            return connection;
         }
     }
 }

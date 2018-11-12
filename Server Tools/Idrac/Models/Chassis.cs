@@ -10,32 +10,32 @@ namespace Server_Tools.Idrac.Models
     {
         public class ChassisLink
         {
-            public List<OdataObject> ComputerSystems { get; }
-            public List<OdataObject> ContainedBy { get; }
-            public List<OdataObject> Contains {get; }
-            public List<OdataObject> CooledBy{ get; }
-            public List<OdataObject> Drives {get; }
-            public List<OdataObject> ManagedBy { get; }
-            public List<OdataObject> ManagersInChassis { get; }
-            public List<OdataObject> PCIeDevices { get; }
-            public List<OdataObject> PoweredBy { get; }
-            public List<OdataObject> ResourceBlocks { get; }
-            public List<OdataObject> Storage { get; }
-            public List<OdataObject> Switches { get; }
+            public List<OdataObject> ComputerSystems { get; set; }
+            public List<OdataObject> ContainedBy { get; set; }
+            public List<OdataObject> Contains {get; set; }
+            public List<OdataObject> CooledBy{ get; set; }
+            public List<OdataObject> Drives {get; set; }
+            public List<OdataObject> ManagedBy { get; set; }
+            public List<OdataObject> ManagersInChassis { get; set; }
+            public List<OdataObject> PCIeDevices { get; set; }
+            public List<OdataObject> PoweredBy { get; set; }
+            public List<OdataObject> ResourceBlocks { get; set; }
+            public List<OdataObject> Storage { get; set; }
+            public List<OdataObject> Switches { get; set; }
         }
 
-        public ChassisLink Links { get ;}
-        public string AssetTag { get; }
-        public string ChassisType { get; }
-        public OdataObject LogServices { get; }
-        public string Manufacturer { get; }
-        public string Model { get; }
-        public OdataObject NetworkAdapters { get; }
-        public string PartNumber { get; }
-        public OdataObject Power { get; }
-        public string SKU { get; }
-        public string SerialNumber { get; }
-        public OdataObject Thermal { get; }
-        public string UUID { get; }    
+        public ChassisLink Links { get; set; }
+        public string AssetTag { get; set; }
+        public string ChassisType { get; set; }
+        public OdataObject LogServices { get; set; }
+        public string Manufacturer { get; set; }
+        public string Model { get; set; }
+        public OdataObject NetworkAdapters { get; set; }
+        public string PartNumber { get; set; }
+        public OdataObject Power { get; set; }
+        public string SKU { get; set; }
+        public string SerialNumber { get; set; }
+        public OdataObject Thermal { get; set; }
+        public string UUID { get; set; }    
     }
 }

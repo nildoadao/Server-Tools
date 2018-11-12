@@ -109,6 +109,7 @@ namespace Server_Tools.View
         {
             if (!CheckForm())
                 return;
+
             UpdateButton.IsEnabled = false;
             string reboot = RebootRadioButton.IsChecked.Value ? "TRUE" : "FALSE";
             foreach(Server server in ServersListBox.Items)
@@ -121,16 +122,31 @@ namespace Server_Tools.View
 
         private async void UpdateFirmware(Server server, string reboot)
         {
+            if(!await NetworkHelper.CheckConnectionAsync(server.Host))
+            {
+                OutputTextBox.AppendText(string.Format("Servidor {0} ínacessivel.\n", server));
+                return;
+            }
             try
             {
-                string jobId = await CreateJob(server, reboot);
-
+                string jobId = "";
+                var idrac = new IdracSshController(server);
+                string command = string.Format(@"racadm update -f Catalog.xml.gz -e ftp.dell.com/Catalog -a {0} -t FTP", reboot);
+                string response = idrac.RunCommand(command);
+                foreach (var item in response.Split(' '))
+                {
+                    if (item.Contains("JID"))
+                    {
+                        jobId = item.Split('"').FirstOrDefault();
+                        break;
+                    }
+                }
                 if (String.IsNullOrEmpty(jobId)) // Caso Haja problema na criação do Job ele retorna ""
                     return;
 
-                var idrac = new JobController(server);
+                var idracJob = new JobController(server);
                 var idracChassis = new ChassisController(server);
-                IdracJob job = await idrac.GetJob(jobId);
+                IdracJob job = await idracJob.GetJob(jobId);
                 Chassis chassis = await idracChassis.GetChassisInformation();
                 var jobs = (List<ServerJob>) JobsDataGrid.ItemsSource;
                 jobs.Add(new ServerJob { Server = server, Job = job, SerialNumber = chassis.SKU });
@@ -140,44 +156,6 @@ namespace Server_Tools.View
             {
                 OutputTextBox.AppendText(string.Format("Falha ao atualizar {0} {1}\n", server, ex.Message));
             }
-        }
-
-        private async Task<string> CreateJob(Server server, string reboot)
-        {
-            string jobId = "";
-            await Task.Run(() =>
-            {
-                if (!NetworkHelper.IsConnected(server.Host))
-                {
-                    Dispatcher.Invoke(() =>
-                    {
-                        OutputTextBox.AppendText(string.Format("Servidor {0} ínacessivel.\n", server));
-                    });
-                    return;
-                }
-                try
-                {
-                    var idrac = new IdracSshController(server);
-                    string command = string.Format(@"racadm update -f Catalog.xml.gz -e ftp.dell.com/Catalog -a {0} -t FTP", reboot);
-                    string response = idrac.RunCommand(command);
-                    foreach (var item in response.Split(' '))
-                    {
-                        if (item.Contains("JID"))
-                        {
-                            jobId = item.Split('"').FirstOrDefault();
-                            break;
-                        }
-                    }                   
-                }
-                catch (Exception ex)
-                {
-                    Dispatcher.Invoke(() =>
-                    {
-                        OutputTextBox.AppendText(string.Format("Falha ao criar Job para {0}: {1}\n", server, ex.Message));
-                    });
-                }
-            });
-            return jobId;
         }
 
         private async void UpdateJobs()

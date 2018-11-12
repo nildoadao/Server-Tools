@@ -97,6 +97,9 @@ namespace Server_Tools.View
 
         private void ImportButton_Click(object sender, RoutedEventArgs e)
         {
+            if (!CheckForm())
+                return;
+
             string target = "";
             foreach(RadioButton item in TargetGroup.Children)
             {
@@ -116,28 +119,26 @@ namespace Server_Tools.View
                 }
             }
             string path = FileTextBox.Text;
-            foreach (Server server in ServersListBox.Items)
+            foreach(Server server in ServersListBox.Items)
             {
+                OutputTextBox.AppendText(string.Format("Importando configurações para {0}...\n", server.Host));
                 ImportScp(server, path, target, shutdown);
-            }
+            }                    
         }
 
         private async void ImportScp(Server server, string path, string target, string shutdown)
         {
-            if (!NetworkHelper.IsConnected(server.Host))
-            {
-                MessageBox.Show("Servidor inacessivel", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+            if(!await NetworkHelper.CheckConnectionAsync(server.Host))
                 return;
-            }
-            ScpController idrac = new ScpController(server);           
+            
             try
             {
-                OutputTextBox.AppendText(string.Format("Importando configurações para {0}...\n", server.Host));
+                ScpController idrac = new ScpController(server);               
                 IdracJob job = await idrac.ImportScpFile(path, target, shutdown, "On");
                 OutputTextBox.AppendText(string.Format("Job {0} criado para servidor {1} \n", job.Id, server));
                 jobQueue.Add(new ServerJob { Server = server, Job = job });
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 OutputTextBox.AppendText("Falha ao importar arquivo: " + ex.Message);
             }
@@ -166,19 +167,9 @@ namespace Server_Tools.View
 
         private bool CheckForm()
         {
-            if (String.IsNullOrEmpty(ServerTextBox.Text))
+            if (ServersListBox.Items.Count == 0)
             {
-                MessageBox.Show("Informe o endereço do host", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
-                return false;
-            }
-            else if (String.IsNullOrEmpty(UserTextBox.Text))
-            {
-                MessageBox.Show("Informe o usuario", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
-                return false;
-            }
-            else if (String.IsNullOrEmpty(PasswordBox.Password))
-            {
-                MessageBox.Show("Informe a senha", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("Selecione ao menos um servidor para aplicar o template", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
                 return false;
             }
             else if (String.IsNullOrEmpty(FileTextBox.Text))
@@ -186,15 +177,8 @@ namespace Server_Tools.View
                 MessageBox.Show("Selecione um arquivo", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
                 return false;
             }
-            else if (ServersListBox.Items.Count == 0)
-            {
-                MessageBox.Show("Selecione ao menos um servidor para aplicar o template", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
-                return false;
-            }
             else
-            {
                 return true;
-            }
         }
 
         private async void UpdateJobs()

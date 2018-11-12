@@ -26,8 +26,8 @@ namespace Server_Tools.View
     /// </summary>
     public partial class CustomScriptPage : Page
     {
-        OpenFileDialog csvDialog;
-        OpenFileDialog scriptDialog;
+        OpenFileDialog CsvDialog;
+        OpenFileDialog ScriptDialog;
         bool operationCancelled;
 
         public CustomScriptPage()
@@ -37,31 +37,31 @@ namespace Server_Tools.View
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            csvDialog = new OpenFileDialog()
+            CsvDialog = new OpenFileDialog()
             {
                 Filter = "Arquivos CSV|*csv"
             };
-            csvDialog.FileOk += CsvDialog_FileOk;
-            scriptDialog = new OpenFileDialog()
+            CsvDialog.FileOk += CsvDialog_FileOk;
+            ScriptDialog = new OpenFileDialog()
             {
                 Filter = "Arquivos Txt|*txt"
             };
-            scriptDialog.FileOk += ScriptDialog_FileOk;
+            ScriptDialog.FileOk += ScriptDialog_FileOk;
         }
 
         private void AddButton_Click(object sender, RoutedEventArgs e)
         {
             if (String.IsNullOrEmpty(UserTextBox.Text) | String.IsNullOrEmpty(PasswordBox.Password) | String.IsNullOrEmpty(ServerTextBox.Text))
-                MessageBox.Show("Preencha os dados da Idrac", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
-
-            else
             {
-                Server server = new Server(ServerTextBox.Text, UserTextBox.Text, PasswordBox.Password);
-                ServersListBox.Items.Add(server);
-                ServerTextBox.Clear();
-                UserTextBox.Clear();
-                PasswordBox.Clear();
+                MessageBox.Show("Preencha os dados da Idrac", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
             }
+            
+            Server server = new Server(ServerTextBox.Text, UserTextBox.Text, PasswordBox.Password);
+            ServersListBox.Items.Add(server);
+            ServerTextBox.Clear();
+            UserTextBox.Clear();
+            PasswordBox.Clear();
         }
 
         private void RemoveButton_Click(object sender, RoutedEventArgs e)
@@ -73,7 +73,7 @@ namespace Server_Tools.View
         {
             try
             {
-                foreach(Server server in FileHelper.ReadCsvFile(csvDialog.FileName))
+                foreach(Server server in FileHelper.ReadCsvFile(CsvDialog.FileName))
                 {
                     ServersListBox.Items.Add(server);
                 }
@@ -100,7 +100,7 @@ namespace Server_Tools.View
                 MessageBox.Show("Insira ao menos um servidor para aplicar o script", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
                 return false;
             }
-            else if (String.IsNullOrEmpty(scriptDialog.FileName))
+            else if (String.IsNullOrEmpty(ScriptDialog.FileName))
             {
                 MessageBox.Show("Selecione um script a ser aplicado", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
                 return false;
@@ -108,14 +108,14 @@ namespace Server_Tools.View
             return true;
         }
 
-        private async void ApplyScript()
+        private void ApplyScript()
         {
             foreach (Server server in ServersListBox.Items)
             {
                 try
                 {
                     var script = File.ReadAllLines(ScriptTextBox.Text);
-                    await RunScriptAsync(server, script);
+                    RunScriptAsync(server, script);
 
                     if (operationCancelled)
                     {
@@ -128,30 +128,28 @@ namespace Server_Tools.View
                 {
                     MessageBox.Show(string.Format("Falha ao executar o script : {0}", ex.Message), "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
-
             }
             ApplyButton.IsEnabled = true;
         }
 
-        private async Task<string> RunScriptAsync(Server server, IEnumerable<string> script)
+        private async void RunScriptAsync(Server server, IEnumerable<string> script)
         {
-            string result = "";
             await Task.Run(() =>
             {
+                if (!NetworkHelper.IsConnected(server.Host))
+                {
+                    Dispatcher.Invoke(() =>
+                    {
+                        OutputTextBox.AppendText(string.Format("Servidor {0} ínacessivel.\n", server));
+                    });
+                    return;
+                }
                 try
                 {
-                    if (!NetworkHelper.IsConnected(server.Host))
-                    {
-                        Dispatcher.Invoke(() =>
-                        {
-                            OutputTextBox.AppendText(string.Format("Servidor {0} ínacessivel.\n", server));
-                        });
-                        return;
-                    }
                     var idrac = new IdracSshController(server);
                     foreach(var command in script)
                     {
-                        result = idrac.RunCommand(command);
+                        idrac.RunCommand(command);
                     }
                 }
                 catch(Exception ex)
@@ -162,7 +160,6 @@ namespace Server_Tools.View
                     });
                 }
             });
-            return result;
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
@@ -173,17 +170,17 @@ namespace Server_Tools.View
 
         private void ScriptDialogButton_Click(object sender, RoutedEventArgs e)
         {
-            scriptDialog.ShowDialog();
+            ScriptDialog.ShowDialog();
         }
 
         private void AddCsvButton_Click(object sender, RoutedEventArgs e)
         {
-            csvDialog.ShowDialog();
+            CsvDialog.ShowDialog();
         }
 
         private void ScriptDialog_FileOk(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            ScriptTextBox.Text = scriptDialog.FileName;
+            ScriptTextBox.Text = ScriptDialog.FileName;
         }
 
     }

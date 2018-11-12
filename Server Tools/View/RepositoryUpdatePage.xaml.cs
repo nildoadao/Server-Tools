@@ -27,9 +27,10 @@ namespace Server_Tools.View
     /// </summary>
     public partial class RepositoryUpdatePage : Page
     {
-        FileDialog csvDialog;
-        ObservableCollection<ServerJob> jobQueue;
+        FileDialog CsvDialog;
         DispatcherTimer timer;
+
+        // Classe interna para os dados do DataGrid
 
         private class ServerJob
         {
@@ -45,12 +46,12 @@ namespace Server_Tools.View
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            csvDialog = new OpenFileDialog()
+            CsvDialog = new OpenFileDialog()
             {
                 Filter = "Arquivos CSV|*csv"
             };
-            csvDialog.FileOk += CsvDialog_FileOk;
-            jobQueue = new ObservableCollection<ServerJob>();
+            CsvDialog.FileOk += CsvDialog_FileOk;
+            JobsDataGrid.ItemsSource = new List<ServerJob>();
             timer = new DispatcherTimer()
             {
                 Interval = new TimeSpan(0, 0, 10)
@@ -63,7 +64,7 @@ namespace Server_Tools.View
         {
             try
             {
-                IEnumerable<Server> servers = FileHelper.ReadCsvFile(csvDialog.FileName);
+                var servers = FileHelper.ReadCsvFile(CsvDialog.FileName);
                 foreach (Server server in servers)
                 {
                     ServersListBox.Items.Add(server);
@@ -82,21 +83,16 @@ namespace Server_Tools.View
 
         private void AddButton_Click(object sender, RoutedEventArgs e)
         {
-            if (!String.IsNullOrEmpty(ServerTextBox.Text))
+            if (String.IsNullOrEmpty(ServerTextBox.Text) || String.IsNullOrEmpty(UserTextBox.Text) || String.IsNullOrEmpty(PasswordBox.Password))
             {
-                if (String.IsNullOrEmpty(UserTextBox.Text) | String.IsNullOrEmpty(PasswordBox.Password))
-                {
-                    MessageBox.Show("Insira usuario e senha da Idrac", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
-                }
-                else
-                {
-                    Server server = new Server(ServerTextBox.Text, UserTextBox.Text, PasswordBox.Password);
-                    ServersListBox.Items.Add(server);
-                    ServerTextBox.Clear();
-                    UserTextBox.Clear();
-                    PasswordBox.Clear();
-                }
+                MessageBox.Show("Preencha os dados da Idrac", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
             }
+            var server = new Server(ServerTextBox.Text, UserTextBox.Text, PasswordBox.Password);
+            ServersListBox.Items.Add(server);
+            ServerTextBox.Clear();
+            UserTextBox.Clear();
+            PasswordBox.Clear();
         }
 
         private void RemoveButton_Click(object sender, RoutedEventArgs e)
@@ -106,20 +102,21 @@ namespace Server_Tools.View
 
         private void AddCsvButton_Click(object sender, RoutedEventArgs e)
         {
-            csvDialog.ShowDialog();
+            CsvDialog.ShowDialog();
         }
 
         private void UpdateButton_Click(object sender, RoutedEventArgs e)
         {
             if (!CheckForm())
                 return;
-
+            UpdateButton.IsEnabled = false;
             string reboot = RebootRadioButton.IsChecked.Value ? "TRUE" : "FALSE";
             foreach(Server server in ServersListBox.Items)
             {
                 OutputTextBox.AppendText(string.Format("Atualizando firmwares de {0}...\n", server));
                 UpdateFirmware(server, reboot);
             }
+            UpdateButton.IsEnabled = true;
         }
 
         private async void UpdateFirmware(Server server, string reboot)
@@ -127,11 +124,16 @@ namespace Server_Tools.View
             try
             {
                 string jobId = await CreateJob(server, reboot);
+
+                if (String.IsNullOrEmpty(jobId)) // Caso Haja problema na criação do Job ele retorna ""
+                    return;
+
                 var idrac = new JobController(server);
                 var idracChassis = new ChassisController(server);
                 IdracJob job = await idrac.GetJob(jobId);
                 Chassis chassis = await idracChassis.GetChassisInformation();
-                jobQueue.Add(new ServerJob { Server = server, Job = job, SerialNumber = chassis.SKU });
+                var jobs = (List<ServerJob>) JobsDataGrid.ItemsSource;
+                jobs.Add(new ServerJob { Server = server, Job = job, SerialNumber = chassis.SKU });
                 OutputTextBox.AppendText(string.Format("Criado {0} par atualizaçao do servidor {1}", jobId, server));
             }
             catch(Exception ex)
@@ -145,19 +147,19 @@ namespace Server_Tools.View
             string jobId = "";
             await Task.Run(() =>
             {
+                if (!NetworkHelper.IsConnected(server.Host))
+                {
+                    Dispatcher.Invoke(() =>
+                    {
+                        OutputTextBox.AppendText(string.Format("Servidor {0} ínacessivel.\n", server));
+                    });
+                    return;
+                }
                 try
                 {
-                    if (!NetworkHelper.IsConnected(server.Host))
-                    {
-                        Dispatcher.Invoke(() =>
-                        {
-                            OutputTextBox.AppendText(string.Format("Servidor {0} ínacessivel.\n", server));
-                        });
-                        return;
-                    }
-                    var sshIdrac = new IdracSshController(server);
-                    string command = string.Format("racadm update -f Catalog.xml.gz -e ftp.dell.com/Catalog -a {0} -t FTP", reboot);
-                    string response = sshIdrac.RunCommand(command);
+                    var idrac = new IdracSshController(server);
+                    string command = string.Format(@"racadm update -f Catalog.xml.gz -e ftp.dell.com/Catalog -a {0} -t FTP", reboot);
+                    string response = idrac.RunCommand(command);
                     foreach (var item in response.Split(' '))
                     {
                         if (item.Contains("JID"))
@@ -180,8 +182,10 @@ namespace Server_Tools.View
 
         private async void UpdateJobs()
         {
-            var updatedJobs = new ObservableCollection<ServerJob>();
-            foreach (var job in jobQueue)
+            var updatedJobs = new List<ServerJob>();
+            var jobs = (List<ServerJob>) JobsDataGrid.ItemsSource;
+
+            foreach (var job in jobs)
             {
                 try
                 {
@@ -196,9 +200,12 @@ namespace Server_Tools.View
                     OutputTextBox.AppendText(string.Format("Falha ao obter dados de {0} {1}\n", job.Server, ex.Message));
                 }
             }
-            jobQueue = updatedJobs;
-            JobsDataGrid.ItemsSource = jobQueue;
+            jobs = updatedJobs;
+            JobsDataGrid.ItemsSource = jobs;
         }
+
+
+        // Valida as entradas do formulário
 
         private bool CheckForm()
         {
@@ -210,7 +217,5 @@ namespace Server_Tools.View
             else
                 return true;
         }
-
-
     }
 }

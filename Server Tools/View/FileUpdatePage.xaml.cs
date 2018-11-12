@@ -14,7 +14,7 @@ namespace Server_Tools.View
     /// </summary>
     public partial class FileUpdatePage : Page
     {
-        OpenFileDialog firmwareDialog;
+        OpenFileDialog FirmwareDialog;
 
         public FileUpdatePage()
         {
@@ -23,16 +23,16 @@ namespace Server_Tools.View
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            firmwareDialog = new OpenFileDialog()
+            FirmwareDialog = new OpenFileDialog()
             {
                 Filter = "Idrac Firmware (*.exe)(*.d7)(*.pm)| *.exe;*.d7;*.pm"
             };
-            firmwareDialog.FileOk += FirmwareDialog_FileOk;
+            FirmwareDialog.FileOk += FirmwareDialog_FileOk;
         }
 
         private void FirmwareDialog_FileOk(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            FirmwareTextBox.Text = firmwareDialog.FileName;
+            FirmwareTextBox.Text = FirmwareDialog.FileName;
         }
 
         private void UpdateButton_Click(object sender, RoutedEventArgs e)
@@ -74,7 +74,7 @@ namespace Server_Tools.View
 
         private void OpenFirmwareButton_Click(object sender, RoutedEventArgs e)
         {
-            firmwareDialog.ShowDialog();
+            FirmwareDialog.ShowDialog();
         }
 
         private bool CheckForm()

@@ -25,6 +25,7 @@ namespace Server_Tools.View
     {
         private Server server;
 
+        // Classe interna para os dados do DataGrid
         private class DiskItem
         {
             public bool IsSelected { get; set; }
@@ -55,14 +56,9 @@ namespace Server_Tools.View
                                 select item.Disk;
 
             var raidDisks = new List<PhysicalDisk>();
-
-            foreach(var disk in selectedDisks)
-            {
-                raidDisks.Add(disk);
-            }
-
+            raidDisks.AddRange(selectedDisks);
             var level = (RaidLevel) RaidCombobox.SelectedItem;
-            Enclousure enclousure = (Enclousure) ControllersCombobox.SelectedItem;
+            var enclousure = (Enclousure) ControllersCombobox.SelectedItem;
             string name = VdNameTextBox.Text;
             int capacity = 0;
             int optimal = 0;
@@ -121,7 +117,7 @@ namespace Server_Tools.View
             {
                 var idrac = new StorageController(server);
                 List<PhysicalDisk> disks = await idrac.GetAllPhysicalDisks();
-                ObservableCollection<DiskItem> datagridItems = new ObservableCollection<DiskItem>();
+                var datagridItems = new List<DiskItem>();
                 foreach (var disk in disks)
                 {
                     datagridItems.Add(new DiskItem { IsSelected = false, Disk = disk });
@@ -132,7 +128,6 @@ namespace Server_Tools.View
             {
                 MessageBox.Show("Falha ao receber dados dos discos do servidor", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-
         }
 
         private async void UpdateControllers()

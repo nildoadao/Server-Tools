@@ -28,10 +28,10 @@ namespace Server_Tools.Idrac.Controllers
         /// <param name="path">Caminho completo para o arquvi do firmware</param>
         /// <param name="option">Modo de instalação</param>
         /// <returns>IdracJob</returns>
-        public async Task<IdracJob> UpdateFirmware(string path, string option)
+        public async Task<IdracJob> UpdateFirmwareAsync(string path, string option)
         {
-            Uri location = await UploadFile(path);
-            return await InstallFirmware(location, option);
+            Uri location = await UploadFileAsync(path);
+            return await InstallFirmwareAsync(location, option);
         }
 
         /// <summary>
@@ -40,14 +40,14 @@ namespace Server_Tools.Idrac.Controllers
         /// <param name="paths">Lista com o caminho dos recursos</param>
         /// <param name="option">Modo de instalação</param>
         /// <returns></returns>
-        public async Task<IdracJob> UpdateFirmware(IEnumerable<string> paths, string option)
+        public async Task<IdracJob> UpdateFirmwareAsync(IEnumerable<string> paths, string option)
         {
             var locations = new List<Uri>();
             foreach(var item in paths)
             {
-                locations.Add(await UploadFile(item));
+                locations.Add(await UploadFileAsync(item));
             }
-            return await InstallFirmware(locations, option);
+            return await InstallFirmwareAsync(locations, option);
         }
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace Server_Tools.Idrac.Controllers
         /// <param name="location">Uri do recurso</param>
         /// <param name="option">Modo de Instalação</param>
         /// <returns>Job de Instação fo Firmware</returns>
-        private async Task<IdracJob> InstallFirmware(Uri location, string option)
+        private async Task<IdracJob> InstallFirmwareAsync(Uri location, string option)
         {
             var uris = new List<string>() { location.ToString() };
             var content = new
@@ -67,7 +67,7 @@ namespace Server_Tools.Idrac.Controllers
             string jsonContent = JsonConvert.SerializeObject(content);
             var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
             var idrac = new JobController(Server);
-            return await idrac.CreateJob(BaseUri + FirmwareInstall, httpContent);
+            return await idrac.CreateJobAsync(BaseUri + FirmwareInstall, httpContent);
         }
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace Server_Tools.Idrac.Controllers
         /// <param name="locations">Lista com a localização dos recursos</param>
         /// <param name="option">Modo de Instalação</param>
         /// <returns>Job de Instação fo Firmware</returns>
-        private async Task<IdracJob> InstallFirmware(IEnumerable<Uri> locations, string option)
+        private async Task<IdracJob> InstallFirmwareAsync(IEnumerable<Uri> locations, string option)
         {
             var uris = new List<string>(); 
             foreach(var item in locations)
@@ -91,7 +91,7 @@ namespace Server_Tools.Idrac.Controllers
             string jsonContent = JsonConvert.SerializeObject(content);
             var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
             var idrac = new JobController(Server);
-            return await idrac.CreateJob(BaseUri + FirmwareInstall, httpContent);
+            return await idrac.CreateJobAsync(BaseUri + FirmwareInstall, httpContent);
         }
 
         /// <summary>
@@ -99,14 +99,14 @@ namespace Server_Tools.Idrac.Controllers
         /// </summary>
         /// <param name="path">caminho completo do arquivo do firmware</param>
         /// <returns>Uri com a localização do recurso</returns>
-        private async Task<Uri> UploadFile(string path)
+        private async Task<Uri> UploadFileAsync(string path)
         {
             using (var request = new HttpRequestMessage(HttpMethod.Post, BaseUri + FirmwareInventory))
             using (var multipartContent = new MultipartFormDataContent())
             using (var fileContent = new StreamContent(File.Open(path, FileMode.Open)))
             {
                 request.Headers.Authorization = Credentials;
-                string etag = await GetHeaderValue("ETag", BaseUri + FirmwareInventory);
+                string etag = await GetHeaderValueAsync("ETag", BaseUri + FirmwareInventory);
                 request.Headers.TryAddWithoutValidation("If-Match", etag);
                 request.Headers.CacheControl = CacheControlHeaderValue.Parse("no-cache");
                 fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse("multipart/form-data");

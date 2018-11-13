@@ -1,7 +1,5 @@
 ﻿using Newtonsoft.Json;
 using Server_Tools.Idrac.Models;
-using Syroot.Windows.IO;
-using System;
 using System.IO;
 using System.Net.Http;
 using System.Text;
@@ -25,7 +23,7 @@ namespace Server_Tools.Idrac.Controllers
         /// </summary>
         /// <param name="target">Parametros que serão incluidos no arquivo</param>
         /// <returns></returns>
-        public async Task<IdracJob> ExportScpFile(string target, string exportUse)
+        public async Task<IdracJob> ExportScpFileAsync(string target, string exportUse)
         {
             var content = new
             {
@@ -40,7 +38,7 @@ namespace Server_Tools.Idrac.Controllers
             var jsonContent = JsonConvert.SerializeObject(content);
             var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
             var idrac = new JobController(Server);
-            return await idrac.CreateJob(BaseUri + ExportSystemConfiguration, httpContent);
+            return await idrac.CreateJobAsync(BaseUri + ExportSystemConfiguration, httpContent);
         }
 
         /// <summary>
@@ -48,10 +46,10 @@ namespace Server_Tools.Idrac.Controllers
         /// </summary>
         /// <param name="jobId">Identificação do Job em que foi criado o SCP</param>
         /// <returns>Dados do arquivo</returns>
-        public async Task<string> GetScpFileData(string jobId)
+        public async Task<string> GetScpFileDataAsync(string jobId)
         {
             var idrac = new JobController(Server);
-            using (var response = await idrac.GetJobData(jobId))
+            using (var response = await idrac.GetJobDataAsync(jobId))
             {
                 if (!response.IsSuccessStatusCode)
                     throw new HttpRequestException("Falha ao receber dados do Export: " + response.RequestMessage);
@@ -68,7 +66,7 @@ namespace Server_Tools.Idrac.Controllers
         /// <param name="shutdown">Método de desligamento, caso necessario</param>
         /// <param name="status">Status do servidor On/Off</param>
         /// <returns></returns>
-        public async Task<IdracJob> ImportScpFile(string file, string target, string shutdown, string status)
+        public async Task<IdracJob> ImportScpFileAsync(string file, string target, string shutdown, string status)
         {
             string fileLines = File.ReadAllText(file);
             var content = new
@@ -84,7 +82,7 @@ namespace Server_Tools.Idrac.Controllers
             var jsonContent = JsonConvert.SerializeObject(content);
             var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
             var idrac = new JobController(Server);
-            return await idrac.CreateJob(BaseUri + ImportSystemConfiguration, httpContent);
+            return await idrac.CreateJobAsync(BaseUri + ImportSystemConfiguration, httpContent);
         }
     }
 }

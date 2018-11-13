@@ -4,17 +4,10 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-using System.Windows.Shapes;
+
 
 namespace Server_Tools.View
 {
@@ -94,23 +87,23 @@ namespace Server_Tools.View
 
             if (MessageBox.Show("Deseja mesmo excluir o volume selecionado ?", "Aviso", MessageBoxButton.OKCancel, MessageBoxImage.Question) == MessageBoxResult.OK)
             {
-                DeleteVd(selectedVolumes.FirstOrDefault());
+                DeleteVdAsync(selectedVolumes.FirstOrDefault());
             }
         }
       
         private void UpdateForm()
         {
-            UpdateDisks();
-            UpdateControllers();
-            UpdateVirtualDisks();
+            UpdateDisksAsync();
+            UpdateControllersAsync();
+            UpdateVirtualDisksAsync();
         }
 
-        private async void UpdateDisks()
+        private async void UpdateDisksAsync()
         {
             try
             {
                 var idrac = new StorageController(server);
-                List<PhysicalDisk> disks = await idrac.GetAllPhysicalDisks();
+                List<PhysicalDisk> disks = await idrac.GetAllPhysicalDisksAsync();
                 PhysicalDiskDatagrid.ItemsSource = disks;
                 ServerTextBlock.Text = server.Host;
                 PhysicalDiskCountTextBlock.Text = disks.Count.ToString();
@@ -122,13 +115,13 @@ namespace Server_Tools.View
             }
         }
 
-        private async void UpdateControllers()
+        private async void UpdateControllersAsync()
         {
             try
             {
                 var idrac = new StorageController(server);
                 ControllersComboBox.Items.Clear();
-                foreach (RaidController controller in await idrac.GetAllRaidControllers())
+                foreach (RaidController controller in await idrac.GetAllRaidControllersAsync())
                 {
                     ControllersComboBox.Items.Add(controller);
                 }
@@ -139,12 +132,12 @@ namespace Server_Tools.View
             }
         }
 
-        private async void UpdateVirtualDisks()
+        private async void UpdateVirtualDisksAsync()
         {
             try
             {
                 var idrac = new StorageController(server);
-                List<VirtualDisk> volumes = await idrac.GetAllVirtualDisks();
+                List<VirtualDisk> volumes = await idrac.GetAllVirtualDisksAsync();
                 var datagridItems = new ObservableCollection<VolumeItem>();
                 foreach (var item in volumes)
                 {
@@ -171,12 +164,12 @@ namespace Server_Tools.View
             return unassigned.Count();
         }
 
-        private async void DeleteVd(VirtualDisk volume)
+        private async void DeleteVdAsync(VirtualDisk volume)
         {
             try
             {
                 var idrac = new StorageController(server);
-                IdracJob job = await idrac.DeleteVirtualDisk(volume);
+                IdracJob job = await idrac.DeleteVirtualDiskAsync(volume);
                 var load = new LoadWindow(server, job) { Title = server.Host };
                 load.Closed += (object sender, EventArgs e) =>
                 {

@@ -1,7 +1,5 @@
 ﻿using Renci.SshNet;
 using Server_Tools.Idrac.Models;
-using System;
-using System.Threading.Tasks;
 
 namespace Server_Tools.Idrac.Controllers
 {

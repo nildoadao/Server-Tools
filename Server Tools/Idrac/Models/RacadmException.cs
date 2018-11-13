@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-
 namespace Server_Tools.Idrac.Models
 {
     

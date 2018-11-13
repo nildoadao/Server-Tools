@@ -1,8 +1,4 @@
 ﻿using Server_Tools.Idrac.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Server_Tools.Idrac.Controllers
@@ -18,9 +14,9 @@ namespace Server_Tools.Idrac.Controllers
         /// Retorna as informações de Chassis do servidor
         /// </summary>
         /// <returns></returns>
-        public async Task<Chassis> GetChassisInformation()
+        public async Task<Chassis> GetChassisAsync()
         {
-            return await GetResource<Chassis>(BaseUri + ChassisRoot);
+            return await GetResourceAsync<Chassis>(BaseUri + ChassisRoot);
         }
 
     }

@@ -3,19 +3,9 @@ using Server_Tools.Idrac.Controllers;
 using Server_Tools.Idrac.Models;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Threading;
 using System.ComponentModel;
 using Server_Tools.Util;
@@ -70,15 +60,16 @@ namespace Server_Tools.View
                     ServersListBox.Items.Add(server);
                 }
             }
-            catch (Exception ex)
+            catch
             {
-                OutputTextBox.AppendText("Falha ao carregar CSV: " + ex.Message + "\n");
+                MessageBox.Show("Falha ao carregar arquivo CSV, certifique que o arquivo está no formato correto e tente novamente\n\nFormato esperado:\n<hostname>;<usuario>;<senha>", 
+                    "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
         private void Timer_Tick(object sender, EventArgs e)
         {
-            UpdateJobs();
+            UpdateJobsAsync();
         }
 
         private void AddButton_Click(object sender, RoutedEventArgs e)
@@ -115,12 +106,12 @@ namespace Server_Tools.View
             foreach(Server server in ServersListBox.Items)
             {
                 OutputTextBox.AppendText(string.Format("Atualizando firmwares de {0}...\n", server));
-                UpdateFirmware(server, reboot);
+                UpdateFirmwareAsync(server, reboot);
             }
             UpdateButton.IsEnabled = true;
         }
 
-        private async void UpdateFirmware(Server server, string reboot)
+        private async void UpdateFirmwareAsync(Server server, string reboot)
         {
             if(!await NetworkHelper.CheckConnectionAsync(server.Host))
             {
@@ -146,8 +137,8 @@ namespace Server_Tools.View
 
                 var idracJob = new JobController(server);
                 var idracChassis = new ChassisController(server);
-                IdracJob job = await idracJob.GetJob(jobId);
-                Chassis chassis = await idracChassis.GetChassisInformation();
+                IdracJob job = await idracJob.GetJobAsync(jobId);
+                Chassis chassis = await idracChassis.GetChassisAsync();
                 var jobs = (List<ServerJob>) JobsDataGrid.ItemsSource;
                 jobs.Add(new ServerJob { Server = server, Job = job, SerialNumber = chassis.SKU });
                 OutputTextBox.AppendText(string.Format("Criado {0} par atualizaçao do servidor {1}", jobId, server));
@@ -158,7 +149,7 @@ namespace Server_Tools.View
             }
         }
 
-        private async void UpdateJobs()
+        private async void UpdateJobsAsync()
         {
             var updatedJobs = new List<ServerJob>();
             var jobs = (List<ServerJob>) JobsDataGrid.ItemsSource;
@@ -168,9 +159,9 @@ namespace Server_Tools.View
                 try
                 {
                     var idrac = new JobController(job.Server);
-                    var updatedJob = await idrac.GetJob(job.Job.Id);
+                    var updatedJob = await idrac.GetJobAsync(job.Job.Id);
                     var chassis = new ChassisController(job.Server);
-                    var serial = await chassis.GetChassisInformation();
+                    var serial = await chassis.GetChassisAsync();
                     updatedJobs.Add(new ServerJob { Server = job.Server, Job = updatedJob, SerialNumber = serial.SKU });
                 }
                 catch(Exception ex)

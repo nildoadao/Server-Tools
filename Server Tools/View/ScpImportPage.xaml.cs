@@ -5,7 +5,6 @@ using Server_Tools.Util;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
@@ -58,7 +57,7 @@ namespace Server_Tools.View
 
         private void Timer_Tick(object sender, EventArgs e)
         {
-            UpdateJobs();
+            UpdateJobsAsync();
         }
 
         private void FileDialog_FileOk(object sender, System.ComponentModel.CancelEventArgs e)
@@ -68,21 +67,17 @@ namespace Server_Tools.View
 
         private void AddButton_Click(object sender, RoutedEventArgs e)
         {
-            if (!String.IsNullOrEmpty(ServerTextBox.Text))
+            if (String.IsNullOrEmpty(ServerTextBox.Text) || String.IsNullOrEmpty(UserTextBox.Text) || String.IsNullOrEmpty(PasswordBox.Password))
             {
-                if (String.IsNullOrEmpty(UserTextBox.Text) | String.IsNullOrEmpty(PasswordBox.Password))
-                {
-                    MessageBox.Show("Insira usuario e senha da Idrac", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
-                }
-                else
-                {
-                    Server server = new Server(ServerTextBox.Text, UserTextBox.Text, PasswordBox.Password);
-                    ServersListBox.Items.Add(server);
-                    ServerTextBox.Clear();
-                    UserTextBox.Clear();
-                    PasswordBox.Clear();
-                }
+                MessageBox.Show("Insira as informações da Idrac", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
             }
+
+            Server server = new Server(ServerTextBox.Text, UserTextBox.Text, PasswordBox.Password);
+            ServersListBox.Items.Add(server);
+            ServerTextBox.Clear();
+            UserTextBox.Clear();
+            PasswordBox.Clear();
         }
 
         private void RemoveButton_Click(object sender, RoutedEventArgs e)
@@ -122,25 +117,28 @@ namespace Server_Tools.View
             foreach(Server server in ServersListBox.Items)
             {
                 OutputTextBox.AppendText(string.Format("Importando configurações para {0}...\n", server.Host));
-                ImportScp(server, path, target, shutdown);
+                ImportScpAsync(server, path, target, shutdown);
             }                    
         }
 
-        private async void ImportScp(Server server, string path, string target, string shutdown)
+        private async void ImportScpAsync(Server server, string path, string target, string shutdown)
         {
             if(!await NetworkHelper.CheckConnectionAsync(server.Host))
+            {
+                OutputTextBox.AppendText(string.Format("Servidor {0} inacessivel\n", server.Host));
                 return;
-            
+            }
+                           
             try
             {
                 ScpController idrac = new ScpController(server);               
-                IdracJob job = await idrac.ImportScpFile(path, target, shutdown, "On");
-                OutputTextBox.AppendText(string.Format("Job {0} criado para servidor {1} \n", job.Id, server));
+                IdracJob job = await idrac.ImportScpFileAsync(path, target, shutdown, "On");
+                OutputTextBox.AppendText(string.Format("Job {0} criado para servidor {1}\n", job.Id, server));
                 jobQueue.Add(new ServerJob { Server = server, Job = job });
             }
             catch (Exception ex)
             {
-                OutputTextBox.AppendText("Falha ao importar arquivo: " + ex.Message);
+                OutputTextBox.AppendText(string.Format("Falha ao importar arquivo {0}\n", ex.Message));
             }
         }
 
@@ -159,9 +157,10 @@ namespace Server_Tools.View
                     ServersListBox.Items.Add(server);
                 }
             }
-            catch (Exception ex)
+            catch
             {
-                OutputTextBox.AppendText("Falha ao carregar CSV: " + ex.Message + "\n");
+                MessageBox.Show("Falha ao carregar arquivo CSV, certifique que o arquivo está no formato correto e tente novamente\n\nFormato esperado:\n<hostname>;<usuario>;<senha>", 
+                    "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -181,7 +180,7 @@ namespace Server_Tools.View
                 return true;
         }
 
-        private async void UpdateJobs()
+        private async void UpdateJobsAsync()
         {
             var updatedJobs = new ObservableCollection<ServerJob>();
             foreach(var job in jobQueue)
@@ -189,14 +188,14 @@ namespace Server_Tools.View
                 try
                 {
                     var idrac = new JobController(job.Server);
-                    var updatedJob = await idrac.GetJob(job.Job.Id);
+                    var updatedJob = await idrac.GetJobAsync(job.Job.Id);
                     var chassis = new ChassisController(job.Server);
-                    var serial = await chassis.GetChassisInformation();
+                    var serial = await chassis.GetChassisAsync();
                     updatedJobs.Add(new ServerJob { Server = job.Server, Job = updatedJob, SerialNumber = serial.SKU });
                 }
                 catch
                 {
-                    OutputTextBox.AppendText("Falha ao atualizar status dos Jobs");
+                    OutputTextBox.AppendText("Falha ao atualizar status dos Jobs\n");
                 }
             }
             jobQueue = updatedJobs;

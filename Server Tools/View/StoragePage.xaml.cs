@@ -2,19 +2,10 @@
 using Server_Tools.Idrac.Models;
 using Server_Tools.Util;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace Server_Tools.View
 {
@@ -33,7 +24,7 @@ namespace Server_Tools.View
             if (!ValidateForm())
                 return;
             var server = new Server(ServerTextBox.Text, UserTextBox.Text, PasswordBox.Password);
-            Connect(server);         
+            ConnectAsync(server);         
         }
 
         private void Page_KeyDown(object sender, KeyEventArgs e)
@@ -43,7 +34,7 @@ namespace Server_Tools.View
                 if (!ValidateForm())
                     return;
                 var server = new Server(ServerTextBox.Text, UserTextBox.Text, PasswordBox.Password);
-                Connect(server);
+                ConnectAsync(server);
             }
         }
 
@@ -57,9 +48,9 @@ namespace Server_Tools.View
             return true;
         }
 
-        private async void Connect(Server server)
+        private async void ConnectAsync(Server server)
         {
-            if (!NetworkHelper.IsConnected(server.Host))
+            if (!await NetworkHelper.CheckConnectionAsync(server.Host))
             {
                 MessageBox.Show("Servidor inacessivel", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
@@ -67,7 +58,7 @@ namespace Server_Tools.View
             try
             {
                 var idrac = new StorageController(server);
-                if (await idrac.CheckRedfishSupport(StorageController.Controllers) == false)
+                if (await idrac.CheckRedfishSupportAsync(StorageController.Controllers) == false)
                 {
                     MessageBox.Show(string.Format("O servidor {0} não suporta a API Redfish", server), "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
                     return;

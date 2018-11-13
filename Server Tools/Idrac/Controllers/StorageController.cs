@@ -2,7 +2,6 @@
 using Server_Tools.Idrac.Models;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,7 +19,7 @@ namespace Server_Tools.Idrac.Controllers
         /// Retorna uma lista com as localizações de todas as enclousures
         /// </summary>
         /// <returns></returns>
-        public async Task<List<string>> GetEnclousuresLocation()
+        public async Task<List<string>> GetEnclousuresLocationAsync()
         {
             using(var request = new HttpRequestMessage(HttpMethod.Get, BaseUri + Controllers))
             {
@@ -51,22 +50,22 @@ namespace Server_Tools.Idrac.Controllers
         /// </summary>
         /// <param name="uri">Uri com a localização do recurso</param>
         /// <returns></returns>
-        public async Task<Enclousure> GetEnclousure(string uri)
+        public async Task<Enclousure> GetEnclousureAsync(string uri)
         {
-            return await GetResource<Enclousure>(BaseUri + uri);
+            return await GetResourceAsync<Enclousure>(BaseUri + uri);
         } 
 
         /// <summary>
         /// Retorna todas as enclousures intaladas no servidor
         /// </summary>
         /// <returns>Lista com todas enclousures</returns>
-        public async Task<List<Enclousure>> GetAllEnclousures()
+        public async Task<List<Enclousure>> GetAllEnclousuresAsync()
         {
-            var locations = await GetEnclousuresLocation();
+            var locations = await GetEnclousuresLocationAsync();
             var enclousures = new List<Enclousure>();
             foreach(var location in locations)
             {
-                enclousures.Add(await GetEnclousure(location));
+                enclousures.Add(await GetEnclousureAsync(location));
             }
             return enclousures;
         }
@@ -76,18 +75,18 @@ namespace Server_Tools.Idrac.Controllers
         /// </summary>
         /// <param name="uri">Localização do recurso</param>
         /// <returns>Objeto contendo a controladora</returns>
-        public async Task<RaidController> GetRaidController(string uri)
+        public async Task<RaidController> GetRaidControllerAsync(string uri)
         {
-            return await GetResource<RaidController>(BaseUri + uri);
+            return await GetResourceAsync<RaidController>(BaseUri + uri);
         }
 
         /// <summary>
         /// Retorna todas as controladoras Raid instaladas no servidor
         /// </summary>
         /// <returns>Lista com controladoras</returns>
-        public async Task<List<RaidController>> GetAllRaidControllers()
+        public async Task<List<RaidController>> GetAllRaidControllersAsync()
         {
-            var enclousures = await GetAllEnclousures();
+            var enclousures = await GetAllEnclousuresAsync();
             var controllers = new List<RaidController>();
             foreach(var enclousure in enclousures)
             {
@@ -101,7 +100,7 @@ namespace Server_Tools.Idrac.Controllers
         /// </summary>
         /// <param name="enclousure">Controladora que abriga os discos</param>
         /// <returns>Lista com todos os discos da controladora</returns>
-        public async Task<List<PhysicalDisk>> GetPhysicalDisks(Enclousure enclousure)
+        public async Task<List<PhysicalDisk>> GetPhysicalDisksAsync(Enclousure enclousure)
         {
             if (enclousure == null)
                 throw new ArgumentNullException("enclousure", "O argumento não pode ser nulo");
@@ -109,7 +108,7 @@ namespace Server_Tools.Idrac.Controllers
             List<PhysicalDisk> disks = new List<PhysicalDisk>();
             foreach(var item in enclousure.Drives)
             {
-               disks.Add(await GetResource<PhysicalDisk>(BaseUri + item.Id));
+               disks.Add(await GetResourceAsync<PhysicalDisk>(BaseUri + item.Id));
             }
             return disks;
         }
@@ -119,7 +118,7 @@ namespace Server_Tools.Idrac.Controllers
         /// </summary>
         /// <param name="volume">Disco virtual</param>
         /// <returns>Lista com todos os discos fisicos</returns>
-        public async Task<List<PhysicalDisk>> GetPhysicalDisks(VirtualDisk volume)
+        public async Task<List<PhysicalDisk>> GetPhysicalDisksAsync(VirtualDisk volume)
         {
             if (volume == null)
                 throw new ArgumentNullException("volume", "O argumento não pode ser nulo");
@@ -127,7 +126,7 @@ namespace Server_Tools.Idrac.Controllers
             List<PhysicalDisk> disks = new List<PhysicalDisk>();
             foreach(var item in volume.Links.Drives)
             {
-                disks.Add(await GetResource<PhysicalDisk>(BaseUri + item.Id));
+                disks.Add(await GetResourceAsync<PhysicalDisk>(BaseUri + item.Id));
             }
             return disks;
         }
@@ -136,12 +135,12 @@ namespace Server_Tools.Idrac.Controllers
         /// Retorna todos os discos fisicos do servidor
         /// </summary>
         /// <returns>Lista com todos os discos</returns>
-        public async Task<List<PhysicalDisk>> GetAllPhysicalDisks()
+        public async Task<List<PhysicalDisk>> GetAllPhysicalDisksAsync()
         {
             var disks = new List<PhysicalDisk>();
-            foreach(var controller in await GetAllEnclousures())
+            foreach(var controller in await GetAllEnclousuresAsync())
             {
-                disks.AddRange(await GetPhysicalDisks(controller));
+                disks.AddRange(await GetPhysicalDisksAsync(controller));
             }
             return disks;
         }
@@ -151,9 +150,9 @@ namespace Server_Tools.Idrac.Controllers
         /// </summary>
         /// <param name="uri">Localização do recurso</param>
         /// <returns>Obejto contendo o disco virtual</returns>
-        public async Task<VirtualDisk> GetVirtualDisk(string uri)
+        public async Task<VirtualDisk> GetVirtualDiskAsync(string uri)
         {
-            return await GetResource<VirtualDisk>(BaseUri + uri);
+            return await GetResourceAsync<VirtualDisk>(BaseUri + uri);
         }
 
         /// <summary>
@@ -161,7 +160,7 @@ namespace Server_Tools.Idrac.Controllers
         /// </summary>
         /// <param name="enclousure">Enclousure onde estão os discos</param>
         /// <returns>Lista com todos os discos virtuais</returns>
-        public async Task<List<VirtualDisk>> GetVirtualDisks(Enclousure enclousure)
+        public async Task<List<VirtualDisk>> GetVirtualDisksAsync(Enclousure enclousure)
         {
             if (enclousure == null)
                 throw new ArgumentNullException("enclousure", "O argumento não pode ser nulo");
@@ -184,7 +183,7 @@ namespace Server_Tools.Idrac.Controllers
                     var virtualDisks = new List<VirtualDisk>();
                     foreach (var item in collection.Members)
                     {
-                        virtualDisks.Add(await GetResource<VirtualDisk>(BaseUri + item.Id));
+                        virtualDisks.Add(await GetResourceAsync<VirtualDisk>(BaseUri + item.Id));
                     }
                     return virtualDisks;
                 }
@@ -195,12 +194,12 @@ namespace Server_Tools.Idrac.Controllers
         /// Retorna todos os discos virtuais presentes no servidor
         /// </summary>
         /// <returns>Lista com todos discos virtuais</returns>
-        public async Task<List<VirtualDisk>> GetAllVirtualDisks()
+        public async Task<List<VirtualDisk>> GetAllVirtualDisksAsync()
         {
             var virtualDisks = new List<VirtualDisk>();
-            foreach(var item in await GetAllEnclousures())
+            foreach(var item in await GetAllEnclousuresAsync())
             {
-                virtualDisks.AddRange(await GetVirtualDisks(item));
+                virtualDisks.AddRange(await GetVirtualDisksAsync(item));
             }
             return virtualDisks;
         }
@@ -215,7 +214,7 @@ namespace Server_Tools.Idrac.Controllers
         /// <param name="stripeSize">Representa o OptimumIOSizeBytes</param>
         /// <param name="name">Nome do VD a ser criado</param>
         /// <returns>Job da operação</returns>
-        public async Task<IdracJob> CreateVirtualDisk(List<PhysicalDisk> disks, Enclousure enclousure, string level, int size, int stripeSize, string name)
+        public async Task<IdracJob> CreateVirtualDiskAsync(List<PhysicalDisk> disks, Enclousure enclousure, string level, int size, int stripeSize, string name)
         {
             List<OdataObject> drives = new List<OdataObject>();
             foreach (var disk in disks)
@@ -233,7 +232,7 @@ namespace Server_Tools.Idrac.Controllers
             var jsonContent = JsonConvert.SerializeObject(content);
             var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
             var idrac = new JobController(Server);
-            return await idrac.CreateJob(string.Format("{0}{1}/Volumes", BaseUri, enclousure.OdataId), httpContent);
+            return await idrac.CreateJobAsync(string.Format("{0}{1}/Volumes", BaseUri, enclousure.OdataId), httpContent);
         }
 
         /// <summary>
@@ -243,7 +242,7 @@ namespace Server_Tools.Idrac.Controllers
         /// <param name="enclousure">Enclousure responsável pelos discos</param>
         /// <param name="level">Nivel de Raid</param>
         /// <returns></returns>
-        public async Task<IdracJob> CreateVirtualDisk(List<PhysicalDisk> disks, Enclousure enclousure, string level)
+        public async Task<IdracJob> CreateVirtualDiskAsync(List<PhysicalDisk> disks, Enclousure enclousure, string level)
         {
             List<OdataObject> drives = new List<OdataObject>();
             foreach (var disk in disks)
@@ -258,7 +257,7 @@ namespace Server_Tools.Idrac.Controllers
             var jsonContent = JsonConvert.SerializeObject(content);
             var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
             var idrac = new JobController(Server);
-            return await idrac.CreateJob(string.Format("{0}{1}/Volumes", BaseUri, enclousure.OdataId), httpContent);
+            return await idrac.CreateJobAsync(string.Format("{0}{1}/Volumes", BaseUri, enclousure.OdataId), httpContent);
         }
 
         /// <summary>
@@ -269,7 +268,7 @@ namespace Server_Tools.Idrac.Controllers
         /// <param name="level">Nivel de Raid</param>
         /// <param name="name">Nome do disco virtual</param>
         /// <returns></returns>
-        public async Task<IdracJob> CreateVirtualDisk(List<PhysicalDisk> disks, Enclousure enclousure, string level, string name)
+        public async Task<IdracJob> CreateVirtualDiskAsync(List<PhysicalDisk> disks, Enclousure enclousure, string level, string name)
         {
             List<OdataObject> drives = new List<OdataObject>();
             foreach (var disk in disks)
@@ -285,7 +284,7 @@ namespace Server_Tools.Idrac.Controllers
             var jsonContent = JsonConvert.SerializeObject(content);
             var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
             var idrac = new JobController(Server);
-            return await idrac.CreateJob(string.Format("{0}{1}/Volumes", BaseUri, enclousure.OdataId), httpContent);
+            return await idrac.CreateJobAsync(string.Format("{0}{1}/Volumes", BaseUri, enclousure.OdataId), httpContent);
         }
 
         /// <summary>
@@ -293,13 +292,13 @@ namespace Server_Tools.Idrac.Controllers
         /// </summary>
         /// <param name="volume">Objeto contendo o disco virtual</param>
         /// <returns>Job de exclusão do VD</returns>
-        public async Task<IdracJob> DeleteVirtualDisk(VirtualDisk volume)
+        public async Task<IdracJob> DeleteVirtualDiskAsync(VirtualDisk volume)
         {
             if (volume == null)
                 throw new ArgumentNullException("volume", "O argumento não pode ser nulo");
 
             var idrac = new JobController(Server);
-            return await idrac.CreateJob(BaseUri + volume.OdataId, HttpMethod.Delete);
+            return await idrac.CreateJobAsync(BaseUri + volume.OdataId, HttpMethod.Delete);
         }
     }
 }

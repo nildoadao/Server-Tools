@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+
 namespace Server_Tools.Util
 {
     class HttpUtil
@@ -15,6 +16,7 @@ namespace Server_Tools.Util
 
         #endregion
 
+        // Client , propiedade estática a ser usada por toda execução do programa.
         public static HttpClient Client
         {
             get
@@ -26,6 +28,9 @@ namespace Server_Tools.Util
             }
         }
 
+        /// <summary>
+        /// Cria uma nova instancia de HttpClient
+        /// </summary>
         private static void BuildClient()
         {
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Ssl3;
@@ -35,9 +40,15 @@ namespace Server_Tools.Util
             _client.DefaultRequestHeaders.Add("User-Agent", USER_AGENT);
             _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("*/*"));
             _client.DefaultRequestHeaders.Connection.Add("keep-alive");
-            _client.Timeout = new TimeSpan(0, 3, 0); 
+            _client.Timeout = new TimeSpan(0, 3, 0); // Em maquinas da geração 13, o update é superior ao timeout default do HttpClient
         }
 
+        /// <summary>
+        /// Cria um cabeçalho de credenciais Http
+        /// </summary>
+        /// <param name="user">Usuario</param>
+        /// <param name="password">Senha</param>
+        /// <returns></returns>
         public static AuthenticationHeaderValue GetCredentialHeader(string user, string password)
         {
             var credentials = string.Format("{0}:{1}", user, password);

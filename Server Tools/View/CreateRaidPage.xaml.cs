@@ -2,19 +2,9 @@
 using Server_Tools.Idrac.Models;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace Server_Tools.View
 {
@@ -62,6 +52,7 @@ namespace Server_Tools.View
             string name = VdNameTextBox.Text;
             int capacity = 0;
             int optimal = 0;
+
             try
             {
                 capacity = int.Parse(CapacityBytesTextBox.Text);
@@ -76,12 +67,12 @@ namespace Server_Tools.View
             if (VdNameCheckBox.IsChecked.Value)
             {
                 if (OptionalCheckBox.IsChecked.Value)
-                    CreateRaid(raidDisks, enclousure, level.ToString(), name, capacity, optimal);
+                    CreateRaidAsync(raidDisks, enclousure, level.ToString(), name, capacity, optimal);
                 else
-                    CreateRaid(raidDisks, enclousure, level.ToString(), name);
+                    CreateRaidAsync(raidDisks, enclousure, level.ToString(), name);
             }
             else
-                CreateRaid(raidDisks, enclousure, level.ToString());
+                CreateRaidAsync(raidDisks, enclousure, level.ToString());
         }
 
         private void OptionalCheckBox_Click(object sender, RoutedEventArgs e)
@@ -97,9 +88,9 @@ namespace Server_Tools.View
 
         private void UpdateForm()
         {
-            UpdateControllers();
+            UpdateControllersAsync();
             UpdateRaid();
-            UpdateDataGrid();
+            UpdateDataGridAsync();
         }
 
         private void UpdateRaid()
@@ -111,12 +102,12 @@ namespace Server_Tools.View
             }
         }
 
-        private async void UpdateDataGrid()
+        private async void UpdateDataGridAsync()
         {
             try
             {
                 var idrac = new StorageController(server);
-                List<PhysicalDisk> disks = await idrac.GetAllPhysicalDisks();
+                List<PhysicalDisk> disks = await idrac.GetAllPhysicalDisksAsync();
                 var datagridItems = new List<DiskItem>();
                 foreach (var disk in disks)
                 {
@@ -130,12 +121,12 @@ namespace Server_Tools.View
             }
         }
 
-        private async void UpdateControllers()
+        private async void UpdateControllersAsync()
         {
             try
             {
                 var idrac = new StorageController(server);
-                List<Enclousure> enclousures = await idrac.GetAllEnclousures();
+                List<Enclousure> enclousures = await idrac.GetAllEnclousuresAsync();
                 foreach (var enclousure in enclousures)
                 {
                     ControllersCombobox.Items.Add(enclousure);
@@ -187,12 +178,12 @@ namespace Server_Tools.View
             return true;
         }
 
-        public async void CreateRaid(List<PhysicalDisk> disks, Enclousure enclousure, string level)
+        public async void CreateRaidAsync(List<PhysicalDisk> disks, Enclousure enclousure, string level)
         {
             try
             {
                 var idrac = new StorageController(server);
-                IdracJob job = await idrac.CreateVirtualDisk(disks, enclousure, level);
+                IdracJob job = await idrac.CreateVirtualDiskAsync(disks, enclousure, level);
                 var load = new LoadWindow(server, job) { Title = server.Host };
                 load.Closed += (object sender, EventArgs e) =>
                 {
@@ -209,12 +200,12 @@ namespace Server_Tools.View
             }
         }
 
-        public async void CreateRaid(List<PhysicalDisk> disks, Enclousure enclousure, string level, string name)
+        public async void CreateRaidAsync(List<PhysicalDisk> disks, Enclousure enclousure, string level, string name)
         {
             try
             {
                 var idrac = new StorageController(server);
-                IdracJob job = await idrac.CreateVirtualDisk(disks, enclousure, level, name);
+                IdracJob job = await idrac.CreateVirtualDiskAsync(disks, enclousure, level, name);
                 var load = new LoadWindow(server, job) { Title = server.Host };
                 load.Closed += (object sender, EventArgs e) =>
                 {
@@ -231,12 +222,12 @@ namespace Server_Tools.View
             }
         }
 
-        public async void CreateRaid(List<PhysicalDisk> disks, Enclousure enclousure, string level, string name, int capacity, int optimal)
+        public async void CreateRaidAsync(List<PhysicalDisk> disks, Enclousure enclousure, string level, string name, int capacity, int optimal)
         {
             try
             {
                 var idrac = new StorageController(server);
-                IdracJob job = await idrac.CreateVirtualDisk(disks, enclousure, level);
+                IdracJob job = await idrac.CreateVirtualDiskAsync(disks, enclousure, level);
                 var load = new LoadWindow(server, job) { Title = server.Host };
                 load.Closed += (object sender, EventArgs e) =>
                 {

@@ -48,7 +48,7 @@ namespace Server_Tools.Idrac.Controllers
         /// </summary>
         /// <param name="resource">caminho do recurso desejado ex: /UpdateService/FirmwareInventory</param>
         /// <returns></returns>
-        public async Task<bool> CheckRedfishSupport(string resource)
+        public async Task<bool> CheckRedfishSupportAsync(string resource)
         {
             bool support = false;
             using (var request = new HttpRequestMessage(HttpMethod.Get, baseUri + resource))
@@ -69,7 +69,7 @@ namespace Server_Tools.Idrac.Controllers
         /// <typeparam name="T">Tipo do Objeto de retorno</typeparam>
         /// <param name="uri">Localização do recurso</param>
         /// <returns></returns>
-        public async Task<T> GetResource<T>(string uri)
+        public async Task<T> GetResourceAsync<T>(string uri)
         {
             using (var request = new HttpRequestMessage(HttpMethod.Get, uri))
             {
@@ -91,7 +91,7 @@ namespace Server_Tools.Idrac.Controllers
         /// <param name="header">Cabeçalho a ser buscado</param>
         /// <param name="uri">Uri do recurso</param>
         /// <returns>O valor de cabeçalho</returns>
-        public async Task<string> GetHeaderValue(string header, string uri)
+        public async Task<string> GetHeaderValueAsync(string header, string uri)
         {
             using (var request = new HttpRequestMessage(HttpMethod.Get, uri))
             {

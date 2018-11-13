@@ -1,23 +1,12 @@
 ﻿using Microsoft.Win32;
-using Renci.SshNet;
 using Server_Tools.Idrac.Controllers;
 using Server_Tools.Idrac.Models;
 using Server_Tools.Util;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace Server_Tools.View
 {
@@ -78,9 +67,10 @@ namespace Server_Tools.View
                     ServersListBox.Items.Add(server);
                 }
             }
-            catch(Exception)
+            catch
             {
-                MessageBox.Show("Falha ao ler arquivo CSV, cheque o arquivo e tente novamente", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Falha ao carregar arquivo CSV, certifique que o arquivo está no formato correto e tente novamente\n\nFormato esperado:\n<hostname>;<usuario>;<senha>", 
+                    "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -90,7 +80,20 @@ namespace Server_Tools.View
                 return;
 
             ApplyButton.IsEnabled = false;
-            ApplyScript();
+            foreach(Server server in ServersListBox.Items)
+            {
+                OutputTextBox.AppendText(string.Format("Aplicando script para {0}\n", server.Host));
+                var script = File.ReadAllLines(ScriptTextBox.Text);
+                RunScriptAsync(server, script);
+
+                if (operationCancelled)
+                {
+                    OutputTextBox.AppendText("Operação cancelada pelo usuário\n");
+                    operationCancelled = false;
+                    break;
+                }
+            }
+            ApplyButton.IsEnabled = true;
         }
 
         private bool CheckForm()
@@ -108,58 +111,25 @@ namespace Server_Tools.View
             return true;
         }
 
-        private void ApplyScript()
-        {
-            foreach (Server server in ServersListBox.Items)
-            {
-                try
-                {
-                    var script = File.ReadAllLines(ScriptTextBox.Text);
-                    RunScriptAsync(server, script);
-
-                    if (operationCancelled)
-                    {
-                        OutputTextBox.AppendText("Operação cancelada pelo usuário\n");
-                        operationCancelled = false;
-                        break;
-                    }
-                }
-                catch(Exception ex)
-                {
-                    MessageBox.Show(string.Format("Falha ao executar o script : {0}", ex.Message), "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-            }
-            ApplyButton.IsEnabled = true;
-        }
-
         private async void RunScriptAsync(Server server, IEnumerable<string> script)
         {
-            await Task.Run(() =>
+            if (!await NetworkHelper.CheckConnectionAsync(server.Host))
             {
-                if (!NetworkHelper.IsConnected(server.Host))
+                OutputTextBox.AppendText(string.Format("Servidor {0} inacessivel.\n", server.Host));
+                return;
+            }
+            try
+            {
+                var idrac = new IdracSshController(server);
+                foreach (var command in script)
                 {
-                    Dispatcher.Invoke(() =>
-                    {
-                        OutputTextBox.AppendText(string.Format("Servidor {0} ínacessivel.\n", server));
-                    });
-                    return;
+                    idrac.RunCommand(command);
                 }
-                try
-                {
-                    var idrac = new IdracSshController(server);
-                    foreach(var command in script)
-                    {
-                        idrac.RunCommand(command);
-                    }
-                }
-                catch(Exception ex)
-                {
-                    Dispatcher.Invoke(() =>
-                    {
-                        OutputTextBox.AppendText(string.Format("Falha ao aplicar script para {0}: {1}\n", server, ex.Message));
-                    });
-                }
-            });
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(string.Format("Falha ao executar o script : {0}", ex.Message), "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)

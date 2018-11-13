@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Net;
 using System.Net.NetworkInformation;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace Server_Tools.Util
 {
@@ -33,6 +28,11 @@ namespace Server_Tools.Util
             }
         }
 
+        /// <summary>
+        /// Checa se um determinado Ip está respondendo na rede
+        /// </summary>
+        /// <param name="host">Endereço de Ip do destino</param>
+        /// <returns></returns>
         public static async Task<bool> CheckConnectionAsync(string host)
         {
             bool connection = false;

@@ -1,18 +1,8 @@
 ﻿using Server_Tools.Idrac.Controllers;
 using Server_Tools.Idrac.Models;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+
 
 namespace Server_Tools.View
 {
@@ -37,7 +27,7 @@ namespace Server_Tools.View
         {
             Title = "Server Tools";
             TaskTextBlock.Text = job.Name;
-            LoopJob();
+            LoopJobAsync();
         }
 
         private void UpdateProgressBar(IdracJob job)
@@ -46,7 +36,7 @@ namespace Server_Tools.View
             StatusTextBlock.Text = string.Format("Status {0}%: {1}", job.PercentComplete.ToString(), job.Message);
         }
 
-        private async void LoopJob()
+        private async void LoopJobAsync()
         {
             var idrac = new JobController(server);
             var time = DateTime.Now;
@@ -54,7 +44,7 @@ namespace Server_Tools.View
             {
                 try
                 {
-                    job = await idrac.GetJob(job.Id);
+                    job = await idrac.GetJobAsync(job.Id);
                     UpdateProgressBar(job);
 
                     if (job.JobState.Contains("Completed"))

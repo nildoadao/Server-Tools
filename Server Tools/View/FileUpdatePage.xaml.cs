@@ -50,20 +50,20 @@ namespace Server_Tools.View
                     break;
                 }
             }
-            UpdateFirmware(firmware, option);
+            UpdateFirmwareAsync(firmware, option);
         }
 
-        private async void UpdateFirmware(string path, string option)
+        private async void UpdateFirmwareAsync(string path, string option)
         {
             Server server = new Server(ServerTextBox.Text, UserTextBox.Text, PasswordBox.Password);
 
-            if (!await CheckSupport(server))
+            if (!await CheckSupportAsync(server))
                 return;
             try
             {
                 UpdateController idrac = new UpdateController(server);
                 OutputTextBox.AppendText(string.Format("Iniciando upload do arquivo {0} para {1} \n", FirmwareTextBox.Text, server.Host));
-                IdracJob job = await idrac.UpdateFirmware(path, option);
+                IdracJob job = await idrac.UpdateFirmwareAsync(path, option);
                 OutputTextBox.AppendText(string.Format("Criado Job {0} para update\n",job.Id));
             }
             catch(Exception ex)
@@ -79,22 +79,22 @@ namespace Server_Tools.View
 
         private bool CheckForm()
         {
-            if (ServerTextBox.Text.Trim().Equals(""))
+            if (String.IsNullOrEmpty(ServerTextBox.Text))
             {
                 MessageBox.Show("Informe o hostname do servidor", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
                 return false;
             }
-            if (UserTextBox.Text.Trim().Equals(""))
+            if (String.IsNullOrEmpty(UserTextBox.Text))
             {
                 MessageBox.Show("Informe o usuário", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
                 return false;
             }
-            if (PasswordBox.Password.Trim().Equals(""))
+            if (String.IsNullOrEmpty(PasswordBox.Password))
             {
                 MessageBox.Show("Informe a senha", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
                 return false;
             }
-            if (FirmwareTextBox.Text.Trim().Equals(""))
+            if (String.IsNullOrEmpty(FirmwareTextBox.Text))
             {
                 MessageBox.Show("Selecione um firmware", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
                 return false;
@@ -102,19 +102,18 @@ namespace Server_Tools.View
             return true;
         }
 
-        private async Task<bool> CheckSupport(Server server)
+        private async Task<bool> CheckSupportAsync(Server server)
         {
             var idrac = new UpdateController(server);
 
-            if (!NetworkHelper.IsConnected(server.Host))
+            if (!await NetworkHelper.CheckConnectionAsync(server.Host))
             {
                 MessageBox.Show(string.Format("O servidor {0} não está acessivel, verifique a conexão e tente novamente", server.Host), "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
                 return false;
             }
-
             try
             {
-                if (!await idrac.CheckRedfishSupport(UpdateController.FirmwareInventory))
+                if (!await idrac.CheckRedfishSupportAsync(UpdateController.FirmwareInventory))
                 {
                     MessageBox.Show("A versão da Idrac desse servidor não possui suporte a função de update de firmware", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
                     return false;
@@ -122,10 +121,9 @@ namespace Server_Tools.View
             }
             catch
             {
-                MessageBox.Show("A versão da Idrac desse servidor não possui suporte a função de update de firmware", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("Falha na comunicação com a Idrac", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
                 return false;
             }
-
             return true;
         }
     }

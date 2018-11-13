@@ -1,6 +1,5 @@
 ﻿using Server_Tools.Idrac.Models;
 using System.Net.Http;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Server_Tools.Idrac.Controllers
@@ -24,7 +23,7 @@ namespace Server_Tools.Idrac.Controllers
         /// <param name="uri">String contento o enderço do recurso</param>
         /// <param name="content">Conteudo Http da requisição</param>
         /// <returns>String contendo o Job Id</returns>
-        public async Task<IdracJob> CreateJob(string uri, HttpContent content)
+        public async Task<IdracJob> CreateJobAsync(string uri, HttpContent content)
         {
             using (var request = new HttpRequestMessage(HttpMethod.Post, uri))
             {
@@ -36,7 +35,7 @@ namespace Server_Tools.Idrac.Controllers
                         throw new HttpRequestException(string.Format("Falha ao criar Job: {0}", response.ReasonPhrase));
 
                     string location = response.Headers.Location.ToString();
-                    return await GetResource<IdracJob>(BaseUri + location);
+                    return await GetResourceAsync<IdracJob>(BaseUri + location);
                 }
             }
         }
@@ -47,7 +46,7 @@ namespace Server_Tools.Idrac.Controllers
         /// <param name="uri">Uri do recurso</param>
         /// <param name="method">Método HTTP da requisição</param>
         /// <returns></returns>
-        public async Task<IdracJob> CreateJob(string uri, HttpMethod method)
+        public async Task<IdracJob> CreateJobAsync(string uri, HttpMethod method)
         {
             using (var request = new HttpRequestMessage(method, uri))
             {
@@ -58,7 +57,7 @@ namespace Server_Tools.Idrac.Controllers
                         throw new HttpRequestException(string.Format("Falha ao criar Job: {0}", response.ReasonPhrase));
 
                     string location = response.Headers.Location.ToString();
-                    return await GetResource<IdracJob>(BaseUri + location);
+                    return await GetResourceAsync<IdracJob>(BaseUri + location);
                 }
             }
         }
@@ -68,9 +67,9 @@ namespace Server_Tools.Idrac.Controllers
         /// </summary>
         /// <param name="jobId">Identificação do Job</param>
         /// <returns>O Job corresponde ao ID</returns>
-        public async Task<IdracJob> GetJob(string jobId)
+        public async Task<IdracJob> GetJobAsync(string jobId)
         {
-            return await GetResource<IdracJob>(BaseUri + JobStatus + jobId);
+            return await GetResourceAsync<IdracJob>(BaseUri + JobStatus + jobId);
         }
 
         /// <summary>
@@ -78,7 +77,7 @@ namespace Server_Tools.Idrac.Controllers
         /// </summary>
         /// <param name="jobId">Identificação do Job</param>
         /// <returns>Resposta Http do Job</returns>
-        public async Task<HttpResponseMessage> GetJobData(string jobId)
+        public async Task<HttpResponseMessage> GetJobDataAsync(string jobId)
         {
             using (var request = new HttpRequestMessage(HttpMethod.Get, BaseUri + JobResult + jobId))
             {

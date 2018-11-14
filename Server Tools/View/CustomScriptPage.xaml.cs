@@ -11,7 +11,7 @@ using System.Windows.Controls;
 namespace Server_Tools.View
 {
     /// <summary>
-    /// Interação lógica para CustomScriptPage.xam
+    /// Interação lógica para CustomScriptPage.xaml
     /// </summary>
     public partial class CustomScriptPage : Page
     {
@@ -128,7 +128,7 @@ namespace Server_Tools.View
             }
             catch (Exception ex)
             {
-                MessageBox.Show(string.Format("Falha ao executar o script : {0}", ex.Message), "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+                OutputTextBox.AppendText(string.Format("Falha ao executar o script para {0} : {1}\n", server.Host, ex.Message));
             }
         }
 

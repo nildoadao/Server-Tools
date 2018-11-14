@@ -55,10 +55,27 @@
                 <TextBox Name="FirmwareTextBox" Width="200" Margin="5"/>
                 <Button Name="OpenFirmwareButton" Content="..." Width="30" Margin="5" Click="OpenFirmwareButton_Click"/>
             </StackPanel>
-            <TextBlock Text="Saida" Grid.Row="5" Margin="5" Foreground="White"/>
-            <ScrollViewer Margin="5" HorizontalContentAlignment="Left"  HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" CanContentScroll="True" MaxWidth="750" BorderBrush="Transparent" Grid.Row="6" Grid.ColumnSpan="3">
-                <TextBox Name="OutputTextBox"  Height="150" IsReadOnly="True" BorderBrush="Transparent"  HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" Width="750" MaxHeight="150" MaxWidth="750"/>
-            </ScrollViewer>
+            <TabControl Grid.Row="5" Grid.ColumnSpan="3">
+                <TabItem Header="Saida">
+                    <ScrollViewer Margin="5" HorizontalContentAlignment="Left"  HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" CanContentScroll="True" MaxWidth="750" BorderBrush="Transparent">
+                        <TextBox Name="OutputTextBox" Margin="5" Height="150" TextWrapping="Wrap" IsReadOnly="True" BorderBrush="Transparent"  HorizontalScrollBarVisibility="Auto" Width="750"/>
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Header="Job">
+                    <DataGrid Name="JobsDataGrid" Height="Auto" VerticalScrollBarVisibility="Auto" AutoGenerateColumns="False" Width="750" MaxWidth="750" Margin="5" CanUserAddRows="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Servidor" Binding="{Binding Server.Host}"/>
+                            <DataGridTextColumn Header="Serial" Binding="{Binding SerialNumber}"/>
+                            <DataGridTextColumn Header="Job ID" Binding="{Binding Job.Id}"/>
+                            <DataGridTextColumn Header="Nome" Binding="{Binding Job.Name}"/>
+                            <DataGridTextColumn Header="Status do Job" Binding="{Binding Job.JobState}"/>
+                            <DataGridTextColumn Header="% Concluido" Binding="{Binding Job.PercentComplete}"/>
+                            <DataGridTextColumn Header="Mensagem" Binding="{Binding Job.Message}"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </TabItem>
+            </TabControl>
+
         </Grid>
     </ScrollViewer>
 </Page>

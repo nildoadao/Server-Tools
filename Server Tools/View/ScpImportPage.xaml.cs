@@ -16,9 +16,8 @@ namespace Server_Tools.View
     /// </summary>
     public partial class ScpImportPage : Page
     {
-        OpenFileDialog fileDialog;
-        OpenFileDialog csvDialog;
-        ObservableCollection<ServerJob> jobQueue;
+        OpenFileDialog FileDialog;
+        OpenFileDialog CsvDialog;
         DispatcherTimer timer;
 
         private class ServerJob
@@ -35,18 +34,17 @@ namespace Server_Tools.View
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            fileDialog = new OpenFileDialog()
+            FileDialog = new OpenFileDialog()
             {
                 Filter = "Arquivos SCP (*.xml)|*.xml",
             };
-            fileDialog.FileOk += FileDialog_FileOk;
-            csvDialog = new OpenFileDialog()
+            FileDialog.FileOk += FileDialog_FileOk;
+            CsvDialog = new OpenFileDialog()
             {
                 Filter = "Arquivos CSV|*csv"
             };
-            csvDialog.FileOk += CsvDialog_FileOk;
-            jobQueue = new ObservableCollection<ServerJob>();
-            JobsDataGrid.ItemsSource = jobQueue;
+            CsvDialog.FileOk += CsvDialog_FileOk;
+            JobsDataGrid.ItemsSource = new List<ServerJob>();
             timer = new DispatcherTimer()
             {
                 Interval = new TimeSpan(0, 0, 10)
@@ -62,7 +60,7 @@ namespace Server_Tools.View
 
         private void FileDialog_FileOk(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            FileTextBox.Text = fileDialog.FileName;
+            FileTextBox.Text = FileDialog.FileName;
         }
 
         private void AddButton_Click(object sender, RoutedEventArgs e)
@@ -87,7 +85,7 @@ namespace Server_Tools.View
 
         private void AddCsvButton_Click(object sender, RoutedEventArgs e)
         {
-            csvDialog.ShowDialog();
+            CsvDialog.ShowDialog();
         }
 
         private void ImportButton_Click(object sender, RoutedEventArgs e)
@@ -134,7 +132,10 @@ namespace Server_Tools.View
                 ScpController idrac = new ScpController(server);               
                 IdracJob job = await idrac.ImportScpFileAsync(path, target, shutdown, "On");
                 OutputTextBox.AppendText(string.Format("Job {0} criado para servidor {1}\n", job.Id, server));
-                jobQueue.Add(new ServerJob { Server = server, Job = job });
+                var chassisIdrac = new ChassisController(server);
+                var chassis = await chassisIdrac.GetChassisAsync();
+                var jobs = (List<ServerJob>) JobsDataGrid.ItemsSource;
+                jobs.Add(new ServerJob { Server = server, Job = job, SerialNumber = chassis.SKU });
             }
             catch (Exception ex)
             {
@@ -144,14 +145,14 @@ namespace Server_Tools.View
 
         private void OpenFileButton_Click(object sender, RoutedEventArgs e)
         {
-            fileDialog.ShowDialog();
+            FileDialog.ShowDialog();
         }
 
         private void CsvDialog_FileOk(object sender, System.ComponentModel.CancelEventArgs e)
         {
             try
             {
-                IEnumerable<Server> servers = FileHelper.ReadCsvFile(csvDialog.FileName);
+                IEnumerable<Server> servers = FileHelper.ReadCsvFile(CsvDialog.FileName);
                 foreach (Server server in servers)
                 {
                     ServersListBox.Items.Add(server);
@@ -182,24 +183,23 @@ namespace Server_Tools.View
 
         private async void UpdateJobsAsync()
         {
-            var updatedJobs = new ObservableCollection<ServerJob>();
-            foreach(var job in jobQueue)
+            var updatedJobs = new List<ServerJob>();
+            foreach(ServerJob job in JobsDataGrid.ItemsSource)
             {
                 try
                 {
                     var idrac = new JobController(job.Server);
                     var updatedJob = await idrac.GetJobAsync(job.Job.Id);
-                    var chassis = new ChassisController(job.Server);
-                    var serial = await chassis.GetChassisAsync();
-                    updatedJobs.Add(new ServerJob { Server = job.Server, Job = updatedJob, SerialNumber = serial.SKU });
+                    var chassisIdrac = new ChassisController(job.Server);
+                    var chassis = await chassisIdrac.GetChassisAsync();
+                    updatedJobs.Add(new ServerJob { Server = job.Server, Job = updatedJob, SerialNumber = chassis.SKU });
                 }
                 catch
                 {
                     OutputTextBox.AppendText("Falha ao atualizar status dos Jobs\n");
                 }
             }
-            jobQueue = updatedJobs;
-            JobsDataGrid.ItemsSource = jobQueue;
+            JobsDataGrid.ItemsSource = updatedJobs;
         }
     }
 }

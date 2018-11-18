@@ -98,7 +98,7 @@
                     <DataGrid Name="PhysicalDiskDatagrid" AutoGenerateColumns="False" IsReadOnly="True" Margin="5">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Nome" Binding="{Binding Name}"/>
-                            <DataGridTextColumn Header="Capacidade" Binding="{Binding CapacityBytes}"/>
+                            <DataGridTextColumn Header="Capacidade" Binding="{Binding FormatedCapacity}"/>
                             <DataGridTextColumn Header="Modelo" Binding="{Binding Model}"/>
                             <DataGridTextColumn Header="Falha Prevista" Binding="{Binding FailurePredicted}"/>
                         </DataGrid.Columns>
@@ -111,7 +111,7 @@
                                 <DataGridCheckBoxColumn Header="Selecionar" Binding="{Binding IsSelected}"/>
                                 <DataGridTextColumn Header="VD" Binding="{Binding Volume.Description}"/>
                                 <DataGridTextColumn Header="Capacidade" Binding="{Binding Volume.CapacityBytes}"/>
-                                <DataGridTextColumn Header="Tipo" Binding="{Binding Volume.VolumeType}"/>
+                                <DataGridTextColumn Header="Tipo" Binding="{Binding Volume.FormatedType}"/>
                             </DataGrid.Columns>
                         </DataGrid>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">

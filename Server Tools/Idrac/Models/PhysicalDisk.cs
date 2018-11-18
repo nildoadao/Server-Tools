@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 
 namespace Server_Tools.Idrac.Models
@@ -9,6 +10,7 @@ namespace Server_Tools.Idrac.Models
         public string OdataId { get; set; }
         public string Id { get; set; }
         public long CapacityBytes { get; set; }
+        public string FormatedCapacity { get { return ParseBytes(CapacityBytes); } }
         public string Manufacturer { get; set; }
         public string Model { get; set; }
         public string Name { get; set; }
@@ -27,6 +29,35 @@ namespace Server_Tools.Idrac.Models
         public override string ToString()
         {
             return Name;
+        }
+
+        // Converte o valor em Bytes para uma notação abreviada
+        // ex: 44.040.192 Bytes para 42 MB
+
+        private string ParseBytes(long value)
+        {
+            if (value < 0)
+                throw new ArgumentOutOfRangeException("value", "O valor para conversão não pode ser negativo");
+
+            Dictionary<int, string> sizes = new Dictionary<int, string>()
+            {
+                {0, "B"},
+                {1, "KB"},
+                {2, "MB"},
+                {3, "GB"},
+                {4, "TB"},
+                {5, "PB"},
+                {6, "EB"},
+            };
+
+            long x = value;
+            int count = 0;
+            while (x > 1024)
+            {
+                x = x / 1024;
+                count++;
+            }
+            return string.Format("{0} {1}", x.ToString(), sizes[count]);
         }
     }
 }

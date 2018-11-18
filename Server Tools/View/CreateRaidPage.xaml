@@ -46,7 +46,7 @@
                 <DataGrid.Columns>
                     <DataGridCheckBoxColumn Header="Selecionar" Binding="{Binding IsSelected}"/>
                     <DataGridTextColumn Header="Disco" Binding="{Binding Disk.Name}"/>
-                    <DataGridTextColumn Header="Capacidade" Binding="{Binding Disk.CapacityBytes}"/>
+                    <DataGridTextColumn Header="Capacidade" Binding="{Binding Disk.FormatedCapacity}"/>
                     <DataGridTextColumn Header="Modelo" Binding="{Binding Disk.Model}"/>
                 </DataGrid.Columns>
             </DataGrid>

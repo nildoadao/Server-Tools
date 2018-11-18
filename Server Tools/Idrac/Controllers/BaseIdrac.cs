@@ -2,6 +2,7 @@
 using Server_Tools.Idrac.Models;
 using Server_Tools.Util;
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
@@ -90,8 +91,8 @@ namespace Server_Tools.Idrac.Controllers
         /// </summary>
         /// <param name="header">Cabeçalho a ser buscado</param>
         /// <param name="uri">Uri do recurso</param>
-        /// <returns>O valor de cabeçalho</returns>
-        public async Task<string> GetHeaderValueAsync(string header, string uri)
+        /// <returns>Lista com os valores do cabeçalho</returns>
+        public async Task<IList<string>> GetHeaderValueAsync(string header, string uri)
         {
             using (var request = new HttpRequestMessage(HttpMethod.Get, uri))
             {
@@ -101,12 +102,12 @@ namespace Server_Tools.Idrac.Controllers
                     if (!response.IsSuccessStatusCode)
                         throw new HttpRequestException(string.Format("Falha ao obter o cabeçalho {0} {1}", header, response.ReasonPhrase));
 
-                    string result = "";
-
-                    foreach (string item in response.Headers.GetValues(header))
-                        result = item;
-
-                    return result;
+                    List<string> values = new List<string>();
+                    foreach(var item in response.Headers.GetValues(header))
+                    {
+                        values.Add(item);
+                    }
+                    return values;                   
                 }
             }
         }

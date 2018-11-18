@@ -49,25 +49,26 @@ namespace Server_Tools.View
             raidDisks.AddRange(selectedDisks);
             var level = (RaidLevel) RaidCombobox.SelectedItem;
             var enclousure = (Enclousure) ControllersCombobox.SelectedItem;
-            string name = VdNameTextBox.Text;
-            int capacity = 0;
-            int optimal = 0;
-
-            try
-            {
-                capacity = int.Parse(CapacityBytesTextBox.Text);
-                optimal = int.Parse(OptimumIOSizeTextBox.Text);
-            }
-            catch
-            {
-                MessageBox.Show("Valores invalidos para Capacity Bytes e Optimal IO.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Exclamation);
-                return;
-            }
 
             if (VdNameCheckBox.IsChecked.Value)
             {
+                string name = VdNameTextBox.Text;
                 if (OptionalCheckBox.IsChecked.Value)
+                {                    
+                    long capacity = 0;
+                    long optimal = 0;
+                    try
+                    {
+                        capacity = long.Parse(CapacityBytesTextBox.Text);
+                        optimal = long.Parse(OptimumIOSizeTextBox.Text);
+                    }
+                    catch
+                    {
+                        MessageBox.Show("Valores invalidos para Capacity Bytes e Optimal IO.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                        return;
+                    }
                     CreateRaidAsync(raidDisks, enclousure, level.ToString(), name, capacity, optimal);
+                }                  
                 else
                     CreateRaidAsync(raidDisks, enclousure, level.ToString(), name);
             }
@@ -222,12 +223,12 @@ namespace Server_Tools.View
             }
         }
 
-        public async void CreateRaidAsync(List<PhysicalDisk> disks, Enclousure enclousure, string level, string name, int capacity, int optimal)
+        public async void CreateRaidAsync(List<PhysicalDisk> disks, Enclousure enclousure, string level, string name, long capacity, long optimal)
         {
             try
             {
                 var idrac = new StorageController(server);
-                IdracJob job = await idrac.CreateVirtualDiskAsync(disks, enclousure, level);
+                IdracJob job = await idrac.CreateVirtualDiskAsync(disks, enclousure, level, capacity, optimal, name);
                 var load = new LoadWindow(server, job) { Title = server.Host };
                 load.Closed += (object sender, EventArgs e) =>
                 {

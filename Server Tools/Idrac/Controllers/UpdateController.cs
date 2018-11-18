@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace Server_Tools.Idrac.Controllers
 {
@@ -106,8 +107,8 @@ namespace Server_Tools.Idrac.Controllers
             using (var fileContent = new StreamContent(File.Open(path, FileMode.Open)))
             {
                 request.Headers.Authorization = Credentials;
-                string etag = await GetHeaderValueAsync("ETag", BaseUri + FirmwareInventory);
-                request.Headers.TryAddWithoutValidation("If-Match", etag);
+                var etag = await GetHeaderValueAsync("ETag", BaseUri + FirmwareInventory);
+                request.Headers.TryAddWithoutValidation("If-Match", etag.FirstOrDefault());
                 request.Headers.CacheControl = CacheControlHeaderValue.Parse("no-cache");
                 fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse("multipart/form-data");
                 fileContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")

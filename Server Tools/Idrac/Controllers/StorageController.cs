@@ -214,7 +214,7 @@ namespace Server_Tools.Idrac.Controllers
         /// <param name="stripeSize">Representa o OptimumIOSizeBytes</param>
         /// <param name="name">Nome do VD a ser criado</param>
         /// <returns>Job da operação</returns>
-        public async Task<IdracJob> CreateVirtualDiskAsync(List<PhysicalDisk> disks, Enclousure enclousure, string level, int size, int stripeSize, string name)
+        public async Task<IdracJob> CreateVirtualDiskAsync(List<PhysicalDisk> disks, Enclousure enclousure, string level, long size, long stripeSize, string name)
         {
             List<OdataObject> drives = new List<OdataObject>();
             foreach (var disk in disks)

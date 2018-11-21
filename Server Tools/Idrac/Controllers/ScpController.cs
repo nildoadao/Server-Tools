@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Server_Tools.Idrac.Models;
+using System;
 using System.IO;
 using System.Net.Http;
 using System.Text;
@@ -9,11 +10,14 @@ namespace Server_Tools.Idrac.Controllers
 {
     class ScpController : BaseIdrac
     {
-        #region Redfish Uris
+        // Uris para execução dos Import / Export
         public const string ExportSystemConfiguration = @"/redfish/v1/Managers/iDRAC.Embedded.1/Actions/Oem/EID_674_Manager.ExportSystemConfiguration";
         public const string ImportSystemConfiguration = @"/redfish/v1/Managers/iDRAC.Embedded.1/Actions/Oem/EID_674_Manager.ImportSystemConfiguration";
-        #endregion
 
+        /// <summary>
+        /// Cria uma nova instancia de ScpController
+        /// </summary>
+        /// <param name="server">Obejto contendo os dados basicos do servidor</param>
         public ScpController(Server server)
             :base(server)
         { }
@@ -51,6 +55,9 @@ namespace Server_Tools.Idrac.Controllers
             var idrac = new JobController(Server);
             using (var response = await idrac.GetJobDataAsync(jobId))
             {
+                if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+                    throw new UnauthorizedAccessException("Acesso negado, verifique usuario/senha");
+
                 if (!response.IsSuccessStatusCode)
                     throw new HttpRequestException("Falha ao receber dados do Export: " + response.RequestMessage);
 

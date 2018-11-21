@@ -38,9 +38,7 @@ namespace Server_Tools.Util
             _client = new HttpClient();
             _client.DefaultRequestHeaders.ExpectContinue = true;
             _client.DefaultRequestHeaders.Add("User-Agent", USER_AGENT);
-            _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("*/*"));
-            _client.DefaultRequestHeaders.Connection.Add("keep-alive");
-            _client.Timeout = new TimeSpan(0, 3, 0); // Em maquinas da geração 13, o update é superior ao timeout default do HttpClient
+            _client.Timeout = new TimeSpan(0, 10, 0);
         }
 
         /// <summary>

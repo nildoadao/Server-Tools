@@ -21,6 +21,7 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <TextBlock Text="Atualizar Firmware" FontSize="28" FontWeight="DemiBold" Grid.ColumnSpan="3" HorizontalAlignment="Center" Margin="20" Foreground="White"/>
             <GroupBox Grid.Row="1" Height="Auto" Header="Dados da Idrac" FontSize="13" Margin="5" Width="Auto" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White">
@@ -42,13 +43,24 @@
                     <PasswordBox Name="PasswordBox" Grid.Row="2" Grid.Column="1" Margin="5" Height="Auto" Width="150" HorizontalAlignment="Left"/>
                 </Grid>
             </GroupBox>
-            <GroupBox Header="Modo de Instalação" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" Margin="5" Foreground="White">
+            <StackPanel Grid.Row="1" Grid.Column="1" Width="Auto" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <Button Name="AddButton" Content="Adicionar" Margin="5"  Width="100" Height="30" Click="AddButton_Click"/>
+                <Button Name="RemoveButton" Content="Remover" Margin="5"  Width="100" Height="30" Click="RemoveButton_Click"/>
+            </StackPanel>
+            <GroupBox Header="Modo de Instalação" Grid.Row="2" HorizontalAlignment="Left" Margin="5" Foreground="White">
                 <StackPanel Name="InstallOptionGroup">
                     <RadioButton Content="Now" IsChecked="True" GroupName="InstallOption" Foreground="White"/>
                     <RadioButton Content="NowAndReboot" GroupName="InstallOption" Foreground="White"/>
                     <RadioButton Content="NextReboot" GroupName="InstallOption" Background="White" Foreground="White"/>
                 </StackPanel>
             </GroupBox>
+            <StackPanel Grid.Row="1" Grid.Column="2" Grid.RowSpan="4">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Margin="5" Text="Servidores" Foreground="White" VerticalAlignment="Center"/>
+                    <Button Name="AddCsvButton" Content="Adicionar CSV" Margin="5"  Width="100" Height="30" HorizontalAlignment="Left" Click="AddCsvButton_Click"/>
+                </StackPanel>
+                <ListBox Name="ServersListBox" HorizontalAlignment="Right" Height="250" Margin="5" Width="250"/>
+            </StackPanel>
             <Button Name="UpdateButton" Grid.Row="4" Content="Atualizar" Margin="5"  Width="100" Height="30" HorizontalAlignment="Left" Click="UpdateButton_Click"/>
             <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom">
                 <TextBlock Text="Arquivo: " Margin="5" Foreground="White"/>

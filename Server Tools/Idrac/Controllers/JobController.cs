@@ -1,4 +1,5 @@
 ﻿using Server_Tools.Idrac.Models;
+using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -6,13 +7,17 @@ namespace Server_Tools.Idrac.Controllers
 {
     class JobController : BaseIdrac
     {
-        # region Redfish Uris
+        // Uris contendo a localização dos recursos de Job
         public const string JobStatus = @"/redfish/v1/Managers/iDRAC.Embedded.1/Jobs/";
         public const string JobResult = @"/redfish/v1/TaskService/Tasks/";
-        #endregion
 
+        // Timeout para execução de Um Job
         public const double JobTimeout = 10;
 
+        /// <summary>
+        /// Cria uma nova instacia de JobController
+        /// </summary>
+        /// <param name="server">Objeto contendo os dados do servidor</param>
         public JobController(Server server)
             :base(server)
         { }
@@ -31,6 +36,9 @@ namespace Server_Tools.Idrac.Controllers
                 request.Content = content;
                 using (var response = await Client.SendAsync(request))
                 {
+                    if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+                        throw new UnauthorizedAccessException("Acesso negado, verifique usuario/senha");
+
                     if (!response.IsSuccessStatusCode)
                         throw new HttpRequestException(string.Format("Falha ao criar Job: {0}", response.ReasonPhrase));
 
@@ -53,6 +61,9 @@ namespace Server_Tools.Idrac.Controllers
                 request.Headers.Authorization = Credentials;;
                 using (var response = await Client.SendAsync(request))
                 {
+                    if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+                        throw new UnauthorizedAccessException("Acesso negado, verifique usuario/senha");
+
                     if (!response.IsSuccessStatusCode)
                         throw new HttpRequestException(string.Format("Falha ao criar Job: {0}", response.ReasonPhrase));
 

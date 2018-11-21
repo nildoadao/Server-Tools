@@ -13,12 +13,15 @@ namespace Server_Tools.Idrac.Controllers
 {
     class UpdateController : BaseIdrac
     {
-        #region Redfish Uris
+        // Uris para acesso as funções de Update
         public const string FirmwareInventory = @"/redfish/v1/UpdateService/FirmwareInventory";
-        public const string FirmwareInstall = @"/redfish/v1/UpdateService/Actions/Oem/DellUpdateService.Install";
+        public const string DellUpdateService = @"/redfish/v1/UpdateService/Actions/Oem/DellUpdateService.Install";
         public const string SimpleUpdate = @"/redfish/v1/UpdateService/Actions/UpdateService.SimpleUpdate";
-        #endregion
 
+        /// <summary>
+        /// Cria uma nova instancia de UpdateController
+        /// </summary>
+        /// <param name="server">Objeto contendo os dados basicos do servidor</param>
         public UpdateController(Server server)
             :base(server)
         { }
@@ -32,7 +35,8 @@ namespace Server_Tools.Idrac.Controllers
         public async Task<IdracJob> UpdateFirmwareAsync(string path, string option)
         {
             Uri location = await UploadFileAsync(path);
-            return await InstallFirmwareAsync(location, option);
+            //return await DellUpdateServiceAsync(location, option);
+            return await DeviceSimpleUpdateAsync(location.ToString());
         }
 
         /// <summary>
@@ -48,7 +52,7 @@ namespace Server_Tools.Idrac.Controllers
             {
                 locations.Add(await UploadFileAsync(item));
             }
-            return await InstallFirmwareAsync(locations, option);
+            return await DellUpdateServiceAsync(locations, option);
         }
 
         /// <summary>
@@ -57,7 +61,7 @@ namespace Server_Tools.Idrac.Controllers
         /// <param name="location">Uri do recurso</param>
         /// <param name="option">Modo de Instalação</param>
         /// <returns>Job de Instação fo Firmware</returns>
-        private async Task<IdracJob> InstallFirmwareAsync(Uri location, string option)
+        private async Task<IdracJob> DellUpdateServiceAsync(Uri location, string option)
         {
             var uris = new List<string>() { location.ToString() };
             var content = new
@@ -68,7 +72,7 @@ namespace Server_Tools.Idrac.Controllers
             string jsonContent = JsonConvert.SerializeObject(content);
             var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
             var idrac = new JobController(Server);
-            return await idrac.CreateJobAsync(BaseUri + FirmwareInstall, httpContent);
+            return await idrac.CreateJobAsync(BaseUri + DellUpdateService, httpContent);
         }
 
         /// <summary>
@@ -77,7 +81,7 @@ namespace Server_Tools.Idrac.Controllers
         /// <param name="locations">Lista com a localização dos recursos</param>
         /// <param name="option">Modo de Instalação</param>
         /// <returns>Job de Instação fo Firmware</returns>
-        private async Task<IdracJob> InstallFirmwareAsync(IEnumerable<Uri> locations, string option)
+        private async Task<IdracJob> DellUpdateServiceAsync(IEnumerable<Uri> locations, string option)
         {
             var uris = new List<string>(); 
             foreach(var item in locations)
@@ -92,7 +96,24 @@ namespace Server_Tools.Idrac.Controllers
             string jsonContent = JsonConvert.SerializeObject(content);
             var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
             var idrac = new JobController(Server);
-            return await idrac.CreateJobAsync(BaseUri + FirmwareInstall, httpContent);
+            return await idrac.CreateJobAsync(BaseUri + DellUpdateService, httpContent);
+        }
+
+        /// <summary>
+        /// Realiza a instalação do firmware utilizando o metodo padrão DTMF
+        /// </summary>
+        /// <param name="location">Localização do firmware a ser instalado</param>
+        /// <returns>Job de atualização de firmware</returns>
+        private async Task<IdracJob> DeviceSimpleUpdateAsync(string location)
+        {
+            var content = new
+            {
+                ImageURI = location
+            };
+            string jsonContent = JsonConvert.SerializeObject(content);
+            var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+            var idrac = new JobController(Server);
+            return await idrac.CreateJobAsync(BaseUri + SimpleUpdate, httpContent);
         }
 
         /// <summary>
@@ -109,17 +130,19 @@ namespace Server_Tools.Idrac.Controllers
                 request.Headers.Authorization = Credentials;
                 var etag = await GetHeaderValueAsync("ETag", BaseUri + FirmwareInventory);
                 request.Headers.TryAddWithoutValidation("If-Match", etag.FirstOrDefault());
-                request.Headers.CacheControl = CacheControlHeaderValue.Parse("no-cache");
                 fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse("multipart/form-data");
                 fileContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
                 {
                     Name = "\"file\"",
-                    FileName = string.Format("\"{0}\"", Path.GetFileName(path))
+                    FileName = string.Format("\"{0}\"", Path.GetFileName(path)),
                 };
                 multipartContent.Add(fileContent);
                 request.Content = multipartContent;
                 using (HttpResponseMessage response = await Client.SendAsync(request))
                 {
+                    if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+                        throw new UnauthorizedAccessException("Acesso negado, verifique usuario/senha");
+
                     if (!response.IsSuccessStatusCode)
                         throw new HttpRequestException("Falha no upload do arquivo: " + response.ReasonPhrase);
 

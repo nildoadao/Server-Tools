@@ -7,6 +7,10 @@ namespace Server_Tools.Idrac.Controllers
     {
         private Server server;
 
+        /// <summary>
+        /// Inicializa uma nova instancia de IdracSshController
+        /// </summary>
+        /// <param name="server">Objeto contendo os dados do servidor</param>
         public IdracSshController(Server server)
         {
             this.server = server;

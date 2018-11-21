@@ -16,26 +16,42 @@ namespace Server_Tools.Idrac.Controllers
         private HttpClient client;
         private AuthenticationHeaderValue credentials;
 
+        /// <summary>
+        /// Objeto contendo os dados basicos do servidor.
+        /// </summary>
         protected Server Server
         {
             get { return server; }
         }
 
+        /// <summary>
+        ///  Url de base para as requisições.
+        /// </summary>
         protected string BaseUri
         {
             get { return baseUri; }
         }
 
+        /// <summary>
+        /// Client Http utilizado nas requisições.
+        /// </summary>
         protected HttpClient Client
         {
             get { return client; }
         }
 
+        /// <summary>
+        /// Cabeçalho padrão de autenticação.
+        /// </summary>
         protected AuthenticationHeaderValue Credentials
         {
             get { return credentials; }
         }
 
+        /// <summary>
+        /// Inicializa uma nova instancia de BaseIdrac
+        /// </summary>
+        /// <param name="server">Clase contendo os dados basicos do servidor</param>
         public BaseIdrac(Server server)
         {
             this.server = server;
@@ -77,6 +93,9 @@ namespace Server_Tools.Idrac.Controllers
                 request.Headers.Authorization = credentials;
                 using (var response = await client.SendAsync(request))
                 {
+                    if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+                        throw new UnauthorizedAccessException("Acesso negado, verifique usuario/senha");
+
                     if (!response.IsSuccessStatusCode)
                         throw new HttpRequestException(string.Format("Falha ao obter recurso {0} {1}", uri, response.ReasonPhrase));
 
@@ -99,6 +118,9 @@ namespace Server_Tools.Idrac.Controllers
                 request.Headers.Authorization = credentials;
                 using (var response = await client.SendAsync(request))
                 {
+                    if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+                        throw new UnauthorizedAccessException("Acesso negado, verifique usuario/senha");
+
                     if (!response.IsSuccessStatusCode)
                         throw new HttpRequestException(string.Format("Falha ao obter o cabeçalho {0} {1}", header, response.ReasonPhrase));
 

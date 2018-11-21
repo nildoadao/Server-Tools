@@ -152,10 +152,9 @@ namespace Server_Tools.View
         {
             try
             {
-                IEnumerable<Server> servers = FileHelper.ReadCsvFile(CsvDialog.FileName);
-                foreach (Server server in servers)
+                foreach (var item in FileHelper.ReadCsvFile(CsvDialog.FileName))
                 {
-                    ServersListBox.Items.Add(server);
+                    ServersListBox.Items.Add(item);
                 }
             }
             catch

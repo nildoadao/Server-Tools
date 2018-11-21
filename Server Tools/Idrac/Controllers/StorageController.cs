@@ -10,8 +10,13 @@ namespace Server_Tools.Idrac.Controllers
 {
     class StorageController : BaseIdrac
     {
+        // Uri para acesso a Controladora Raid
         public const string Controllers = @"/redfish/v1/Systems/System.Embedded.1/Storage";
 
+        /// <summary>
+        /// Cria uma nova instancia de StorageController
+        /// </summary>
+        /// <param name="server">Objeto contendo os dados basicos do servidor</param>
         public StorageController(Server server)
             : base(server) { }
 
@@ -26,6 +31,9 @@ namespace Server_Tools.Idrac.Controllers
                 request.Headers.Authorization = Credentials;
                 using(var response = await Client.SendAsync(request))
                 {
+                    if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+                        throw new UnauthorizedAccessException("Acesso negado, verifique usuario/senha");
+
                     if (!response.IsSuccessStatusCode)
                         throw new HttpRequestException(string.Format("Falha ao listar controladoras: {0}", response.ReasonPhrase));
 
@@ -171,6 +179,9 @@ namespace Server_Tools.Idrac.Controllers
                 request.Headers.Authorization = Credentials;
                 using(var response = await Client.SendAsync(request))
                 {
+                    if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+                        throw new UnauthorizedAccessException("Acesso negado, verifique usuario/senha");
+
                     if (!response.IsSuccessStatusCode)
                         throw new HttpRequestException(string.Format("Falha ao obter discos virtuais {0}", response.ReasonPhrase));
 

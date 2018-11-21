@@ -17,6 +17,7 @@ namespace Server_Tools.View
     public partial class FileUpdatePage : Page
     {
         OpenFileDialog FirmwareDialog;
+        OpenFileDialog CsvDialog;
         DispatcherTimer timer;
 
         public FileUpdatePage()
@@ -40,6 +41,11 @@ namespace Server_Tools.View
                 Filter = "Idrac Firmware (*.exe)(*.d7)(*.pm)| *.exe;*.d7;*.pm"
             };
             FirmwareDialog.FileOk += FirmwareDialog_FileOk;
+            CsvDialog = new OpenFileDialog()
+            {
+                Filter = "Arquivos CSV|*csv"
+            };
+            CsvDialog.FileOk += CsvDialog_FileOk;
             JobsDataGrid.ItemsSource = new List<ServerJob>();
             timer = new DispatcherTimer()
             {
@@ -47,6 +53,22 @@ namespace Server_Tools.View
             };
             timer.Tick += Timer_Tick;
             timer.Start();
+        }
+
+        private void CsvDialog_FileOk(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            try
+            {
+                foreach(var item in FileHelper.ReadCsvFile(CsvDialog.FileName))
+                {
+                    ServersListBox.Items.Add(item);
+                }
+            }
+            catch
+            {
+                MessageBox.Show("Falha ao carregar arquivo CSV, certifique que o arquivo está no formato correto e tente novamente\n\nFormato esperado:\n<hostname>;<usuario>;<senha>",
+                                "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+            }            
         }
 
         private void Timer_Tick(object sender, EventArgs e)
@@ -74,15 +96,48 @@ namespace Server_Tools.View
                     break;
                 }
             }
+
+            foreach(Server server in ServersListBox.Items)
+            {
+                UpdateFirmwareAsync(server, firmware, option);
+            }
+        }
+
+        private void AddButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (String.IsNullOrEmpty(ServerTextBox.Text) || String.IsNullOrEmpty(UserTextBox.Text) || String.IsNullOrEmpty(PasswordBox.Password))
+            {
+                MessageBox.Show("Insira as informações da Idrac", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
             Server server = new Server(ServerTextBox.Text, UserTextBox.Text, PasswordBox.Password);
-            UpdateFirmwareAsync(server, firmware, option);
+            ServersListBox.Items.Add(server);
+            ServerTextBox.Clear();
+            UserTextBox.Clear();
+            PasswordBox.Clear();
+        }
+
+        private void RemoveButton_Click(object sender, RoutedEventArgs e)
+        {
+            ServersListBox.Items.Remove(ServersListBox.SelectedItem);
+        }
+
+        private void AddCsvButton_Click(object sender, RoutedEventArgs e)
+        {
+            CsvDialog.ShowDialog();
+        }
+
+        private void OpenFirmwareButton_Click(object sender, RoutedEventArgs e)
+        {
+            FirmwareDialog.ShowDialog();
         }
 
         private async void UpdateFirmwareAsync(Server server, string path, string option)
         {
             if (!await NetworkHelper.CheckConnectionAsync(server.Host))
             {
-                MessageBox.Show(string.Format("O servidor {0} não está acessivel, verifique a conexão e tente novamente", server.Host), "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
+                OutputTextBox.AppendText(string.Format("O servidor {0} não está acessivel, verifique a conexão e tente novamente\n", server.Host));
                 return;
             }
             try
@@ -91,7 +146,7 @@ namespace Server_Tools.View
 
                 if(!await idrac.CheckRedfishSupportAsync(UpdateController.FirmwareInventory))
                 {
-                    MessageBox.Show("A versão da Idrac desse servidor não possui suporte a função de update de firmware", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
+                    OutputTextBox.AppendText(string.Format("A versão da Idrac do {0} servidor não possui suporte a função de update de firmware\n", server.Host));
                     return;
                 }
 
@@ -105,35 +160,20 @@ namespace Server_Tools.View
             }
             catch(Exception ex)
             {
-                OutputTextBox.AppendText(string.Format("Erro ao atualizar firmware: {0}\n", ex.Message));
+                OutputTextBox.AppendText(string.Format("Erro ao atualizar {0} {1}\n", server.Host, ex.Message));
             }           
-        }
-
-        private void OpenFirmwareButton_Click(object sender, RoutedEventArgs e)
-        {
-            FirmwareDialog.ShowDialog();
         }
 
         private bool CheckForm()
         {
-            if (String.IsNullOrEmpty(ServerTextBox.Text))
+            if (ServersListBox.Items.Count == 0)
             {
-                MessageBox.Show("Informe o hostname do servidor", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
-                return false;
-            }
-            if (String.IsNullOrEmpty(UserTextBox.Text))
-            {
-                MessageBox.Show("Informe o usuário", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
-                return false;
-            }
-            if (String.IsNullOrEmpty(PasswordBox.Password))
-            {
-                MessageBox.Show("Informe a senha", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("Selecione ao menos um servidor para aplicar o update.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
                 return false;
             }
             if (String.IsNullOrEmpty(FirmwareTextBox.Text))
             {
-                MessageBox.Show("Selecione um firmware", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("Selecione um firmware.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
                 return false;
             }
             return true;

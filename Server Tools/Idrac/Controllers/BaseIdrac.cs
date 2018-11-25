@@ -73,6 +73,9 @@ namespace Server_Tools.Idrac.Controllers
                 request.Headers.Authorization = credentials;
                 using (var response = await client.SendAsync(request))
                 {
+                    if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+                        throw new UnauthorizedAccessException("Usuario/senha invalido(s).");
+
                     if (response.IsSuccessStatusCode)
                         support = true;
                 }

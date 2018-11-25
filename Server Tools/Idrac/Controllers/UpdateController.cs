@@ -35,7 +35,6 @@ namespace Server_Tools.Idrac.Controllers
         public async Task<IdracJob> UpdateFirmwareAsync(string path, string option)
         {
             Uri location = await UploadFileAsync(path);
-            //return await DellUpdateServiceAsync(location, option);
             return await DeviceSimpleUpdateAsync(location.ToString());
         }
 
@@ -130,13 +129,13 @@ namespace Server_Tools.Idrac.Controllers
                 request.Headers.Authorization = Credentials;
                 var etag = await GetHeaderValueAsync("ETag", BaseUri + FirmwareInventory);
                 request.Headers.TryAddWithoutValidation("If-Match", etag.FirstOrDefault());
-                fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse("multipart/form-data");
+                fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse("application/x-msdownload");
                 fileContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
                 {
                     Name = "\"file\"",
                     FileName = string.Format("\"{0}\"", Path.GetFileName(path)),
                 };
-                multipartContent.Add(fileContent);
+                multipartContent.Add(fileContent, "file", Path.GetFileName(path));
                 request.Content = multipartContent;
                 using (HttpResponseMessage response = await Client.SendAsync(request))
                 {

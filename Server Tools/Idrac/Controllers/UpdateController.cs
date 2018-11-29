@@ -35,7 +35,7 @@ namespace Server_Tools.Idrac.Controllers
         public async Task<IdracJob> UpdateFirmwareAsync(string path, string option)
         {
             Uri location = await UploadFileAsync(path);
-            return await DeviceSimpleUpdateAsync(location.ToString());
+            return await DellUpdateServiceAsync(location, option);
         }
 
         /// <summary>
@@ -122,20 +122,23 @@ namespace Server_Tools.Idrac.Controllers
         /// <returns>Uri com a localização do recurso</returns>
         private async Task<Uri> UploadFileAsync(string path)
         {
+            var boundary = Guid.NewGuid().ToString();
             using (var request = new HttpRequestMessage(HttpMethod.Post, BaseUri + FirmwareInventory))
-            using (var multipartContent = new MultipartFormDataContent())
+            using (var multipartContent = new MultipartFormDataContent(boundary))
             using (var fileContent = new StreamContent(File.Open(path, FileMode.Open)))
             {
                 request.Headers.Authorization = Credentials;
                 var etag = await GetHeaderValueAsync("ETag", BaseUri + FirmwareInventory);
-                request.Headers.TryAddWithoutValidation("If-Match", etag.FirstOrDefault());
-                fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse("application/x-msdownload");
+                request.Headers.TryAddWithoutValidation("If-Match", etag.FirstOrDefault());            
                 fileContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
                 {
                     Name = "\"file\"",
                     FileName = string.Format("\"{0}\"", Path.GetFileName(path)),
                 };
-                multipartContent.Add(fileContent, "file", Path.GetFileName(path));
+                fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse("multipart/form-data");
+                multipartContent.Headers.Remove("Content-Type");               
+                multipartContent.Headers.TryAddWithoutValidation("Content-Type", "multipart/form-data; boundary=" + boundary);
+                multipartContent.Add(fileContent);
                 request.Content = multipartContent;
                 using (HttpResponseMessage response = await Client.SendAsync(request))
                 {

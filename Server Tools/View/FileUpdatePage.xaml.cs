@@ -85,7 +85,8 @@ namespace Server_Tools.View
         {
             if (!CheckForm())
                 return;
-            
+
+            UpdateButton.IsEnabled = false;
             string firmware = FirmwareTextBox.Text;
             string option = "";
             foreach(RadioButton item in InstallOptionGroup.Children)
@@ -96,11 +97,7 @@ namespace Server_Tools.View
                     break;
                 }
             }
-
-            foreach(Server server in ServersListBox.Items)
-            {
-                UpdateFirmwareAsync(server, firmware, option);
-            }
+            UpdateFirmwareAsync(firmware, option);
         }
 
         private void AddButton_Click(object sender, RoutedEventArgs e)
@@ -114,8 +111,17 @@ namespace Server_Tools.View
             Server server = new Server(ServerTextBox.Text, UserTextBox.Text, PasswordBox.Password);
             ServersListBox.Items.Add(server);
             ServerTextBox.Clear();
-            UserTextBox.Clear();
-            PasswordBox.Clear();
+
+            if (!KeepCheckbox.IsChecked.Value)
+            {
+                UserTextBox.Clear();
+                PasswordBox.Clear();
+            }
+        }
+
+        private void ClearButton_Click(object sender, RoutedEventArgs e)
+        {
+            ServersListBox.Items.Clear();
         }
 
         private void RemoveButton_Click(object sender, RoutedEventArgs e)
@@ -133,35 +139,43 @@ namespace Server_Tools.View
             FirmwareDialog.ShowDialog();
         }
 
-        private async void UpdateFirmwareAsync(Server server, string path, string option)
+        private async void UpdateFirmwareAsync(string path, string option)
         {
-            if (!await NetworkHelper.CheckConnectionAsync(server.Host))
-            {
-                OutputTextBox.AppendText(string.Format("O servidor {0} não está acessivel, verifique a conexão e tente novamente\n", server.Host));
-                return;
-            }
-            try
-            {
-                UpdateController idrac = new UpdateController(server);
+            List<Server> servers = new List<Server>();
+            foreach (Server item in ServersListBox.Items)
+                servers.Add(item);
 
-                if(!await idrac.CheckRedfishSupportAsync(UpdateController.FirmwareInventory))
+            foreach (Server server in servers)
+            {
+                if (!await NetworkHelper.CheckConnectionAsync(server.Host))
                 {
-                    OutputTextBox.AppendText(string.Format("A versão da Idrac do {0} servidor não possui suporte a função de update de firmware\n", server.Host));
-                    return;
+                    OutputTextBox.AppendText(string.Format("O servidor {0} não está acessivel, verifique a conexão e tente novamente\n", server.Host));
+                    continue;
                 }
+                try
+                {
+                    UpdateController idrac = new UpdateController(server);
 
-                OutputTextBox.AppendText(string.Format("Iniciando upload do firmware para {0}...\n", server.Host));
-                ChassisController chassisIdrac = new ChassisController(server);                
-                IdracJob job = await idrac.UpdateFirmwareAsync(path, option);
-                Chassis chassis = await chassisIdrac.GetChassisAsync();
-                var jobs = (List<ServerJob>) JobsDataGrid.ItemsSource;
-                jobs.Add(new ServerJob { Server = server, Job = job, SerialNumber = chassis.SKU });
-                OutputTextBox.AppendText(string.Format("Upload concluido, criado Job {0} para update\n", job.Id));
+                    if (!await idrac.CheckRedfishSupportAsync(UpdateController.FirmwareInventory))
+                    {
+                        OutputTextBox.AppendText(string.Format("A versão da Idrac do {0} servidor não possui suporte a função de update de firmware\n", server.Host));
+                        continue;
+                    }
+
+                    OutputTextBox.AppendText(string.Format("Iniciando upload do firmware para {0}...\n", server.Host));
+                    ChassisController chassisIdrac = new ChassisController(server);
+                    IdracJob job = await idrac.UpdateFirmwareAsync(path, option);
+                    Chassis chassis = await chassisIdrac.GetChassisAsync();
+                    var jobs = (List<ServerJob>)JobsDataGrid.ItemsSource;
+                    jobs.Add(new ServerJob { Server = server, Job = job, SerialNumber = chassis.SKU });
+                    OutputTextBox.AppendText(string.Format("Upload concluido, criado Job {0} para update\n", job.Id));
+                }
+                catch (Exception ex)
+                {
+                    OutputTextBox.AppendText(string.Format("Erro ao atualizar {0} {1}\n", server.Host, ex.Message));
+                }
             }
-            catch(Exception ex)
-            {
-                OutputTextBox.AppendText(string.Format("Erro ao atualizar {0} {1}\n", server.Host, ex.Message));
-            }           
+            UpdateButton.IsEnabled = true;
         }
 
         private bool CheckForm()
@@ -181,8 +195,11 @@ namespace Server_Tools.View
 
         private async void UpdateJobsAsync()
         {
-            var updatedJobs = new List<ServerJob>();
-            foreach (ServerJob job in JobsDataGrid.ItemsSource)
+            List<ServerJob> updatedJobs = new List<ServerJob>();
+            List<ServerJob> jobs = new List<ServerJob>();
+            jobs.AddRange((List<ServerJob>)JobsDataGrid.ItemsSource);
+
+            foreach (ServerJob job in jobs)
             {
                 try
                 {

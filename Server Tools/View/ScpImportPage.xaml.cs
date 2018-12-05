@@ -74,8 +74,17 @@ namespace Server_Tools.View
             Server server = new Server(ServerTextBox.Text, UserTextBox.Text, PasswordBox.Password);
             ServersListBox.Items.Add(server);
             ServerTextBox.Clear();
-            UserTextBox.Clear();
-            PasswordBox.Clear();
+
+            if (!KeepCheckbox.IsChecked.Value)
+            {
+                UserTextBox.Clear();
+                PasswordBox.Clear();
+            }
+        }
+
+        private void ClearButton_Click(object sender, RoutedEventArgs e)
+        {
+            ServersListBox.Items.Clear();
         }
 
         private void RemoveButton_Click(object sender, RoutedEventArgs e)
@@ -93,6 +102,7 @@ namespace Server_Tools.View
             if (!CheckForm())
                 return;
 
+            ImportButton.IsEnabled = false;
             string target = "";
             foreach(RadioButton item in TargetGroup.Children)
             {
@@ -112,35 +122,39 @@ namespace Server_Tools.View
                 }
             }
             string path = FileTextBox.Text;
-            foreach(Server server in ServersListBox.Items)
-            {
-                OutputTextBox.AppendText(string.Format("Importando configurações para {0}...\n", server.Host));
-                ImportScpAsync(server, path, target, shutdown);
-            }                    
+            ImportScpAsync(path, target, shutdown);                  
         }
 
-        private async void ImportScpAsync(Server server, string path, string target, string shutdown)
+        private async void ImportScpAsync(string path, string target, string shutdown)
         {
-            if(!await NetworkHelper.CheckConnectionAsync(server.Host))
+            List<Server> servers = new List<Server>();
+            foreach (Server item in ServersListBox.Items)
+                servers.Add(item);
+
+            foreach (Server server in servers)
             {
-                OutputTextBox.AppendText(string.Format("Servidor {0} inacessivel\n", server.Host));
-                return;
+                if (!await NetworkHelper.CheckConnectionAsync(server.Host))
+                {
+                    OutputTextBox.AppendText(string.Format("Servidor {0} inacessivel, verifique a conexão e tente novamente.\n", server.Host));
+                    continue;
+                }
+                try
+                {
+                    OutputTextBox.AppendText(string.Format("Importando configurações para {0}...\n", server.Host));
+                    ScpController idrac = new ScpController(server);
+                    IdracJob job = await idrac.ImportScpFileAsync(path, target, shutdown, "On");
+                    OutputTextBox.AppendText(string.Format("Job {0} criado para servidor {1}\n", job.Id, server));
+                    var chassisIdrac = new ChassisController(server);
+                    var chassis = await chassisIdrac.GetChassisAsync();
+                    var jobs = (List<ServerJob>)JobsDataGrid.ItemsSource;
+                    jobs.Add(new ServerJob { Server = server, Job = job, SerialNumber = chassis.SKU });
+                }
+                catch (Exception ex)
+                {
+                    OutputTextBox.AppendText(string.Format("Falha ao importar arquivo para {0} {1}\n", server.Host, ex.Message));
+                }
             }
-                           
-            try
-            {
-                ScpController idrac = new ScpController(server);               
-                IdracJob job = await idrac.ImportScpFileAsync(path, target, shutdown, "On");
-                OutputTextBox.AppendText(string.Format("Job {0} criado para servidor {1}\n", job.Id, server));
-                var chassisIdrac = new ChassisController(server);
-                var chassis = await chassisIdrac.GetChassisAsync();
-                var jobs = (List<ServerJob>) JobsDataGrid.ItemsSource;
-                jobs.Add(new ServerJob { Server = server, Job = job, SerialNumber = chassis.SKU });
-            }
-            catch (Exception ex)
-            {
-                OutputTextBox.AppendText(string.Format("Falha ao importar arquivo {0}\n", ex.Message));
-            }
+            ImportButton.IsEnabled = true;
         }
 
         private void OpenFileButton_Click(object sender, RoutedEventArgs e)
@@ -153,9 +167,7 @@ namespace Server_Tools.View
             try
             {
                 foreach (var item in FileHelper.ReadCsvFile(CsvDialog.FileName))
-                {
                     ServersListBox.Items.Add(item);
-                }
             }
             catch
             {
@@ -182,8 +194,11 @@ namespace Server_Tools.View
 
         private async void UpdateJobsAsync()
         {
-            var updatedJobs = new List<ServerJob>();
-            foreach(ServerJob job in JobsDataGrid.ItemsSource)
+            List<ServerJob> updatedJobs = new List<ServerJob>();
+            List<ServerJob> jobs = new List<ServerJob>();
+            jobs.AddRange((List<ServerJob>)JobsDataGrid.ItemsSource);
+
+            foreach(ServerJob job in jobs)
             {
                 try
                 {

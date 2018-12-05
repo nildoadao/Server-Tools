@@ -82,8 +82,17 @@ namespace Server_Tools.View
             var server = new Server(ServerTextBox.Text, UserTextBox.Text, PasswordBox.Password);
             ServersListBox.Items.Add(server);
             ServerTextBox.Clear();
-            UserTextBox.Clear();
-            PasswordBox.Clear();
+
+            if (!KeepCheckbox.IsChecked.Value)
+            {
+                UserTextBox.Clear();
+                PasswordBox.Clear();
+            }
+        }
+
+        private void ClearButton_Click(object sender, RoutedEventArgs e)
+        {
+            ServersListBox.Items.Clear();
         }
 
         private void RemoveButton_Click(object sender, RoutedEventArgs e)
@@ -103,56 +112,63 @@ namespace Server_Tools.View
 
             UpdateButton.IsEnabled = false;
             string reboot = RebootRadioButton.IsChecked.Value ? "TRUE" : "FALSE";
-            foreach(Server server in ServersListBox.Items)
-            {
-                OutputTextBox.AppendText(string.Format("Atualizando firmwares de {0}...\n", server));
-                UpdateFirmwareAsync(server, reboot);
-            }
-            UpdateButton.IsEnabled = true;
+            string repository = FileTextBox.Text;
+            UpdateFirmwareAsync(repository, reboot);
+            
         }
 
-        private async void UpdateFirmwareAsync(Server server, string reboot)
+        private async void UpdateFirmwareAsync(string repository, string reboot)
         {
-            if(!await NetworkHelper.CheckConnectionAsync(server.Host))
-            {
-                OutputTextBox.AppendText(string.Format("Servidor {0} ínacessivel.\n", server));
-                return;
-            }
-            try
-            {
-                string jobId = "";
-                var idrac = new IdracSshController(server);
-                string command = string.Format(@"racadm update -f Catalog.xml.gz -e ftp.dell.com/Catalog -a {0} -t FTP", reboot);
-                string response = idrac.RunCommand(command);
-                foreach (var item in response.Split(' '))
-                {
-                    if (item.Contains("JID"))
-                    {
-                        jobId = item.Split('"').FirstOrDefault();
-                        break;
-                    }
-                }
-                if (String.IsNullOrEmpty(jobId)) // Caso Haja problema na criação do Job ele retorna ""
-                    return;
+            List<Server> servers = new List<Server>();
+            foreach (Server item in ServersListBox.Items)
+                servers.Add(item);
 
-                var idracJob = new JobController(server);
-                var idracChassis = new ChassisController(server);
-                IdracJob job = await idracJob.GetJobAsync(jobId);
-                Chassis chassis = await idracChassis.GetChassisAsync();
-                var jobs = (List<ServerJob>) JobsDataGrid.ItemsSource;
-                jobs.Add(new ServerJob { Server = server, Job = job, SerialNumber = chassis.SKU });
-                OutputTextBox.AppendText(string.Format("Criado {0} par atualizaçao do servidor {1}", jobId, server));
-            }
-            catch(Exception ex)
+            foreach (Server server in servers)
             {
-                OutputTextBox.AppendText(string.Format("Falha ao atualizar {0} {1}\n", server, ex.Message));
+                if (!await NetworkHelper.CheckConnectionAsync(server.Host))
+                {
+                    OutputTextBox.AppendText(string.Format("Servidor {0} ínacessivel.\n", server));
+                    continue;
+                }
+                try
+                {
+                    OutputTextBox.AppendText(string.Format("Atualizando firmwares de {0}...\n", server));
+                    string jobId = "";
+                    var idrac = new IdracSshController(server);
+                    string command = string.Format(@"racadm update -f Catalog.xml.gz -e {0} -a {1} -t FTP", repository, reboot);
+                    string response = idrac.RunCommand(command);
+                    foreach (var item in response.Split(' '))
+                    {
+                        if (item.Contains("JID"))
+                        {
+                            jobId = item.Split('"').FirstOrDefault();
+                            break;
+                        }
+                    }
+                    if (String.IsNullOrEmpty(jobId)) // Caso Haja problema na criação do Job ele retorna ""
+                        continue;
+
+                    var idracJob = new JobController(server);
+                    var idracChassis = new ChassisController(server);
+                    IdracJob job = await idracJob.GetJobAsync(jobId);
+                    Chassis chassis = await idracChassis.GetChassisAsync();
+                    var jobs = (List<ServerJob>)JobsDataGrid.ItemsSource;
+                    jobs.Add(new ServerJob { Server = server, Job = job, SerialNumber = chassis.SKU });
+                    OutputTextBox.AppendText(string.Format("Criado {0} par atualizaçao do servidor {1}", jobId, server));
+                }
+                catch (Exception ex)
+                {
+                    OutputTextBox.AppendText(string.Format("Falha ao atualizar {0} {1}\n", server, ex.Message));
+                }
             }
+            UpdateButton.IsEnabled = true;
         }
 
         private async void UpdateJobsAsync()
         {
             var updatedJobs = new List<ServerJob>();
-            var jobs = (List<ServerJob>) JobsDataGrid.ItemsSource;
+            List<ServerJob> jobs = new List<ServerJob>();
+            jobs.AddRange((List<ServerJob>)JobsDataGrid.ItemsSource);
 
             foreach (var job in jobs)
             {
@@ -169,8 +185,7 @@ namespace Server_Tools.View
                     OutputTextBox.AppendText(string.Format("Falha ao obter dados de {0} {1}\n", job.Server, ex.Message));
                 }
             }
-            jobs = updatedJobs;
-            JobsDataGrid.ItemsSource = jobs;
+            JobsDataGrid.ItemsSource = updatedJobs;
         }
 
 

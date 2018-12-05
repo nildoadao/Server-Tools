@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Server_Tools.View"
         xmlns:wpf="http://schemas.microsoft.com/netfx/2009/xaml/presentation"
         mc:Ignorable="d"
-        Title="Server Tools" Height="700" Width="800" WindowStartupLocation="CenterScreen" Background="#FF3E3E42">
+        Title="Server Tools" Height="700" Width="900" WindowStartupLocation="CenterScreen" Background="#FF3E3E42" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
         <ControlTemplate x:Key="NavigationTemplate" TargetType="Frame">
@@ -25,5 +25,7 @@
             </DockPanel>
         </ControlTemplate>
     </Window.Resources>
-    <Frame Name="MainFrame" Template="{StaticResource NavigationTemplate}"/>
+    <ScrollViewer ScrollViewer.HorizontalScrollBarVisibility="Disabled"  ScrollViewer.VerticalScrollBarVisibility="Auto" MaxWidth="800">
+        <Frame Name="MainFrame" Template="{StaticResource NavigationTemplate}"/>
+    </ScrollViewer>
 </Window>

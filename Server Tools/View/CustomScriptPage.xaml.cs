@@ -17,7 +17,6 @@ namespace Server_Tools.View
     {
         OpenFileDialog CsvDialog;
         OpenFileDialog ScriptDialog;
-        bool operationCancelled;
 
         public CustomScriptPage()
         {
@@ -49,8 +48,17 @@ namespace Server_Tools.View
             Server server = new Server(ServerTextBox.Text, UserTextBox.Text, PasswordBox.Password);
             ServersListBox.Items.Add(server);
             ServerTextBox.Clear();
-            UserTextBox.Clear();
-            PasswordBox.Clear();
+
+            if (!KeepCheckbox.IsChecked.Value)
+            {
+                UserTextBox.Clear();
+                PasswordBox.Clear();
+            }
+        }
+
+        private void ClearButton_Click(object sender, RoutedEventArgs e)
+        {
+            ServersListBox.Items.Clear();
         }
 
         private void RemoveButton_Click(object sender, RoutedEventArgs e)
@@ -80,20 +88,9 @@ namespace Server_Tools.View
                 return;
 
             ApplyButton.IsEnabled = false;
-            foreach(Server server in ServersListBox.Items)
-            {
-                OutputTextBox.AppendText(string.Format("Aplicando script para {0}\n", server.Host));
-                var script = File.ReadAllLines(ScriptTextBox.Text);
-                RunScriptAsync(server, script);
-
-                if (operationCancelled)
-                {
-                    OutputTextBox.AppendText("Operação cancelada pelo usuário\n");
-                    operationCancelled = false;
-                    break;
-                }
-            }
-            ApplyButton.IsEnabled = true;
+            ClearButton.IsEnabled = false;
+            string path = ScriptTextBox.Text;
+            RunScriptAsync(path);
         }
 
         private bool CheckForm()
@@ -111,31 +108,36 @@ namespace Server_Tools.View
             return true;
         }
 
-        private async void RunScriptAsync(Server server, IEnumerable<string> script)
+        private async void RunScriptAsync(string path)
         {
-            if (!await NetworkHelper.CheckConnectionAsync(server.Host))
+            List<Server> servers = new List<Server>();
+            foreach (Server item in ServersListBox.Items)
+                servers.Add(item);
+
+            foreach(Server server in servers)
             {
-                OutputTextBox.AppendText(string.Format("Servidor {0} inacessivel.\n", server.Host));
-                return;
-            }
-            try
-            {
-                var idrac = new IdracSshController(server);
-                foreach (var command in script)
+                if (!await NetworkHelper.CheckConnectionAsync(server.Host))
                 {
-                    idrac.RunCommand(command);
+                    OutputTextBox.AppendText(string.Format("Servidor {0} inacessivel.\n", server.Host));
+                    continue;
+                }
+                try
+                {
+                    OutputTextBox.AppendText(string.Format("Aplicando script para {0}\n", server.Host));
+                    var idrac = new IdracSshController(server);
+                    string[] script = File.ReadAllLines(path);
+                    foreach (var command in script)
+                    {
+                        idrac.RunCommand(command);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    OutputTextBox.AppendText(string.Format("Falha ao executar o script para {0} : {1}\n", server.Host, ex.Message));
                 }
             }
-            catch (Exception ex)
-            {
-                OutputTextBox.AppendText(string.Format("Falha ao executar o script para {0} : {1}\n", server.Host, ex.Message));
-            }
-        }
-
-        private void CancelButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (!operationCancelled)
-                operationCancelled = true;
+            ApplyButton.IsEnabled = true;
+            ClearButton.IsEnabled = true;
         }
 
         private void ScriptDialogButton_Click(object sender, RoutedEventArgs e)

@@ -136,8 +136,11 @@ namespace Server_Tools.Idrac.Controllers
                     FileName = string.Format("\"{0}\"", Path.GetFileName(path)),
                 };
                 fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse("multipart/form-data");
+
+                // Na Idrac 7/8 o update não aceita a boundary entre ""
                 multipartContent.Headers.Remove("Content-Type");               
                 multipartContent.Headers.TryAddWithoutValidation("Content-Type", "multipart/form-data; boundary=" + boundary);
+
                 multipartContent.Add(fileContent);
                 request.Content = multipartContent;
                 using (HttpResponseMessage response = await Client.SendAsync(request))

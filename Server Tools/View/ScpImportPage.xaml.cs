@@ -19,6 +19,7 @@ namespace Server_Tools.View
         OpenFileDialog FileDialog;
         OpenFileDialog CsvDialog;
         DispatcherTimer timer;
+        bool isUpdating;
 
         private class ServerJob
         {
@@ -47,14 +48,16 @@ namespace Server_Tools.View
             JobsDataGrid.ItemsSource = new List<ServerJob>();
             timer = new DispatcherTimer()
             {
-                Interval = new TimeSpan(0, 0, 10)
+                Interval = new TimeSpan(0, 0, 5)
             };
             timer.Tick += Timer_Tick;
             timer.Start();
+            isUpdating = false;
         }
 
         private void Timer_Tick(object sender, EventArgs e)
         {
+            timer.Stop();
             UpdateJobsAsync();
         }
 
@@ -127,6 +130,8 @@ namespace Server_Tools.View
 
         private async void ImportScpAsync(string path, string target, string shutdown)
         {
+            isUpdating = true;
+            timer.Stop();
             List<Server> servers = new List<Server>();
             foreach (Server item in ServersListBox.Items)
                 servers.Add(item);
@@ -155,6 +160,8 @@ namespace Server_Tools.View
                 }
             }
             ImportButton.IsEnabled = true;
+            isUpdating = false;
+            timer.Start();
         }
 
         private void OpenFileButton_Click(object sender, RoutedEventArgs e)
@@ -213,7 +220,10 @@ namespace Server_Tools.View
                     OutputTextBox.AppendText("Falha ao atualizar status dos Jobs\n");
                 }
             }
-            JobsDataGrid.ItemsSource = updatedJobs;
+            if(!isUpdating)
+                JobsDataGrid.ItemsSource = updatedJobs;
+
+            timer.Start();
         }
     }
 }

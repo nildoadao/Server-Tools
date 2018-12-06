@@ -4,6 +4,7 @@ using Server_Tools.Idrac.Models;
 using Server_Tools.Util;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -19,6 +20,7 @@ namespace Server_Tools.View
         OpenFileDialog FirmwareDialog;
         OpenFileDialog CsvDialog;
         DispatcherTimer timer;
+        bool isUpdating;
 
         public FileUpdatePage()
         {
@@ -49,10 +51,11 @@ namespace Server_Tools.View
             JobsDataGrid.ItemsSource = new List<ServerJob>();
             timer = new DispatcherTimer()
             {
-                Interval = new TimeSpan(0, 0, 10)
+                Interval = new TimeSpan(0, 0, 5)
             };
             timer.Tick += Timer_Tick;
             timer.Start();
+            isUpdating = false;
         }
 
         private void CsvDialog_FileOk(object sender, System.ComponentModel.CancelEventArgs e)
@@ -60,9 +63,7 @@ namespace Server_Tools.View
             try
             {
                 foreach(var item in FileHelper.ReadCsvFile(CsvDialog.FileName))
-                {
                     ServersListBox.Items.Add(item);
-                }
             }
             catch
             {
@@ -73,6 +74,7 @@ namespace Server_Tools.View
 
         private void Timer_Tick(object sender, EventArgs e)
         {
+            timer.Stop();            
             UpdateJobsAsync();
         }
 
@@ -141,6 +143,8 @@ namespace Server_Tools.View
 
         private async void UpdateFirmwareAsync(string path, string option)
         {
+            isUpdating = true;
+            timer.Stop();
             List<Server> servers = new List<Server>();
             foreach (Server item in ServersListBox.Items)
                 servers.Add(item);
@@ -161,7 +165,6 @@ namespace Server_Tools.View
                         OutputTextBox.AppendText(string.Format("A versão da Idrac do {0} servidor não possui suporte a função de update de firmware\n", server.Host));
                         continue;
                     }
-
                     OutputTextBox.AppendText(string.Format("Iniciando upload do firmware para {0}...\n", server.Host));
                     ChassisController chassisIdrac = new ChassisController(server);
                     IdracJob job = await idrac.UpdateFirmwareAsync(path, option);
@@ -176,6 +179,8 @@ namespace Server_Tools.View
                 }
             }
             UpdateButton.IsEnabled = true;
+            isUpdating = false;
+            timer.Start();
         }
 
         private bool CheckForm()
@@ -198,7 +203,6 @@ namespace Server_Tools.View
             List<ServerJob> updatedJobs = new List<ServerJob>();
             List<ServerJob> jobs = new List<ServerJob>();
             jobs.AddRange((List<ServerJob>)JobsDataGrid.ItemsSource);
-
             foreach (ServerJob job in jobs)
             {
                 try
@@ -214,7 +218,11 @@ namespace Server_Tools.View
                     OutputTextBox.AppendText("Falha ao atualizar status dos Jobs\n");
                 }
             }
-            JobsDataGrid.ItemsSource = updatedJobs;
+
+            if (!isUpdating)
+                JobsDataGrid.ItemsSource = updatedJobs;
+
+            timer.Start();           
         }
     }
 }

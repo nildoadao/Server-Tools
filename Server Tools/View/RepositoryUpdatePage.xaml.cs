@@ -19,6 +19,7 @@ namespace Server_Tools.View
     {
         FileDialog CsvDialog;
         DispatcherTimer timer;
+        bool isUpdating;
 
         // Classe interna para os dados do DataGrid
 
@@ -44,10 +45,11 @@ namespace Server_Tools.View
             JobsDataGrid.ItemsSource = new List<ServerJob>();
             timer = new DispatcherTimer()
             {
-                Interval = new TimeSpan(0, 0, 10)
+                Interval = new TimeSpan(0, 0, 5)
             };
             timer.Tick += Timer_Tick;
             timer.Start();
+            isUpdating = false;
         }
 
         private void CsvDialog_FileOk(object sender, CancelEventArgs e)
@@ -69,6 +71,7 @@ namespace Server_Tools.View
 
         private void Timer_Tick(object sender, EventArgs e)
         {
+            timer.Stop();
             UpdateJobsAsync();
         }
 
@@ -119,6 +122,8 @@ namespace Server_Tools.View
 
         private async void UpdateFirmwareAsync(string repository, string reboot)
         {
+            isUpdating = true;
+            timer.Stop();
             List<Server> servers = new List<Server>();
             foreach (Server item in ServersListBox.Items)
                 servers.Add(item);
@@ -162,6 +167,8 @@ namespace Server_Tools.View
                 }
             }
             UpdateButton.IsEnabled = true;
+            isUpdating = false;
+            timer.Start();
         }
 
         private async void UpdateJobsAsync()
@@ -185,7 +192,10 @@ namespace Server_Tools.View
                     OutputTextBox.AppendText(string.Format("Falha ao obter dados de {0} {1}\n", job.Server, ex.Message));
                 }
             }
-            JobsDataGrid.ItemsSource = updatedJobs;
+            if(!isUpdating)
+                JobsDataGrid.ItemsSource = updatedJobs;
+
+            timer.Start();
         }
 
 

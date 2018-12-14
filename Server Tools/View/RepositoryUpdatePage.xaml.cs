@@ -9,6 +9,7 @@ using System.Windows.Controls;
 using System.Windows.Threading;
 using System.ComponentModel;
 using Server_Tools.Util;
+using System.Collections.Concurrent;
 
 namespace Server_Tools.View
 {
@@ -19,7 +20,7 @@ namespace Server_Tools.View
     {
         FileDialog CsvDialog;
         DispatcherTimer timer;
-        bool isUpdating;
+        ConcurrentDictionary<string, ServerJob> currentJobs;
 
         // Classe interna para os dados do DataGrid
 
@@ -27,7 +28,7 @@ namespace Server_Tools.View
         {
             public Server Server { get; set; }
             public IdracJob Job { get; set; }
-            public string SerialNumber { get; set; }
+            public string SerialNumber { get; set; }            
         }
 
         public RepositoryUpdatePage()
@@ -37,19 +38,19 @@ namespace Server_Tools.View
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
+            currentJobs = new ConcurrentDictionary<string, ServerJob>();
             CsvDialog = new OpenFileDialog()
             {
                 Filter = "Arquivos CSV|*csv"
             };
             CsvDialog.FileOk += CsvDialog_FileOk;
-            JobsDataGrid.ItemsSource = new List<ServerJob>();
+            JobsDataGrid.ItemsSource = currentJobs.Values;
             timer = new DispatcherTimer()
             {
                 Interval = new TimeSpan(0, 0, 5)
             };
             timer.Tick += Timer_Tick;
             timer.Start();
-            isUpdating = false;
         }
 
         private void CsvDialog_FileOk(object sender, CancelEventArgs e)
@@ -58,9 +59,7 @@ namespace Server_Tools.View
             {
                 var servers = FileHelper.ReadCsvFile(CsvDialog.FileName);
                 foreach (Server server in servers)
-                {
                     ServersListBox.Items.Add(server);
-                }
             }
             catch
             {
@@ -71,7 +70,6 @@ namespace Server_Tools.View
 
         private void Timer_Tick(object sender, EventArgs e)
         {
-            timer.Stop();
             UpdateJobsAsync();
         }
 
@@ -116,14 +114,11 @@ namespace Server_Tools.View
             UpdateButton.IsEnabled = false;
             string reboot = RebootRadioButton.IsChecked.Value ? "TRUE" : "FALSE";
             string repository = FileTextBox.Text;
-            UpdateFirmwareAsync(repository, reboot);
-            
+            UpdateFirmwareAsync(repository, reboot);           
         }
 
         private async void UpdateFirmwareAsync(string repository, string reboot)
         {
-            isUpdating = true;
-            timer.Stop();
             List<Server> servers = new List<Server>();
             foreach (Server item in ServersListBox.Items)
                 servers.Add(item);
@@ -157,8 +152,7 @@ namespace Server_Tools.View
                     var idracChassis = new ChassisController(server);
                     IdracJob job = await idracJob.GetJobAsync(jobId);
                     Chassis chassis = await idracChassis.GetChassisAsync();
-                    var jobs = (List<ServerJob>)JobsDataGrid.ItemsSource;
-                    jobs.Add(new ServerJob { Server = server, Job = job, SerialNumber = chassis.SKU });
+                    currentJobs.TryAdd(job.Id, new ServerJob() { Server = server, Job = job, SerialNumber = chassis.SKU });
                     OutputTextBox.AppendText(string.Format("Criado {0} par atualizaçao do servidor {1}", jobId, server));
                 }
                 catch (Exception ex)
@@ -167,34 +161,34 @@ namespace Server_Tools.View
                 }
             }
             UpdateButton.IsEnabled = true;
-            isUpdating = false;
-            timer.Start();
         }
 
         private async void UpdateJobsAsync()
         {
-            var updatedJobs = new List<ServerJob>();
-            List<ServerJob> jobs = new List<ServerJob>();
-            jobs.AddRange((List<ServerJob>)JobsDataGrid.ItemsSource);
-
-            foreach (var job in jobs)
+            timer.Stop();
+            foreach (var job in currentJobs.Values)
             {
                 try
                 {
                     var idrac = new JobController(job.Server);
                     var updatedJob = await idrac.GetJobAsync(job.Job.Id);
-                    var chassis = new ChassisController(job.Server);
-                    var serial = await chassis.GetChassisAsync();
-                    updatedJobs.Add(new ServerJob { Server = job.Server, Job = updatedJob, SerialNumber = serial.SKU });
+                    currentJobs.AddOrUpdate(job.Job.Id, new ServerJob() { Server = job.Server, Job = updatedJob, SerialNumber = job.SerialNumber },
+                        (key, existingVal) =>
+                        {
+                            existingVal.Job.Message = updatedJob.Message;
+                            existingVal.Job.PercentComplete = updatedJob.PercentComplete;
+                            existingVal.Job.JobState = updatedJob.JobState;
+                            return existingVal;
+                        });
                 }
                 catch(Exception ex)
                 {
                     OutputTextBox.AppendText(string.Format("Falha ao obter dados de {0} {1}\n", job.Server, ex.Message));
+                    timer.Start();
+                    return;
                 }
             }
-            if(!isUpdating)
-                JobsDataGrid.ItemsSource = updatedJobs;
-
+            JobsDataGrid.ItemsSource = currentJobs.Values;
             timer.Start();
         }
 

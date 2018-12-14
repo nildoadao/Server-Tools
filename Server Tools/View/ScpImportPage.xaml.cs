@@ -3,6 +3,7 @@ using Server_Tools.Idrac.Controllers;
 using Server_Tools.Idrac.Models;
 using Server_Tools.Util;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows;
@@ -19,7 +20,7 @@ namespace Server_Tools.View
         OpenFileDialog FileDialog;
         OpenFileDialog CsvDialog;
         DispatcherTimer timer;
-        bool isUpdating;
+        ConcurrentDictionary<string, ServerJob> currentJobs;
 
         private class ServerJob
         {
@@ -35,6 +36,7 @@ namespace Server_Tools.View
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
+            currentJobs = new ConcurrentDictionary<string, ServerJob>();
             FileDialog = new OpenFileDialog()
             {
                 Filter = "Arquivos SCP (*.xml)|*.xml",
@@ -45,19 +47,17 @@ namespace Server_Tools.View
                 Filter = "Arquivos CSV|*csv"
             };
             CsvDialog.FileOk += CsvDialog_FileOk;
-            JobsDataGrid.ItemsSource = new List<ServerJob>();
+            JobsDataGrid.ItemsSource = currentJobs.Values;
             timer = new DispatcherTimer()
             {
                 Interval = new TimeSpan(0, 0, 5)
             };
             timer.Tick += Timer_Tick;
             timer.Start();
-            isUpdating = false;
         }
 
         private void Timer_Tick(object sender, EventArgs e)
         {
-            timer.Stop();
             UpdateJobsAsync();
         }
 
@@ -130,8 +130,6 @@ namespace Server_Tools.View
 
         private async void ImportScpAsync(string path, string target, string shutdown)
         {
-            isUpdating = true;
-            timer.Stop();
             List<Server> servers = new List<Server>();
             foreach (Server item in ServersListBox.Items)
                 servers.Add(item);
@@ -151,17 +149,15 @@ namespace Server_Tools.View
                     OutputTextBox.AppendText(string.Format("Job {0} criado para servidor {1}\n", job.Id, server));
                     var chassisIdrac = new ChassisController(server);
                     var chassis = await chassisIdrac.GetChassisAsync();
-                    var jobs = (List<ServerJob>)JobsDataGrid.ItemsSource;
-                    jobs.Add(new ServerJob { Server = server, Job = job, SerialNumber = chassis.SKU });
+                    currentJobs.TryAdd(job.Id, new ServerJob() { Job = job, SerialNumber = chassis.SKU, Server = server });
                 }
                 catch (Exception ex)
                 {
                     OutputTextBox.AppendText(string.Format("Falha ao importar arquivo para {0} {1}\n", server.Host, ex.Message));
+
                 }
             }
             ImportButton.IsEnabled = true;
-            isUpdating = false;
-            timer.Start();
         }
 
         private void OpenFileButton_Click(object sender, RoutedEventArgs e)
@@ -201,28 +197,30 @@ namespace Server_Tools.View
 
         private async void UpdateJobsAsync()
         {
-            List<ServerJob> updatedJobs = new List<ServerJob>();
-            List<ServerJob> jobs = new List<ServerJob>();
-            jobs.AddRange((List<ServerJob>)JobsDataGrid.ItemsSource);
-
-            foreach(ServerJob job in jobs)
+            timer.Stop();
+            foreach(ServerJob job in currentJobs.Values)
             {
                 try
                 {
                     var idrac = new JobController(job.Server);
                     var updatedJob = await idrac.GetJobAsync(job.Job.Id);
-                    var chassisIdrac = new ChassisController(job.Server);
-                    var chassis = await chassisIdrac.GetChassisAsync();
-                    updatedJobs.Add(new ServerJob { Server = job.Server, Job = updatedJob, SerialNumber = chassis.SKU });
+                    currentJobs.AddOrUpdate(job.Job.Id, new ServerJob() { Server = job.Server, Job = updatedJob, SerialNumber = job.SerialNumber }, 
+                        (key, existingVal) => 
+                        {
+                            existingVal.Job.Message = updatedJob.Message;
+                            existingVal.Job.PercentComplete = updatedJob.PercentComplete;
+                            existingVal.Job.JobState = updatedJob.JobState;
+                            return existingVal;
+                        });                  
                 }
                 catch
                 {
                     OutputTextBox.AppendText("Falha ao atualizar status dos Jobs\n");
+                    timer.Start();
+                    return;
                 }
             }
-            if(!isUpdating)
-                JobsDataGrid.ItemsSource = updatedJobs;
-
+            JobsDataGrid.ItemsSource = currentJobs.Values;
             timer.Start();
         }
     }

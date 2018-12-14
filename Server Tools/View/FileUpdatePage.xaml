@@ -7,7 +7,7 @@
       mc:Ignorable="d" 
       d:DesignHeight="600" d:DesignWidth="800"
       Title="FileUpdatePage" Loaded="Page_Loaded">
-    <ScrollViewer ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto">
+    <WrapPanel>
         <Grid HorizontalAlignment="Center" VerticalAlignment="Top">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -91,7 +91,6 @@
                     </DataGrid>
                 </TabItem>
             </TabControl>
-
         </Grid>
-    </ScrollViewer>
+    </WrapPanel>
 </Page>

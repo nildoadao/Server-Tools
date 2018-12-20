@@ -38,5 +38,10 @@ namespace Server_Tools.View
         {
             NavigationService.Navigate(new ScpImportPage());
         }
+
+        private void TsrButton_Click(object sender, RoutedEventArgs e)
+        {
+            NavigationService.Navigate(new TsrCollectPage());
+        }
     }
 }

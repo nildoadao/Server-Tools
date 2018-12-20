@@ -49,6 +49,12 @@
                         <TextBlock Text="Importar SCP" VerticalAlignment="Center" Foreground="White"/>
                     </StackPanel>
                 </Button>
+                <Button Height="Auto" Width="Auto" Background="Transparent " Margin="50" Name="TsrButton" Click="TsrButton_Click" BorderBrush="Transparent" Cursor="Hand">
+                    <StackPanel>
+                        <Image Source="/Server Tools;component/Resources/logs.png" Width="50"/>
+                        <TextBlock Text="Coletar TSR" VerticalAlignment="Center" Foreground="White"/>
+                    </StackPanel>
+                </Button>
             </WrapPanel>
         </Grid>
     </ScrollViewer>

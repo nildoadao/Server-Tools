@@ -123,6 +123,16 @@ namespace Server_Tools.Properties {
         /// <summary>
         ///   Consulta um recurso localizado do tipo System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap logs {
+            get {
+                object obj = ResourceManager.GetObject("logs", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta um recurso localizado do tipo System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap network_card {
             get {
                 object obj = ResourceManager.GetObject("network_card", resourceCulture);

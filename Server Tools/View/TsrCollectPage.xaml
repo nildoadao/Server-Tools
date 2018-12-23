@@ -58,7 +58,7 @@
                 <ListBox Name="ServersListBox" HorizontalAlignment="Right" Height="250" Margin="5" Width="250"/>
                 <Button Name="ClearButton" Content="Limpar Lista" Width="100" Height="30" Margin="5" HorizontalAlignment="Left" Click="ClearButton_Click"/>
             </StackPanel>
-            <StackPanel Grid.Row="3" Orientation="Vertical">
+            <StackPanel Grid.Row="2" Orientation="Vertical">
                 <TextBlock Text="Conteudo" Foreground="White" Margin="5"/>
                 <CheckBox Content="System Information" Name="SysInfoCheckBox" Foreground="White" Margin="5" />
                 <CheckBox Content="Filtered OS and Application data" Name="OsAppCheckBox" Foreground="White" Margin="5" />
@@ -68,26 +68,9 @@
             <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
                 <Button Name="CollectButton" Content="Coletar" Margin="5" Width="100" Height="30" Click="CollectButton_Click"/>
             </StackPanel>
-            <TabControl Grid.Row="5" Grid.ColumnSpan="3">
-                <TabItem Header="Saida">
-                    <ScrollViewer Margin="5" HorizontalContentAlignment="Left"  HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" CanContentScroll="True" MaxWidth="750" BorderBrush="Transparent">
-                        <TextBox Name="OutputTextBox" Margin="5" Height="150" TextWrapping="Wrap" IsReadOnly="True" BorderBrush="Transparent" Width="750"/>
-                    </ScrollViewer>
-                </TabItem>
-                <TabItem Header="Job">
-                    <DataGrid Name="JobsDataGrid" Height="Auto" VerticalScrollBarVisibility="Auto" AutoGenerateColumns="False" Width="750" MaxWidth="750" Margin="5" CanUserAddRows="False">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="Servidor" Binding="{Binding Server.Host}"/>
-                            <DataGridTextColumn Header="Serial" Binding="{Binding SerialNumber}"/>
-                            <DataGridTextColumn Header="Job ID" Binding="{Binding Job.Id}"/>
-                            <DataGridTextColumn Header="Nome" Binding="{Binding Job.Name}"/>
-                            <DataGridTextColumn Header="Status do Job" Binding="{Binding Job.JobState}"/>
-                            <DataGridTextColumn Header="% Concluido" Binding="{Binding Job.PercentComplete}"/>
-                            <DataGridTextColumn Header="Mensagem" Binding="{Binding Job.Message}"/>
-                        </DataGrid.Columns>
-                    </DataGrid>
-                </TabItem>
-            </TabControl>
+            <ScrollViewer Grid.Row="5" Grid.ColumnSpan="3" Margin="5" HorizontalContentAlignment="Left"  HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" CanContentScroll="True" MaxWidth="750" MaxHeight="150" BorderBrush="Transparent">
+                <TextBox Name="OutputTextBox" Margin="5" Height="150" IsReadOnly="True" BorderBrush="Transparent" Width="750" HorizontalAlignment="Left"/>
+            </ScrollViewer>
         </Grid>
     </ScrollViewer>
 </Page>

@@ -88,8 +88,8 @@
         </StackPanel>
         <TabControl Grid.Row="5" Grid.ColumnSpan="3" Width="750">
             <TabItem Header="Saida">
-                <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" CanContentScroll="True" MaxWidth="700" BorderBrush="Transparent" >
-                    <TextBox Name="OutputTextBox" Margin="5" Height="150" TextWrapping="Wrap" IsReadOnly="True" BorderBrush="Transparent"  HorizontalScrollBarVisibility="Auto" Width="700" HorizontalAlignment="Left"/>
+                <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" CanContentScroll="True" MaxWidth="750" MaxHeight="150" BorderBrush="Transparent" >
+                    <TextBox Name="OutputTextBox" Margin="5" Height="150" TextWrapping="Wrap" IsReadOnly="True" BorderBrush="Transparent"  HorizontalScrollBarVisibility="Auto" Width="750" HorizontalAlignment="Left"/>
                 </ScrollViewer>
             </TabItem>
             <TabItem Header="Jobs">

@@ -6,6 +6,7 @@ using Syroot.Windows.IO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -91,6 +92,9 @@ namespace Server_Tools.View
 
         private void CollectButton_Click(object sender, RoutedEventArgs e)
         {
+            if (!CheckForm())
+                return;
+
             List<string> types = new List<string>();
 
             if (SysInfoCheckBox.IsChecked.Value)
@@ -117,11 +121,12 @@ namespace Server_Tools.View
                 }
                 try
                 {
-                    OutputTextBox.AppendText(string.Format("Coletando Logs de {0}...", server.Host));
+                    OutputTextBox.AppendText(string.Format("Coletando Logs de {0}...\n", server.Host));
                     string collectCommand = string.Format("racadm techsupreport collect -t {0}", type);
                     IdracSshController idrac = new IdracSshController(server);
                     string result = idrac.RunCommand(collectCommand);
-                    string jobId = result.Split('\r').FirstOrDefault();
+                    string jobLine = result.Split('\r').FirstOrDefault();
+                    string jobId = jobLine.Split('=')[1].Trim();
                     IdracJob job = await new JobController(server).GetJobAsync(jobId);
                     var load = new LoadWindow(server, job) { Title = server.Host };
                     load.Closed += (object sender, EventArgs e) =>
@@ -147,7 +152,7 @@ namespace Server_Tools.View
 
             System.Diagnostics.ProcessStartInfo info = new System.Diagnostics.ProcessStartInfo()
             {
-                WindowStyle = System.Diagnostics.ProcessWindowStyle.Maximized,
+                WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden,
                 FileName = "cmd.exe",
                 Arguments = string.Format(@"/C {0}", exportCommand)
             };
@@ -163,6 +168,21 @@ namespace Server_Tools.View
                 OutputTextBox.AppendText(string.Format("Logs de {0} coletados com sucesso ! salvo em {1}\n", server.Host, KnownFolders.Downloads.Path));
             else
                 OutputTextBox.AppendText(string.Format("Falha ao coletar os Logs de {0}\n", server.Host));
+        }
+
+        private bool CheckForm()
+        {
+            if (ServersListBox.Items.Count == 0)
+            {
+                MessageBox.Show("Insira ao menos um servidor para coleta do TSR", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
+                return false;
+            }
+            else if (!OsAppAllCheckBox.IsChecked.Value & !OsAppCheckBox.IsChecked.Value & !TtyLogCheckBox.IsChecked.Value & !SysInfoCheckBox.IsChecked.Value)
+            {
+                MessageBox.Show("Selecione ao menos um item para a coleção", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
+                return false;
+            }
+            return true;
         }
 
     }

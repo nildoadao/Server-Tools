@@ -107,41 +107,40 @@ namespace Server_Tools.View
                 types.Add("TTYLog");
 
             string type = String.Join(",", types);
-            CollectTsrAsync(type);
+
+            foreach (Server server in ServersListBox.Items)
+                CollectAsync(server, type);      
         }
 
-        private async void CollectTsrAsync(string type)
+        private async void CollectAsync(Server server, string type)
         {
-            foreach (Server server in ServersListBox.Items)
+            if (!await NetworkHelper.CheckConnectionAsync(server.Host))
             {
-                if (!await NetworkHelper.CheckConnectionAsync(server.Host))
+                OutputTextBox.AppendText(string.Format("Servidor {0} inacessivel.\n", server.Host));
+                return;
+            }
+            try
+            {
+                OutputTextBox.AppendText(string.Format("Coletando Logs de {0}...\n", server.Host));
+                string collectCommand = string.Format("racadm techsupreport collect -t {0}", type);
+                IdracSshController idrac = new IdracSshController(server);
+                string result = idrac.RunCommand(collectCommand);
+                string jobLine = result.Split('\n').FirstOrDefault();
+                string jobId = jobLine.Split('=')[1].Trim();
+                IdracJob job = await new JobController(server).GetJobAsync(jobId);
+                var load = new LoadWindow(server, job) { Title = server.Host };
+                load.Closed += (object sender, EventArgs e) =>
                 {
-                    OutputTextBox.AppendText(string.Format("Servidor {0} inacessivel.\n", server.Host));
-                    continue;
-                }
-                try
-                {
-                    OutputTextBox.AppendText(string.Format("Coletando Logs de {0}...\n", server.Host));
-                    string collectCommand = string.Format("racadm techsupreport collect -t {0}", type);
-                    IdracSshController idrac = new IdracSshController(server);
-                    string result = idrac.RunCommand(collectCommand);
-                    string jobLine = result.Split('\r').FirstOrDefault();
-                    string jobId = jobLine.Split('=')[1].Trim();
-                    IdracJob job = await new JobController(server).GetJobAsync(jobId);
-                    var load = new LoadWindow(server, job) { Title = server.Host };
-                    load.Closed += (object sender, EventArgs e) =>
-                    {
-                        var window = (LoadWindow)sender;
-                        job = window.Job;
-                        if (job.JobState.Contains("Completed"))
-                            ExportTsr(server);
-                    };
-                    load.Show();
-                }
-                catch(Exception ex)
-                {
-                    OutputTextBox.AppendText(string.Format("Falha ao coletar TSR de {0}, {1}\n", server.Host, ex.Message));
-                }
+                    var window = (LoadWindow)sender;
+                    job = window.Job;
+                    if (job.JobState.Contains("Completed"))
+                        ExportTsr(server);
+                };
+                load.Show();
+            }
+            catch (Exception ex)
+            {
+                OutputTextBox.AppendText(string.Format("Falha ao coletar TSR de {0}, {1}\n", server.Host, ex.Message));
             }
         }
 

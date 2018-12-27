@@ -5,6 +5,7 @@ using Server_Tools.Util;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -82,7 +83,7 @@ namespace Server_Tools.View
             }
         }
 
-        private void ApplyButton_Click(object sender, RoutedEventArgs e)
+        private async void ApplyButton_Click(object sender, RoutedEventArgs e)
         {
             if (!CheckForm())
                 return;
@@ -90,7 +91,7 @@ namespace Server_Tools.View
             ApplyButton.IsEnabled = false;
             ClearButton.IsEnabled = false;
             string path = ScriptTextBox.Text;
-            RunScriptAsync(path);
+            await RunScriptAsync(path);
         }
 
         private bool CheckForm()
@@ -108,13 +109,9 @@ namespace Server_Tools.View
             return true;
         }
 
-        private async void RunScriptAsync(string path)
+        private async Task RunScriptAsync(string path)
         {
-            List<Server> servers = new List<Server>();
-            foreach (Server item in ServersListBox.Items)
-                servers.Add(item);
-
-            foreach(Server server in servers)
+            foreach(Server server in ServersListBox.Items)
             {
                 if (!await NetworkHelper.CheckConnectionAsync(server.Host))
                 {

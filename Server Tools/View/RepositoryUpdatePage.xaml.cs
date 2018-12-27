@@ -10,6 +10,7 @@ using System.Windows.Threading;
 using System.ComponentModel;
 using Server_Tools.Util;
 using System.Collections.Concurrent;
+using System.Threading.Tasks;
 
 namespace Server_Tools.View
 {
@@ -68,9 +69,9 @@ namespace Server_Tools.View
             }
         }
 
-        private void Timer_Tick(object sender, EventArgs e)
+        private async void Timer_Tick(object sender, EventArgs e)
         {
-            UpdateJobsAsync();
+            await UpdateJobsAsync();
         }
 
         private void AddButton_Click(object sender, RoutedEventArgs e)
@@ -106,7 +107,7 @@ namespace Server_Tools.View
             CsvDialog.ShowDialog();
         }
 
-        private void UpdateButton_Click(object sender, RoutedEventArgs e)
+        private async void UpdateButton_Click(object sender, RoutedEventArgs e)
         {
             if (!CheckForm())
                 return;
@@ -114,16 +115,12 @@ namespace Server_Tools.View
             UpdateButton.IsEnabled = false;
             string reboot = RebootRadioButton.IsChecked.Value ? "TRUE" : "FALSE";
             string repository = FileTextBox.Text;
-            UpdateFirmwareAsync(repository, reboot);           
+            await UpdateFirmwareAsync(repository, reboot);           
         }
 
-        private async void UpdateFirmwareAsync(string repository, string reboot)
+        private async Task UpdateFirmwareAsync(string repository, string reboot)
         {
-            List<Server> servers = new List<Server>();
-            foreach (Server item in ServersListBox.Items)
-                servers.Add(item);
-
-            foreach (Server server in servers)
+            foreach (Server server in ServersListBox.Items)
             {
                 if (!await NetworkHelper.CheckConnectionAsync(server.Host))
                 {
@@ -163,7 +160,7 @@ namespace Server_Tools.View
             UpdateButton.IsEnabled = true;
         }
 
-        private async void UpdateJobsAsync()
+        private async Task UpdateJobsAsync()
         {
             timer.Stop();
             foreach (var job in currentJobs.Values)

@@ -73,9 +73,9 @@ namespace Server_Tools.View
             }            
         }
 
-        private void Timer_Tick(object sender, EventArgs e)
+        private async void Timer_Tick(object sender, EventArgs e)
         {           
-            UpdateJobsAsync();
+            await UpdateJobsAsync();
         }
 
         private void FirmwareDialog_FileOk(object sender, System.ComponentModel.CancelEventArgs e)
@@ -83,7 +83,7 @@ namespace Server_Tools.View
             FirmwareTextBox.Text = FirmwareDialog.FileName;
         }
 
-        private void UpdateButton_Click(object sender, RoutedEventArgs e)
+        private async void UpdateButton_Click(object sender, RoutedEventArgs e)
         {
             if (!CheckForm())
                 return;
@@ -99,7 +99,7 @@ namespace Server_Tools.View
                     break;
                 }
             }
-            UpdateFirmwareAsync(firmware, option);
+            await UpdateFirmwareAsync(firmware, option);
         }
 
         private void AddButton_Click(object sender, RoutedEventArgs e)
@@ -141,13 +141,9 @@ namespace Server_Tools.View
             FirmwareDialog.ShowDialog();
         }
 
-        private async void UpdateFirmwareAsync(string path, string option)
+        private async Task UpdateFirmwareAsync(string path, string option)
         {
-            List<Server> servers = new List<Server>();
-            foreach (Server item in ServersListBox.Items)
-                servers.Add(item);
-
-            foreach (Server server in servers)
+            foreach (Server server in ServersListBox.Items)
             {
                 if (!await NetworkHelper.CheckConnectionAsync(server.Host))
                 {
@@ -193,7 +189,7 @@ namespace Server_Tools.View
             return true;
         }
 
-        private async void UpdateJobsAsync()
+        private async Task UpdateJobsAsync()
         {
             timer.Stop();
             foreach (ServerJob job in currentJobs.Values)

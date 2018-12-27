@@ -4,6 +4,7 @@ using Server_Tools.Util;
 using Syroot.Windows.IO;
 using System;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -19,7 +20,7 @@ namespace Server_Tools.View
             InitializeComponent();
         }
 
-        private void ExportButton_Click(object sender, RoutedEventArgs e)
+        private async void ExportButton_Click(object sender, RoutedEventArgs e)
         {
             if (!CheckForm())
                 return;
@@ -44,10 +45,10 @@ namespace Server_Tools.View
                 }
             }
             Server server = new Server(ServerTextBox.Text, UserTextBox.Text, PasswordBox.Password);
-            ExportScpFileAsync(server, target, exportUse);
+            await ExportScpFileAsync(server, target, exportUse);
         }
 
-        private async void ExportScpFileAsync(Server server, string target, string exportUse)
+        private async Task ExportScpFileAsync(Server server, string target, string exportUse)
         {
             if (!await NetworkHelper.CheckConnectionAsync(server.Host))
             {
@@ -61,12 +62,12 @@ namespace Server_Tools.View
                 OutputTextBox.AppendText(string.Format("Exportando configurações de {0}...\n", server.Host));
                 IdracJob job = await idrac.ExportScpFileAsync(target, exportUse);
                 var load = new LoadWindow(server, job) { Title = server.Host };
-                load.Closed += (object sender, EventArgs e) =>
+                load.Closed += async (object sender, EventArgs e) =>
                 {
                     var window = (LoadWindow) sender;
                     job = window.Job;
                     if (job.JobState.Contains("Completed"))
-                        SaveFileAsync(server, job);
+                        await SaveFileAsync(server, job);
                 };
                 load.Show();
             }
@@ -77,7 +78,7 @@ namespace Server_Tools.View
             }           
         }
 
-        private async void SaveFileAsync(Server server, IdracJob job)
+        private async Task SaveFileAsync(Server server, IdracJob job)
         {
             try
             {

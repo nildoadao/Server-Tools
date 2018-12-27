@@ -6,6 +6,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
@@ -56,9 +57,9 @@ namespace Server_Tools.View
             timer.Start();
         }
 
-        private void Timer_Tick(object sender, EventArgs e)
+        private async void Timer_Tick(object sender, EventArgs e)
         {
-            UpdateJobsAsync();
+            await UpdateJobsAsync();
         }
 
         private void FileDialog_FileOk(object sender, System.ComponentModel.CancelEventArgs e)
@@ -100,7 +101,7 @@ namespace Server_Tools.View
             CsvDialog.ShowDialog();
         }
 
-        private void ImportButton_Click(object sender, RoutedEventArgs e)
+        private async void ImportButton_Click(object sender, RoutedEventArgs e)
         {
             if (!CheckForm())
                 return;
@@ -125,16 +126,12 @@ namespace Server_Tools.View
                 }
             }
             string path = FileTextBox.Text;
-            ImportScpAsync(path, target, shutdown);                  
+            await ImportScpAsync(path, target, shutdown);                  
         }
 
-        private async void ImportScpAsync(string path, string target, string shutdown)
+        private async Task ImportScpAsync(string path, string target, string shutdown)
         {
-            List<Server> servers = new List<Server>();
-            foreach (Server item in ServersListBox.Items)
-                servers.Add(item);
-
-            foreach (Server server in servers)
+            foreach (Server server in ServersListBox.Items)
             {
                 if (!await NetworkHelper.CheckConnectionAsync(server.Host))
                 {
@@ -154,7 +151,6 @@ namespace Server_Tools.View
                 catch (Exception ex)
                 {
                     OutputTextBox.AppendText(string.Format("Falha ao importar arquivo para {0} {1}\n", server.Host, ex.Message));
-
                 }
             }
             ImportButton.IsEnabled = true;
@@ -195,7 +191,7 @@ namespace Server_Tools.View
                 return true;
         }
 
-        private async void UpdateJobsAsync()
+        private async Task UpdateJobsAsync()
         {
             timer.Stop();
             foreach(ServerJob job in currentJobs.Values)

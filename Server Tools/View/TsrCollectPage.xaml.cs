@@ -90,7 +90,7 @@ namespace Server_Tools.View
             ServersListBox.Items.Clear();
         }
 
-        private void CollectButton_Click(object sender, RoutedEventArgs e)
+        private async void CollectButton_Click(object sender, RoutedEventArgs e)
         {
             if (!CheckForm())
                 return;
@@ -107,18 +107,26 @@ namespace Server_Tools.View
                 types.Add("TTYLog");
 
             string type = String.Join(",", types);
-
-            foreach (Server server in ServersListBox.Items)
-                CollectAsync(server, type);      
+            await RunAsync(type);      
         }
 
-        private async void CollectAsync(Server server, string type)
+        private async Task RunAsync(string type)
         {
-            if (!await NetworkHelper.CheckConnectionAsync(server.Host))
+            List<Task> tasks = new List<Task>();
+            foreach (Server server in ServersListBox.Items)
             {
-                OutputTextBox.AppendText(string.Format("Servidor {0} inacessivel.\n", server.Host));
-                return;
+                if (!await NetworkHelper.CheckConnectionAsync(server.Host))
+                {
+                    OutputTextBox.AppendText(string.Format("Servidor {0} inacessivel.\n", server.Host));
+                    continue;
+                }               
+                tasks.Add(CollectAsync(server, type));
             }
+            await Task.WhenAll(tasks);
+        }
+
+        private async Task CollectAsync(Server server, string type)
+        {
             try
             {
                 OutputTextBox.AppendText(string.Format("Coletando Logs de {0}...\n", server.Host));

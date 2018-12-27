@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Navigation;
@@ -70,7 +71,7 @@ namespace Server_Tools.View
             NavigationService.Navigate(new CreateRaidPage(server));
         }
 
-        private void DeleteVdButton_Click(object sender, RoutedEventArgs e)
+        private async void DeleteVdButton_Click(object sender, RoutedEventArgs e)
         {
             if (!CheckForm())
                 return;
@@ -87,18 +88,20 @@ namespace Server_Tools.View
 
             if (MessageBox.Show("Deseja mesmo excluir o volume selecionado ?", "Aviso", MessageBoxButton.OKCancel, MessageBoxImage.Question) == MessageBoxResult.OK)
             {
-                DeleteVdAsync(selectedVolumes.FirstOrDefault());
+                await DeleteVdAsync(selectedVolumes.FirstOrDefault());
             }
         }
       
-        private void UpdateForm()
+        private async void UpdateForm()
         {
-            UpdateDisksAsync();
-            UpdateControllersAsync();
-            UpdateVirtualDisksAsync();
+            List<Task> tasks = new List<Task>();
+            tasks.Add(UpdateDisksAsync());
+            tasks.Add(UpdateControllersAsync());
+            tasks.Add(UpdateVirtualDisksAsync());
+            await Task.WhenAll(tasks);
         }
 
-        private async void UpdateDisksAsync()
+        private async Task UpdateDisksAsync()
         {
             try
             {
@@ -115,7 +118,7 @@ namespace Server_Tools.View
             }
         }
 
-        private async void UpdateControllersAsync()
+        private async Task UpdateControllersAsync()
         {
             try
             {
@@ -132,7 +135,7 @@ namespace Server_Tools.View
             }
         }
 
-        private async void UpdateVirtualDisksAsync()
+        private async Task UpdateVirtualDisksAsync()
         {
             try
             {
@@ -164,7 +167,7 @@ namespace Server_Tools.View
             return unassigned.Count();
         }
 
-        private async void DeleteVdAsync(VirtualDisk volume)
+        private async Task DeleteVdAsync(VirtualDisk volume)
         {
             try
             {

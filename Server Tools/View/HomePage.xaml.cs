@@ -43,5 +43,10 @@ namespace Server_Tools.View
         {
             NavigationService.Navigate(new TsrCollectPage());
         }
+
+        private void OsButton_Click(object sender, RoutedEventArgs e)
+        {
+            NavigationService.Navigate(new OsInstallPage());
+        }
     }
 }

@@ -24,7 +24,7 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>12</ApplicationRevision>
+    <ApplicationRevision>13</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -144,6 +144,9 @@
     <Compile Include="View\LoadWindow.xaml.cs">
       <DependentUpon>LoadWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\OsInstallPage.xaml.cs">
+      <DependentUpon>OsInstallPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\RepositoryUpdatePage.xaml.cs">
       <DependentUpon>RepositoryUpdatePage.xaml</DependentUpon>
     </Compile>
@@ -194,6 +197,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="View\LoadWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\OsInstallPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -310,6 +317,15 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\logs.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\linux.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\windows.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\os.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

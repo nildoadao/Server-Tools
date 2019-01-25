@@ -55,6 +55,12 @@
                         <TextBlock Text="Coletar TSR" VerticalAlignment="Center" Foreground="White"/>
                     </StackPanel>
                 </Button>
+                <Button Height="Auto" Width="Auto" Background="Transparent " Margin="50" Name="OsButton" Click="OsButton_Click" BorderBrush="Transparent" Cursor="Hand">
+                    <StackPanel>
+                        <Image Source="/Server Tools;component/Resources/os.png"  Width="96"/>
+                        <TextBlock Text="Instalação de S.O" VerticalAlignment="Center" Foreground="White"/>
+                    </StackPanel>
+                </Button>
             </WrapPanel>
         </Grid>
     </ScrollViewer>

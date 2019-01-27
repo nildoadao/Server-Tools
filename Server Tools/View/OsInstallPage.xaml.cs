@@ -111,7 +111,7 @@ namespace Server_Tools.View
         {
             if (ServersListBox.Items.Count == 0)
             {
-                MessageBox.Show("Insira ao menos um servidor para coleta do TSR", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("Insira ao menos um servidor para a instalação do S.O", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
                 return false;
             }
             if(String.IsNullOrEmpty(ImageTextBox.Text) || String.IsNullOrEmpty(ShareUserTextBox.Text) || String.IsNullOrEmpty(SharePasswordBox.Password))
@@ -124,15 +124,21 @@ namespace Server_Tools.View
 
         private async void InstallButton_Click(object sender, RoutedEventArgs e)
         {
+            if (!CheckForm())
+                return;
+
+            InstallButton.IsEnabled = false;
+
             List<Task> tasks = new List<Task>();
             foreach(Server server in ServersListBox.Items)
             {
-                tasks.Add(InstallImage(server, ImageTextBox.Text, ShareUserTextBox.Text, SharePasswordBox.Password));
+                tasks.Add(InstallOs(server, ImageTextBox.Text, ShareUserTextBox.Text, SharePasswordBox.Password));
             }
             await Task.WhenAll(tasks);
+            InstallButton.IsEnabled = true;
         }
 
-        private Task InstallImage(Server server, string image, string user, string password)
+        private Task InstallOs(Server server, string image, string user, string password)
         {
             OutputTextBox.AppendText(string.Format("Iniciando instalação para {0}\n", server.Host));
 
@@ -145,8 +151,8 @@ namespace Server_Tools.View
                     string command = string.Format("racadm remoteimage -c -u {0} -p {1} -l {2}", user, password, image);
 
                     idrac.RunCommand(command);
-                    idrac.RunCommand("racadm set BIOS.OneTimeBoot.OneTimeBootMode OneTimeBootSeq");
-                    idrac.RunCommand("racadm set BIOS.OneTimeBoot.OneTimeBootDev VCD-DVD");
+                    idrac.RunCommand("racadm set iDRAC.serverboot.FirstBootDevice VCD-DVD");
+                    idrac.RunCommand("racadm set iDRAC.serverboot.BootOnce 1");
 
                     if (GetPowerStatus(server).Equals("ON"))
                         idrac.RunCommand("racadm serveraction powercycle");
@@ -166,6 +172,18 @@ namespace Server_Tools.View
                     });
                 }
             });            
+        }
+
+        /// <summary>
+        /// Retorna a iDRAC para a condição anterior
+        /// </summary>
+        /// <param name="server">Dados do servidor</param>
+        private void RestoreIdrac(Server server)
+        {
+            IdracSshController idrac = new IdracSshController(server);
+            idrac.RunCommand("racadm -d remoteimage");
+            idrac.RunCommand("racadm set iDRAC.serverboot.FirstBootDevice Normal");
+            idrac.RunCommand("racadm set iDRAC.serverboot.BootOnce 0");
         }
 
         private string GetPowerStatus(Server server)

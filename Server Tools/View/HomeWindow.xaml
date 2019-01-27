@@ -10,13 +10,18 @@
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
         <ControlTemplate x:Key="NavigationTemplate" TargetType="Frame">
-            <DockPanel Margin="5">
+            <DockPanel>
+                <Menu DockPanel.Dock="Top">
+                    <MenuItem Header="_Arquivo"/>
+                    <MenuItem Header="_Ajuda">
+                        <MenuItem Header="_Exemplos"/>
+                        <Separator/>
+                        <MenuItem Header="_Sobre Server Tools"/>
+                    </MenuItem>
+                </Menu>
                 <StackPanel Margin="5" Orientation="Horizontal" DockPanel.Dock="Top">
                     <Button Name="BackButton" Command="{x:Static NavigationCommands.BrowseBack}" Visibility="{TemplateBinding CanGoBack, Converter={StaticResource BoolToVis}}" Height="Auto" Width="Auto" Background="#00808080" BorderBrush="Transparent" Foreground="#00808080">
                         <Image  Width="30" Source="/Server Tools;component/Resources/back.png"/>
-                    </Button>
-                    <Button Name="FowardButton"  Command="{x:Static NavigationCommands.BrowseForward}" Visibility="{TemplateBinding CanGoForward, Converter={StaticResource BoolToVis}}" Height="Auto" Width="Auto" Background="#00000000" BorderBrush="Transparent" Foreground="Transparent">
-                        <Image  Width="30" Source="/Server Tools;component/Resources/forward.png"/>
                     </Button>
                 </StackPanel>
                 <Border BorderBrush="CadetBlue" BorderThickness="1" Padding="5" CornerRadius="5">
@@ -25,7 +30,7 @@
             </DockPanel>
         </ControlTemplate>
     </Window.Resources>
-    <ScrollViewer ScrollViewer.HorizontalScrollBarVisibility="Disabled"  ScrollViewer.VerticalScrollBarVisibility="Auto" MaxWidth="800">
+    <ScrollViewer ScrollViewer.HorizontalScrollBarVisibility="Disabled"  ScrollViewer.VerticalScrollBarVisibility="Auto">
         <Frame Name="MainFrame" Template="{StaticResource NavigationTemplate}"/>
     </ScrollViewer>
 </Window>

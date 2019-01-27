@@ -7,7 +7,7 @@
       mc:Ignorable="d" 
       d:DesignHeight="600" d:DesignWidth="800"
       Title="FileUpdatePage" Loaded="Page_Loaded">
-    <WrapPanel>
+    <ScrollViewer HorizontalAlignment="Center" VerticalAlignment="Top" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto">
         <Grid HorizontalAlignment="Center" VerticalAlignment="Top">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -71,7 +71,7 @@
                 <TextBox Name="FirmwareTextBox" Width="200" Margin="5"/>
                 <Button Name="OpenFirmwareButton" Content="..." Width="30" Margin="5" Click="OpenFirmwareButton_Click"/>
             </StackPanel>
-            <TabControl Grid.Row="5" Grid.ColumnSpan="3">
+            <TabControl Grid.Row="5" Grid.ColumnSpan="3" HorizontalAlignment="Left" VerticalAlignment="Center">
                 <TabItem Header="Saida">
                     <ScrollViewer Margin="5" HorizontalContentAlignment="Left"  HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" CanContentScroll="True" MaxWidth="750" BorderBrush="Transparent">
                         <TextBox Name="OutputTextBox" Margin="5" Height="150" TextWrapping="Wrap" IsReadOnly="True" BorderBrush="Transparent" Width="750"/>
@@ -92,5 +92,5 @@
                 </TabItem>
             </TabControl>
         </Grid>
-    </WrapPanel>
+    </ScrollViewer>
 </Page>

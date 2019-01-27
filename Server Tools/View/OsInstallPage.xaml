@@ -23,7 +23,7 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <TextBlock Text="Instalação OS" FontSize="28" HorizontalAlignment="Center" Margin="20" Height="50" FontWeight="DemiBold" Grid.ColumnSpan="3" Foreground="White"/>
+            <TextBlock Text="Instalação S.O" FontSize="28" HorizontalAlignment="Center" Margin="20" Height="50" FontWeight="DemiBold" Grid.ColumnSpan="3" Foreground="White"/>
             <GroupBox Header="Dados da Idrac" HorizontalAlignment="Left" Height="Auto" Margin="5" VerticalAlignment="Top" Width="Auto" Grid.Row="1" Foreground="White" >
                 <Grid>
                     <Grid.RowDefinitions>

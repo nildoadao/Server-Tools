@@ -14,9 +14,6 @@
                     <Button Name="BackButton" Command="{x:Static NavigationCommands.BrowseBack}" Visibility="{TemplateBinding CanGoBack, Converter={StaticResource BoolToVis}}" Height="Auto" Width="Auto" Background="#00808080" BorderBrush="Transparent" Foreground="#00808080">
                         <Image  Width="30" Source="/Server Tools;component/Resources/back.png"/>
                     </Button>
-                    <Button Name="FowardButton"  Command="{x:Static NavigationCommands.BrowseForward}" Visibility="{TemplateBinding CanGoForward, Converter={StaticResource BoolToVis}}" Height="Auto" Width="Auto" Background="#00000000" BorderBrush="Transparent" Foreground="Transparent">
-                        <Image  Width="30" Source="/Server Tools;component/Resources/forward.png"/>
-                    </Button>
                 </StackPanel>
                 <Border BorderBrush="CadetBlue" Margin="7" BorderThickness="1" Padding="5" CornerRadius="5">
                     <ContentPresenter />

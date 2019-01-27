@@ -115,10 +115,11 @@ namespace Server_Tools.View
             UpdateButton.IsEnabled = false;
             string reboot = RebootRadioButton.IsChecked.Value ? "TRUE" : "FALSE";
             string repository = FileTextBox.Text;
-            await UpdateFirmwareAsync(repository, reboot);           
+            string catalog = CatalogTextBox.Text;
+            await UpdateFirmwareAsync(repository, catalog, reboot);           
         }
 
-        private async Task UpdateFirmwareAsync(string repository, string reboot)
+        private async Task UpdateFirmwareAsync(string repository, string catalog, string reboot)
         {
             foreach (Server server in ServersListBox.Items)
             {
@@ -132,7 +133,7 @@ namespace Server_Tools.View
                     OutputTextBox.AppendText(string.Format("Atualizando firmwares de {0}...\n", server));
                     string jobId = "";
                     var idrac = new IdracSshController(server);
-                    string command = string.Format(@"racadm update -f Catalog.xml.gz -e {0} -a {1} -t FTP", repository, reboot);
+                    string command = string.Format(@"racadm update -f {0} -e {1} -a {2} -t FTP", catalog, repository, reboot);
                     string response = idrac.RunCommand(command);
                     foreach (var item in response.Split(' '))
                     {
@@ -150,7 +151,7 @@ namespace Server_Tools.View
                     IdracJob job = await idracJob.GetJobAsync(jobId);
                     Chassis chassis = await idracChassis.GetChassisAsync();
                     currentJobs.TryAdd(job.Id, new ServerJob() { Server = server, Job = job, SerialNumber = chassis.SKU });
-                    OutputTextBox.AppendText(string.Format("Criado {0} par atualizaçao do servidor {1}", jobId, server));
+                    OutputTextBox.AppendText(string.Format("Criado {0} para atualizaçao do servidor {1}\n", jobId, server));
                 }
                 catch (Exception ex)
                 {
@@ -197,6 +198,11 @@ namespace Server_Tools.View
             if (ServersListBox.Items.Count == 0)
             {
                 MessageBox.Show("Selecione ao menos um servidor para atualização", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
+                return false;
+            }
+            if(String.IsNullOrEmpty(CatalogTextBox.Text) || String.IsNullOrEmpty(FileTextBox.Text))
+            {
+                MessageBox.Show("Preencha os dados do repositório", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
                 return false;
             }
             else

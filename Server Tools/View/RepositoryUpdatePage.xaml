@@ -17,7 +17,6 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
@@ -68,20 +67,34 @@
                 </GroupBox>
             </StackPanel>
             <StackPanel Grid.Row="3" Orientation="Horizontal">
-                <TextBlock Text="Repositório: " Margin="5" Grid.Column="3" Foreground="White" VerticalAlignment="Center"/>
-                <TextBox Name="FileTextBox" Width="200" Margin="5" VerticalAlignment="Center" Text="ftp.dell.com/Catalog"/>
+                <GroupBox Header="Dados do Repositório" Width="Auto" Foreground="White">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Repositório: " Margin="5" Foreground="White"/>
+                        <TextBox Name="FileTextBox" Grid.Column="1" Width="200" Margin="5" Text="ftp.dell.com/Catalog"/>
+                        <TextBlock Text="Catalogo:" Grid.Row="1" Margin="5" Foreground="White" VerticalAlignment="Center"/>
+                        <TextBox Name="CatalogTextBox" Text="Catalog.xml.gz"  Grid.Row="1" Grid.Column="1" Width="150" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                    </Grid>
+                </GroupBox>
             </StackPanel>
             <StackPanel Grid.Row="4" Width="Auto" Orientation="Horizontal">
                 <Button Name="UpdateButton" Content="Atualizar" Margin="5"  Width="100" Height="30" HorizontalAlignment="Left" Click="UpdateButton_Click"/>
             </StackPanel>
             <TabControl Grid.Row="5" Grid.ColumnSpan="3" HorizontalAlignment="Left">
                 <TabItem Header="Saida">
-                    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" CanContentScroll="True" MaxWidth="700" BorderBrush="Transparent" >
-                        <TextBox Name="OutputTextBox" HorizontalAlignment="Left" Margin="5" Height="150" TextWrapping="Wrap" IsReadOnly="True" BorderBrush="Transparent" Width="700"/>
+                    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" CanContentScroll="True" MaxWidth="750" BorderBrush="Transparent" >
+                        <TextBox Name="OutputTextBox" HorizontalAlignment="Left" Margin="5" Height="150" TextWrapping="Wrap" IsReadOnly="True" BorderBrush="Transparent" Width="750"/>
                     </ScrollViewer>
                 </TabItem>
                 <TabItem Header="Jobs">
-                    <DataGrid Name="JobsDataGrid" Height="Auto" VerticalScrollBarVisibility="Auto" AutoGenerateColumns="False" Width="700" MaxWidth="700" Margin="5" CanUserAddRows="False">
+                    <DataGrid Name="JobsDataGrid" Height="Auto" VerticalScrollBarVisibility="Auto" AutoGenerateColumns="False" Width="750" MaxWidth="750" Margin="5" CanUserAddRows="False">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Servidor" Binding="{Binding Server.Host}"/>
                             <DataGridTextColumn Header="Serial" Binding="{Binding SerialNumber}"/>
